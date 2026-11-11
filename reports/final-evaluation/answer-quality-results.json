@@ -1,0 +1,3011 @@
+{
+  "generated_utc": "2026-11-11T14:13:51.370902+00:00",
+  "measurement_type": "real_groq_end_to_end",
+  "simulated": false,
+  "model": "openai/gpt-oss-20b",
+  "prompt_version": "relay-phase3-v1",
+  "conditions": {
+    "strategy": "bm25",
+    "preset": 600,
+    "evidence_tokens": 3000,
+    "max_tool_calls": 2,
+    "request_timeout_seconds": 40.0,
+    "turn_timeout_seconds": 180.0,
+    "temperature": 0,
+    "seed": 0
+  },
+  "questions_source": "reports\\phase3\\evaluation\\questions.json",
+  "counts": {
+    "total": 20,
+    "answerable": 12,
+    "unanswerable": 8,
+    "answered": 5,
+    "refused": 8,
+    "failed": 7
+  },
+  "grade_status": "pending_manual_review",
+  "grade_values": [
+    "correct",
+    "refused_correctly",
+    "refused_wrongly",
+    "wrong"
+  ],
+  "known_source_conflicts": {
+    "A4": {
+      "description": "Attention Is All You Need reports English-to-French BLEU 41.8 in Table 2 and 41.0 in the prose on physical page 8. The conflict must not be silently hidden or resolved by inventing a third value.",
+      "table_2": {
+        "page": 8,
+        "english_to_german": 28.4,
+        "english_to_french": 41.8,
+        "verified_quote": "Transformer (big) | 28.4 | 41.8"
+      },
+      "prose": {
+        "page": 8,
+        "english_to_french": 41.0,
+        "verified_quote": "our big model achieves a BLEU score of 41.0, outperforming all of the previously published single models"
+      },
+      "provenance": "reports/rag/audit-2026-11-11/questions.json (A2) and direct PDF page 8 check",
+      "review_requirement": "Identify the discrepancy explicitly in the final review."
+    }
+  },
+  "results": [
+    {
+      "id": "A1",
+      "category": "answerable",
+      "question": "What theoretical and practical latency figures does Moshi report?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1",
+      "note": null,
+      "status": "answered",
+      "answer": "Moshi’s theoretical latency is 160 ms. [S1]\nMoshi’s practical latency is 200 ms. [S1]\nThe minimal achievable latency with Moshi’s Mimi tokens at 12.5 Hz is 80 ms. [S2]",
+      "claims": [
+        {
+          "text": "Moshi’s theoretical latency is 160 ms.",
+          "citations": [
+            {
+              "source_id": "S1",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                1
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+              "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+              "char_start": 1805,
+              "quote": "Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi."
+            }
+          ]
+        },
+        {
+          "text": "Moshi’s practical latency is 200 ms.",
+          "citations": [
+            {
+              "source_id": "S1",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                1
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+              "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+              "char_start": 1805,
+              "quote": "Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi."
+            }
+          ]
+        },
+        {
+          "text": "The minimal achievable latency with Moshi’s Mimi tokens at 12.5 Hz is 80 ms.",
+          "citations": [
+            {
+              "source_id": "S2",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                26
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=26",
+              "chunk_id": "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+              "char_start": 79533,
+              "quote": "The [0, 0, 0, 0, 0, 0, 0, 0] pattern represents the\nminimal latency of 80ms that can be obtained with Mimi tokens at 12.5Hz."
+            }
+          ]
+        }
+      ],
+      "supporting": {
+        "papers": [
+          "Moshi: a speech-text foundation model for real-time dialogue"
+        ],
+        "pages": [
+          "arXiv:2410.00037 p. 1",
+          "arXiv:2410.00037 p. 26"
+        ],
+        "labels": [
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)",
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 26)"
+        ]
+      },
+      "citation_validation": {
+        "status": "valid",
+        "claim_count": 3,
+        "citation_count": 3,
+        "quotes_present": true,
+        "numbers_supported": true,
+        "errors": []
+      },
+      "citations": [
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            1
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+          "quote": "Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)"
+        },
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            1
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+          "quote": "Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)"
+        },
+        {
+          "source_id": "S2",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            26
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=26",
+          "quote": "The [0, 0, 0, 0, 0, 0, 0, 0] pattern represents the\nminimal latency of 80ms that can be obtained with Mimi tokens at 12.5Hz.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 26)"
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 12879.494,
+        "ttft_ms": 12699.922,
+        "generation_first_token_ms": 610.523,
+        "retrieval_ms": 10617.764,
+        "evidence_selection_ms": 20.862,
+        "citation_validation_ms": 1.299,
+        "planning_ms": 1356.046,
+        "generation_ms": 884.339,
+        "input_tokens": 3063,
+        "output_tokens": 328,
+        "known_input_tokens": 3063,
+        "known_output_tokens": 328,
+        "evidence_tokens": 1639,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_501b2f56-f87e-4be7-9df3-bfe28ec633ef",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+            "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+            "a9981e96fd148b63ced7f46c02ccd5878c1cc2b4cda8e452641e1915e7c6ba04",
+            "28afba33c7d8dcdac494e0d6861173a0bbd8e021e9e190f56189f7aa714a54da"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:01:14.195378+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75ekas3ez58zj5xp7eg6ak2",
+          "completion_id": "chatcmpl-d70b89a0-4e2d-427b-a352-1b6596e1d2cd",
+          "finish_reason": "tool_calls",
+          "input_tokens": 449,
+          "output_tokens": 42,
+          "total_tokens": 491,
+          "duration_seconds": 1.3560460999997304,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2961,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:01:26.190197+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75ekpbxe01a7f2zv47bnxjw",
+          "completion_id": "chatcmpl-2a8f1ccc-9383-445c-8c2a-cc0fb59f8f58",
+          "finish_reason": "stop",
+          "input_tokens": 2614,
+          "output_tokens": 286,
+          "total_tokens": 2900,
+          "duration_seconds": 0.8843394000004992,
+          "first_token_seconds": 0.6105225000001155,
+          "prompt_budget_upper_bound": 13026,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "answered",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 12.88
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A2",
+      "category": "answerable",
+      "question": "Which optimizer and beta values were used to train the Transformer, and how many learning-rate warmup steps were used?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 15940.802,
+        "ttft_ms": null,
+        "generation_first_token_ms": 661.079,
+        "retrieval_ms": 14749.557,
+        "evidence_selection_ms": 38.814,
+        "citation_validation_ms": 0.45,
+        "planning_ms": 369.819,
+        "generation_ms": 782.027,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 461,
+        "known_output_tokens": 44,
+        "evidence_tokens": 1785,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_b189ca43-b115-4e98-a528-ad798da21c85",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "10756f19bc1d360711b8f7e74b4c5ec9ae55fec784d217f073162c7d4b57bbf4",
+            "799e01ddd16172aaccc4c2c7b6ad1d0772c4ea57cc1bae46def9c1e79e4cdfa8",
+            "f640512fc42494ddd5c1d6e9eb7f658d43880eb80e163c36b12ea14c637af1e2",
+            "e3cfb32fddf4d013d16807b75207bfc592f260d57768a6f468f6cf93701f8f03"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:11:03.121069+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f59y2er6akhr51v71yg9f",
+          "completion_id": "chatcmpl-ff1b8ee0-ee47-4892-a4a5-c04cdead1008",
+          "finish_reason": "tool_calls",
+          "input_tokens": 461,
+          "output_tokens": 44,
+          "total_tokens": 505,
+          "duration_seconds": 0.3698185999992347,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 3014,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:11:18.286821+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f5rk3e669ec2vx99kh27q",
+          "completion_id": "chatcmpl-3e129a6d-d3c1-40b7-8073-31face06e869",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 0.782026699999733,
+          "first_token_seconds": 0.6610791000002791,
+          "prompt_budget_upper_bound": 12248,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "citation_validation"
+        }
+      ],
+      "error": {
+        "code": "citation_validation",
+        "message": "The supporting quotation is absent from the cited passage.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "citation_validation",
+          "retryable": false,
+          "elapsed_seconds": 15.941
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A3",
+      "category": "answerable",
+      "question": "How many attention heads does the Transformer base model use, and what are the per-head key and value dimensions?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": null,
+      "status": "answered",
+      "answer": "The Transformer base model uses 8 attention heads, each with key and value dimensions of 64. [S4]",
+      "claims": [
+        {
+          "text": "The Transformer base model uses 8 attention heads, each with key and value dimensions of 64.",
+          "citations": [
+            {
+              "source_id": "S4",
+              "paper_title": "Attention Is All You Need",
+              "arxiv_id": "1706.03762",
+              "version": 7,
+              "pages": [
+                5
+              ],
+              "source_url": "https://arxiv.org/pdf/1706.03762v7#page=5",
+              "chunk_id": "19e60edd19de1e3a9b86702114a19036caa00b0a6949880b3154a4c23fee96ef",
+              "char_start": 12075,
+              "quote": "In this work we employ h = 8 parallel attention layers, or heads. For each of these we use\ndk = dv = dmodel/h = 64."
+            }
+          ]
+        }
+      ],
+      "supporting": {
+        "papers": [
+          "Attention Is All You Need"
+        ],
+        "pages": [
+          "arXiv:1706.03762 p. 5"
+        ],
+        "labels": [
+          "Attention Is All You Need (arXiv:1706.03762v7, p. 5)"
+        ]
+      },
+      "citation_validation": {
+        "status": "valid",
+        "claim_count": 1,
+        "citation_count": 1,
+        "quotes_present": true,
+        "numbers_supported": true,
+        "errors": []
+      },
+      "citations": [
+        {
+          "source_id": "S4",
+          "paper_title": "Attention Is All You Need",
+          "arxiv_id": "1706.03762",
+          "version": 7,
+          "pages": [
+            5
+          ],
+          "source_url": "https://arxiv.org/pdf/1706.03762v7#page=5",
+          "quote": "In this work we employ h = 8 parallel attention layers, or heads. For each of these we use\ndk = dv = dmodel/h = 64.",
+          "label": "Attention Is All You Need (arXiv:1706.03762v7, p. 5)"
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 834.224,
+        "ttft_ms": 819.898,
+        "generation_first_token_ms": 283.352,
+        "retrieval_ms": 105.202,
+        "evidence_selection_ms": 13.256,
+        "citation_validation_ms": 0.706,
+        "planning_ms": 338.305,
+        "generation_ms": 377.046,
+        "input_tokens": 2804,
+        "output_tokens": 161,
+        "known_input_tokens": 2804,
+        "known_output_tokens": 161,
+        "evidence_tokens": 1375,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_01c53f3d-2511-4734-a536-a59356246fb1",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "bac021c083e3887418f6237d430d7346d1abe0fb1886d8d78918340c0a450779",
+            "51053dd12ad1ec48afd84538385c1d9428e414eabc0aa28e06520796906b5bf0",
+            "cc0a338938be3b07503cc12fc1f73b82c944e3cb0f02878b3ebbae75362ef47f",
+            "19e60edd19de1e3a9b86702114a19036caa00b0a6949880b3154a4c23fee96ef"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:06:26.726974+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75ewvv6ey9r4snh4nq4v2fw",
+          "completion_id": "chatcmpl-41c43769-4f44-40c2-973d-ae2ae055c944",
+          "finish_reason": "tool_calls",
+          "input_tokens": 460,
+          "output_tokens": 50,
+          "total_tokens": 510,
+          "duration_seconds": 0.3383051000000705,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 3009,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:06:27.183245+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eww8vevrby7ddnstj99kf",
+          "completion_id": "chatcmpl-1029734c-e0a6-424a-abf2-445fafab5e20",
+          "finish_reason": "stop",
+          "input_tokens": 2344,
+          "output_tokens": 111,
+          "total_tokens": 2455,
+          "duration_seconds": 0.37704630000007455,
+          "first_token_seconds": 0.2833522000000812,
+          "prompt_budget_upper_bound": 10804,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "answered",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 0.834
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A4",
+      "category": "answerable",
+      "question": "According to Table 2, what BLEU scores does Transformer (big) report for English-to-German and English-to-French?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": "The prose and table contain a known EN-FR discrepancy; the interface should not silently hide a source conflict.",
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 1632.456,
+        "ttft_ms": 1630.943,
+        "generation_first_token_ms": 771.068,
+        "retrieval_ms": 133.567,
+        "evidence_selection_ms": 18.865,
+        "citation_validation_ms": 1.554,
+        "planning_ms": 607.053,
+        "generation_ms": 872.409,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 465,
+        "known_output_tokens": 57,
+        "evidence_tokens": 1601,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_6ced3152-b772-4ade-b100-0a06a6a5745e",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+            "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+            "549782c834b6366f535db1176c53aab83a55d43ed209455e95be0eaeb0a464cf",
+            "5b2ba86c3a2ae79623391890b5e673d8d642cd9a9795640a94a2e6ead8544e2c"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:11:39.089620+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f6cwce6q8tqp7z51dm9gh",
+          "completion_id": "chatcmpl-313cb943-88fc-4aa2-bf9a-54afd22334c9",
+          "finish_reason": "tool_calls",
+          "input_tokens": 465,
+          "output_tokens": 57,
+          "total_tokens": 522,
+          "duration_seconds": 0.6070534000000407,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 3009,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:11:39.849702+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f6dkfebhrbjr4m5k8ckbt",
+          "completion_id": "chatcmpl-17679029-2e50-4e29-9490-3900ecce0d58",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 0.8724087999999028,
+          "first_token_seconds": 0.7710680000000139,
+          "prompt_budget_upper_bound": 12083,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "stream_format"
+        }
+      ],
+      "error": {
+        "code": "stream_format",
+        "message": "Expected a structured answer object.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "stream_format",
+          "retryable": false,
+          "elapsed_seconds": 1.633
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": "",
+      "known_source_conflict": {
+        "description": "Attention Is All You Need reports English-to-French BLEU 41.8 in Table 2 and 41.0 in the prose on physical page 8. The conflict must not be silently hidden or resolved by inventing a third value.",
+        "table_2": {
+          "page": 8,
+          "english_to_german": 28.4,
+          "english_to_french": 41.8,
+          "verified_quote": "Transformer (big) | 28.4 | 41.8"
+        },
+        "prose": {
+          "page": 8,
+          "english_to_french": 41.0,
+          "verified_quote": "our big model achieves a BLEU score of 41.0, outperforming all of the previously published single models"
+        },
+        "provenance": "reports/rag/audit-2026-11-11/questions.json (A2) and direct PDF page 8 check",
+        "review_requirement": "Identify the discrepancy explicitly in the final review.",
+        "answer_mentions_28_4": false,
+        "answer_mentions_41_8": false,
+        "answer_mentions_41_0": false,
+        "exposes_both_values": false
+      }
+    },
+    {
+      "id": "A5",
+      "category": "answerable",
+      "question": "How many quantizers and codebook entries does Mimi use, and what frame rate and bitrate result?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1",
+      "note": null,
+      "status": "answered",
+      "answer": "Mimi uses 8 quantizers, each with a codebook size of 2048. [S1]\nMimi operates at a frame rate of 12.5 Hz and achieves a bitrate of 1.1 kbps. [S1] [S2]",
+      "claims": [
+        {
+          "text": "Mimi uses 8 quantizers, each with a codebook size of 2048.",
+          "citations": [
+            {
+              "source_id": "S1",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                11
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=11",
+              "chunk_id": "3046939903cfb5c8fca162d9e5583a4db4fb7f91e0ab370ce13f486fa2018d68",
+              "char_start": 32112,
+              "quote": "We use Q = 8 quantizers, each with a codebook size of NA = 2048."
+            }
+          ]
+        },
+        {
+          "text": "Mimi operates at a frame rate of 12.5 Hz and achieves a bitrate of 1.1 kbps.",
+          "citations": [
+            {
+              "source_id": "S1",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                11
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=11",
+              "chunk_id": "3046939903cfb5c8fca162d9e5583a4db4fb7f91e0ab370ce13f486fa2018d68",
+              "char_start": 32177,
+              "quote": "At 12.5Hz, this represents a bitrate of 1.1kbps."
+            },
+            {
+              "source_id": "S2",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                23
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=23",
+              "chunk_id": "4c2ca01cc81381824cf16911325b2240964fc9959421ec724473fcc70c4cf3e3",
+              "char_start": 69111,
+              "quote": "Mimi, adv. loss only | 24kHz | 12.5Hz | 1.1kbps | ✓"
+            }
+          ]
+        }
+      ],
+      "supporting": {
+        "papers": [
+          "Moshi: a speech-text foundation model for real-time dialogue"
+        ],
+        "pages": [
+          "arXiv:2410.00037 p. 11",
+          "arXiv:2410.00037 p. 23"
+        ],
+        "labels": [
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 11)",
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 23)"
+        ]
+      },
+      "citation_validation": {
+        "status": "valid",
+        "claim_count": 2,
+        "citation_count": 3,
+        "quotes_present": true,
+        "numbers_supported": true,
+        "errors": []
+      },
+      "citations": [
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            11
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=11",
+          "quote": "We use Q = 8 quantizers, each with a codebook size of NA = 2048.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 11)"
+        },
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            11
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=11",
+          "quote": "At 12.5Hz, this represents a bitrate of 1.1kbps.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 11)"
+        },
+        {
+          "source_id": "S2",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            23
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=23",
+          "quote": "Mimi, adv. loss only | 24kHz | 12.5Hz | 1.1kbps | ✓",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 23)"
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 1612.01,
+        "ttft_ms": 1396.768,
+        "generation_first_token_ms": 864.698,
+        "retrieval_ms": 94.197,
+        "evidence_selection_ms": 27.389,
+        "citation_validation_ms": 1.258,
+        "planning_ms": 333.614,
+        "generation_ms": 1156.441,
+        "input_tokens": 3692,
+        "output_tokens": 273,
+        "known_input_tokens": 3692,
+        "known_output_tokens": 273,
+        "evidence_tokens": 2247,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_991e90dd-ed93-4880-9cb2-21bbe77c2e24",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "3046939903cfb5c8fca162d9e5583a4db4fb7f91e0ab370ce13f486fa2018d68",
+            "4c2ca01cc81381824cf16911325b2240964fc9959421ec724473fcc70c4cf3e3",
+            "a257ed66ec859e89c9dd13f1108825ea6434076f9cce0971e894bde8361e9e7d",
+            "9847f55c60e9ad91d547ca5ff39d21ee5ccc56f4a783444112489bc8058985b5"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:07:09.222251+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75ey5cbe2f9p8g5a36xt5j3",
+          "completion_id": "chatcmpl-673583c1-7369-4b6e-bfdf-a94cae1c1307",
+          "finish_reason": "tool_calls",
+          "input_tokens": 458,
+          "output_tokens": 46,
+          "total_tokens": 504,
+          "duration_seconds": 0.3336138000004212,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2991,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:07:09.677074+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75ey5s8ezdt8wdwx4ha595w",
+          "completion_id": "chatcmpl-bad89a8c-ee9c-40aa-bc13-f4e760fbef07",
+          "finish_reason": "stop",
+          "input_tokens": 3234,
+          "output_tokens": 227,
+          "total_tokens": 3461,
+          "duration_seconds": 1.1564407999994728,
+          "first_token_seconds": 0.8646977999997034,
+          "prompt_budget_upper_bound": 14497,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "answered",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 1.612
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A6",
+      "category": "answerable",
+      "question": "How many parameters does Helium have, and on how many pretraining tokens was it trained?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1",
+      "note": null,
+      "status": "answered",
+      "answer": "Helium is a 7B-parameter text language model trained on 2.1 trillion tokens of public English data. [S4]",
+      "claims": [
+        {
+          "text": "Helium is a 7B-parameter text language model trained on 2.1 trillion tokens of public English data.",
+          "citations": [
+            {
+              "source_id": "S4",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                3
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=3",
+              "chunk_id": "2916f6796b9315f8c419e496b0a9864d7fd804b1cb20522529ef72c370493297",
+              "char_start": 5818,
+              "quote": "We present Helium, a 7B-parameter text LLM that we pretrain on 2.1T tokens of\npublic English data."
+            }
+          ]
+        }
+      ],
+      "supporting": {
+        "papers": [
+          "Moshi: a speech-text foundation model for real-time dialogue"
+        ],
+        "pages": [
+          "arXiv:2410.00037 p. 3"
+        ],
+        "labels": [
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 3)"
+        ]
+      },
+      "citation_validation": {
+        "status": "valid",
+        "claim_count": 1,
+        "citation_count": 1,
+        "quotes_present": true,
+        "numbers_supported": true,
+        "errors": []
+      },
+      "citations": [
+        {
+          "source_id": "S4",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            3
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=3",
+          "quote": "We present Helium, a 7B-parameter text LLM that we pretrain on 2.1T tokens of\npublic English data.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 3)"
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2254.69,
+        "ttft_ms": 2224.409,
+        "generation_first_token_ms": 1534.836,
+        "retrieval_ms": 99.52,
+        "evidence_selection_ms": 33.97,
+        "citation_validation_ms": 0.413,
+        "planning_ms": 476.593,
+        "generation_ms": 1644.225,
+        "input_tokens": 3899,
+        "output_tokens": 157,
+        "known_input_tokens": 3899,
+        "known_output_tokens": 157,
+        "evidence_tokens": 2408,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_54dad0b2-a36b-48bf-acdd-eefa9275bf3e",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "799e01ddd16172aaccc4c2c7b6ad1d0772c4ea57cc1bae46def9c1e79e4cdfa8",
+            "a7abbb8709fe4d32111d7352d8d2b00767474bc7ad2eb925fc7196336f5d1f24",
+            "47473e67bda09adaddbc75febdc6b26420d4f1bf2af76ad51490bf3ceab5047c",
+            "2916f6796b9315f8c419e496b0a9864d7fd804b1cb20522529ef72c370493297"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:07:30.852698+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eytf6ewgs6xssmmkq2jz7",
+          "completion_id": "chatcmpl-6e7f3935-1469-409a-8ac4-f8a10ef56aeb",
+          "finish_reason": "tool_calls",
+          "input_tokens": 457,
+          "output_tokens": 42,
+          "total_tokens": 499,
+          "duration_seconds": 0.47659309999926336,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2984,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:07:31.462395+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eyv1nea7bdt9g0jw4hxjc",
+          "completion_id": "chatcmpl-50a25a57-dab5-4315-afb7-303504856cab",
+          "finish_reason": "stop",
+          "input_tokens": 3442,
+          "output_tokens": 115,
+          "total_tokens": 3557,
+          "duration_seconds": 1.64422470000045,
+          "first_token_seconds": 1.534835500000554,
+          "prompt_budget_upper_bound": 15646,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "answered",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 2.255
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A7",
+      "category": "answerable",
+      "question": "How does Moshi's Inner Monologue method arrange text tokens relative to audio tokens?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1",
+      "note": null,
+      "status": "answered",
+      "answer": "Moshi’s Inner Monologue method arranges text tokens as a prefix to audio tokens, generating the text tokens first and then using them as a prefix for the subsequent audio tokens. [S1] [S2]",
+      "claims": [
+        {
+          "text": "Moshi’s Inner Monologue method arranges text tokens as a prefix to audio tokens, generating the text tokens first and then using them as a prefix for the subsequent audio tokens.",
+          "citations": [
+            {
+              "source_id": "S1",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                41
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=41",
+              "chunk_id": "85cacb0acb264c9d7810cf822fdb1a80002c7f437edde0119bff63eec73acfaa",
+              "char_start": 126775,
+              "quote": "We moreover show that speech-to-speech generation can be drastically\nimproved by Inner Monologue, a new method that generates text tokens as a prefix to\naudio tokens, while remaining compatible with streaming inference."
+            },
+            {
+              "source_id": "S2",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                1
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+              "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+              "char_start": 1446,
+              "quote": "We moreover extend the hierarchical semantic-to-acoustic token generation of previous work\nto first predict time-aligned text tokens as a prefix to audio tokens. Not only this “Inner\nMonologue” method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech."
+            }
+          ]
+        }
+      ],
+      "supporting": {
+        "papers": [
+          "Moshi: a speech-text foundation model for real-time dialogue"
+        ],
+        "pages": [
+          "arXiv:2410.00037 p. 41",
+          "arXiv:2410.00037 p. 1"
+        ],
+        "labels": [
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 41)",
+          "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)"
+        ]
+      },
+      "citation_validation": {
+        "status": "valid",
+        "claim_count": 1,
+        "citation_count": 2,
+        "quotes_present": true,
+        "numbers_supported": true,
+        "errors": []
+      },
+      "citations": [
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            41
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=41",
+          "quote": "We moreover show that speech-to-speech generation can be drastically\nimproved by Inner Monologue, a new method that generates text tokens as a prefix to\naudio tokens, while remaining compatible with streaming inference.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 41)"
+        },
+        {
+          "source_id": "S2",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            1
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+          "quote": "We moreover extend the hierarchical semantic-to-acoustic token generation of previous work\nto first predict time-aligned text tokens as a prefix to audio tokens. Not only this “Inner\nMonologue” method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech.",
+          "label": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)"
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 1303.596,
+        "ttft_ms": 1295.55,
+        "generation_first_token_ms": 435.507,
+        "retrieval_ms": 96.575,
+        "evidence_selection_ms": 24.428,
+        "citation_validation_ms": 0.914,
+        "planning_ms": 556.613,
+        "generation_ms": 625.652,
+        "input_tokens": 3488,
+        "output_tokens": 275,
+        "known_input_tokens": 3488,
+        "known_output_tokens": 275,
+        "evidence_tokens": 2062,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_d6225a9a-75d4-45c1-b689-a4c5999325b1",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "85cacb0acb264c9d7810cf822fdb1a80002c7f437edde0119bff63eec73acfaa",
+            "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+            "d40c570aa785461b34a3d96a48be6e067b7ddb99678379cd21cf792e2cda0956",
+            "258417cc4e1e9e6dd76dc6c434b05833c6d9fcc33800285d8de0240ef31ca156"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:02:11.763766+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75en2tte6qa1wwq6j8g7gqg",
+          "completion_id": "chatcmpl-659d4aa6-e4c2-4015-b8e0-8e61c882a471",
+          "finish_reason": "tool_calls",
+          "input_tokens": 455,
+          "output_tokens": 51,
+          "total_tokens": 506,
+          "duration_seconds": 0.5566134999999122,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2981,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:02:12.440935+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75en3g4epkr15fd81bs6gn4",
+          "completion_id": "chatcmpl-baad1a63-0dda-4628-a011-797e25cf426a",
+          "finish_reason": "stop",
+          "input_tokens": 3033,
+          "output_tokens": 224,
+          "total_tokens": 3257,
+          "duration_seconds": 0.6256519999997181,
+          "first_token_seconds": 0.43550709999999526,
+          "prompt_budget_upper_bound": 15421,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "answered",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 1.304
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A8",
+      "category": "answerable",
+      "question": "How does H-Net replace handcrafted tokenization with learned dynamic chunking?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2173.083,
+        "ttft_ms": null,
+        "generation_first_token_ms": 1455.133,
+        "retrieval_ms": 119.34,
+        "evidence_selection_ms": 19.242,
+        "citation_validation_ms": 0.275,
+        "planning_ms": 325.194,
+        "generation_ms": 1708.935,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 452,
+        "known_output_tokens": 47,
+        "evidence_tokens": 1794,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_b09860f8-cd42-40e8-aeec-f7986a880d97",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "f4a748fc7969923162e5815160c86c89be40b06a722a6e2241c4aac752cacf65",
+            "3a46d8836b14242d419dc2c83acaa685b027d0b582fc2e5dccd94b40d23d182e",
+            "837e1069b52cd75b8a89c593f346322c6c2153d54c40418ecf624c6724f1be94",
+            "e4fd972041f7f67d2fb723d3a3811031d8fc8e7ede8e02d36c27b8568f6d3c48"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:12:00.769000+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f722zeqr8tvyexnvvxz73",
+          "completion_id": "chatcmpl-995f3176-4539-4b4d-9ec2-1f4b0b9981d0",
+          "finish_reason": "tool_calls",
+          "input_tokens": 452,
+          "output_tokens": 47,
+          "total_tokens": 499,
+          "duration_seconds": 0.3251940000000104,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2974,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:12:01.223915+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f72fveke9s23aqpne85p3",
+          "completion_id": "chatcmpl-d65db432-8483-40f4-9942-cef771f911a5",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 1.7089347999999518,
+          "first_token_seconds": 1.4551329000005353,
+          "prompt_budget_upper_bound": 14094,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "citation_validation"
+        }
+      ],
+      "error": {
+        "code": "citation_validation",
+        "message": "The supporting quotation is absent from the cited passage.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "citation_validation",
+          "retryable": false,
+          "elapsed_seconds": 2.173
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A9",
+      "category": "answerable",
+      "question": "What probability threshold turns H-Net routing scores into chunk boundaries, and what boundary probability is forced at the first position?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 1386.864,
+        "ttft_ms": 1386.696,
+        "generation_first_token_ms": 628.43,
+        "retrieval_ms": 120.92,
+        "evidence_selection_ms": 33.939,
+        "citation_validation_ms": 0.352,
+        "planning_ms": 539.36,
+        "generation_ms": 692.298,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 461,
+        "known_output_tokens": 49,
+        "evidence_tokens": 2177,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_33cd5338-079c-455e-ad0a-adf3fe58fc13",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "3b0d1448366035e6f50a199273d6b869dde6ee5898406e282e1b7acba52eddd9",
+            "0c75b5c85444e420e00db5954a24ac3c6c61f2fb948008ec304eaefd41b7adc6",
+            "3a46d8836b14242d419dc2c83acaa685b027d0b582fc2e5dccd94b40d23d182e",
+            "46bcbd267437b97070fe8e587e5a7f49d801ce945bd29d7c5b3e3123082dc180"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:12:22.963958+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f7qqpercv6a3yq4y76v6b",
+          "completion_id": "chatcmpl-518e795d-2bd4-44d1-becb-040f93bdee98",
+          "finish_reason": "tool_calls",
+          "input_tokens": 461,
+          "output_tokens": 49,
+          "total_tokens": 510,
+          "duration_seconds": 0.5393595000005007,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 3035,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:12:23.658077+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f7rcjefvbtpg8kzydaapf",
+          "completion_id": "chatcmpl-44021ca4-bf38-4106-8685-4795c30f722c",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 0.6922977000003812,
+          "first_token_seconds": 0.6284304000000702,
+          "prompt_budget_upper_bound": 15444,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "stream_format"
+        }
+      ],
+      "error": {
+        "code": "stream_format",
+        "message": "Expected a structured answer object.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "stream_format",
+          "retryable": false,
+          "elapsed_seconds": 1.387
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A10",
+      "category": "answerable",
+      "question": "According to Table 4, what XWinograd-zh accuracies do the Transformer and H-Net (2-stage) achieve?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2413.065,
+        "ttft_ms": null,
+        "generation_first_token_ms": 1711.284,
+        "retrieval_ms": 109.315,
+        "evidence_selection_ms": 18.376,
+        "citation_validation_ms": 0.315,
+        "planning_ms": 437.822,
+        "generation_ms": 1847.158,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 464,
+        "known_output_tokens": 52,
+        "evidence_tokens": 1802,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_0df5892d-a5cc-499f-be07-c5b46cd8cb82",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "bd9ef80279e2245a0e08168962525ddeca134517f2325162a63d7d973ed6c4bb",
+            "6a203cb4bf4a6fc4da9ba2e4cf426c56fe1b7c459a465a59052ac67a277cc30b",
+            "d42ef94200ef9db58dd01131e459038d7796b3886bd836eb96b6d7b1bf2132f2",
+            "68cd812d657ed41aac97ef466fc393ff655601938e4f1435a10b21cde6a473c4"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:12:44.367735+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f8cmhe2ztb26axpmhdp4g",
+          "completion_id": "chatcmpl-a0553c89-87e9-4495-85ba-bd1f3e343a57",
+          "finish_reason": "tool_calls",
+          "input_tokens": 464,
+          "output_tokens": 52,
+          "total_tokens": 516,
+          "duration_seconds": 0.43782220000048255,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2994,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:12:44.933341+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f8d5eecjbzy4tjj0ey2f2",
+          "completion_id": "chatcmpl-18f44877-5ef8-432b-a61d-64876392918f",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 1.847157999999581,
+          "first_token_seconds": 1.7112839000001259,
+          "prompt_budget_upper_bound": 12741,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "citation_validation"
+        }
+      ],
+      "error": {
+        "code": "citation_validation",
+        "message": "The supporting quotation is absent from the cited passage.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "citation_validation",
+          "retryable": false,
+          "elapsed_seconds": 2.413
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A11",
+      "category": "answerable",
+      "question": "What data-efficiency improvement over isotropic models does Figure 6 report for H-Net on HG38 DNA?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2264.18,
+        "ttft_ms": null,
+        "generation_first_token_ms": 1742.178,
+        "retrieval_ms": 97.441,
+        "evidence_selection_ms": 19.123,
+        "citation_validation_ms": 0.431,
+        "planning_ms": 302.791,
+        "generation_ms": 1844.447,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 460,
+        "known_output_tokens": 51,
+        "evidence_tokens": 1845,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_22ab4fd7-5f7d-45cb-bd86-d25fa76595c9",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "4b71f580e7b3a8f09cefb5ab859dd6f8017fb4f63cc7c29cb7dbef1a7977f495",
+            "6a203cb4bf4a6fc4da9ba2e4cf426c56fe1b7c459a465a59052ac67a277cc30b",
+            "548a4c925ff482d7115cad297cc1d24523c071d07ec5a1bb7763ee0d7f86661f",
+            "5eaa1be6f87f98d8bf9785eef2b9f4933187a469309936fbf0b8b43786aa2ba6"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:13:06.804468+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f92hsewat9q90y61c2z0r",
+          "completion_id": "chatcmpl-b528a79f-d984-4936-a478-1b559a961e18",
+          "finish_reason": "tool_calls",
+          "input_tokens": 460,
+          "output_tokens": 51,
+          "total_tokens": 511,
+          "duration_seconds": 0.30279090000021824,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2994,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:13:07.224324+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f92y7e28vxc15d7dz7x6t",
+          "completion_id": "chatcmpl-7fdc1831-760e-4b8f-8aa7-57df4f11f4e2",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 1.8444471000002522,
+          "first_token_seconds": 1.7421784999996817,
+          "prompt_budget_upper_bound": 12522,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "citation_validation"
+        }
+      ],
+      "error": {
+        "code": "citation_validation",
+        "message": "The supporting quotation is absent from the cited passage.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "citation_validation",
+          "retryable": false,
+          "elapsed_seconds": 2.264
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "A12",
+      "category": "answerable",
+      "question": "Why does scaled dot-product attention divide by the square root of the key dimension?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2261.441,
+        "ttft_ms": null,
+        "generation_first_token_ms": 732.52,
+        "retrieval_ms": 98.881,
+        "evidence_selection_ms": 12.701,
+        "citation_validation_ms": 0.292,
+        "planning_ms": 1222.733,
+        "generation_ms": 926.835,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 454,
+        "known_output_tokens": 49,
+        "evidence_tokens": 1103,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_3f81c651-4a5f-41bc-805f-3094e73ada70",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "1e74cdb2c2a4857f770b4feed4804114a5e21b33ec0965d908560aee040acef3",
+            "cc0a338938be3b07503cc12fc1f73b82c944e3cb0f02878b3ebbae75362ef47f",
+            "4fd9caf575d3535d6f9aeaf229c803630bf0b58a34efb50384947927a3346e2b",
+            "bac021c083e3887418f6237d430d7346d1abe0fb1886d8d78918340c0a450779"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:13:29.090933+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f9ra1es1s0pgsby93q1h7",
+          "completion_id": "chatcmpl-a196d9fc-66b2-4ad1-851a-250f337a92f2",
+          "finish_reason": "tool_calls",
+          "input_tokens": 454,
+          "output_tokens": 49,
+          "total_tokens": 503,
+          "duration_seconds": 1.2227332000002207,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2981,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:13:30.421693+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f9sk3epeb996gbjyvwcqa",
+          "completion_id": "chatcmpl-4b50a592-6920-45c1-9e05-60cecd5ed83e",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 0.9268345999998928,
+          "first_token_seconds": 0.7325203000000329,
+          "prompt_budget_upper_bound": 10471,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "citation_validation"
+        }
+      ],
+      "error": {
+        "code": "citation_validation",
+        "message": "The supporting quotation is absent from the cited passage.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "citation_validation",
+          "retryable": false,
+          "elapsed_seconds": 2.261
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": ""
+    },
+    {
+      "id": "U1",
+      "category": "unanswerable",
+      "question": "What p95 latency does Moshi measure on an iPhone 15 Pro running iOS?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "The papers report generic Moshi latency, not a p95 measurement on that device and operating system.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "p95 in arXiv:2410.00037",
+          "iPhone 15 Pro in arXiv:2410.00037",
+          "iOS in arXiv:2410.00037"
+        ]
+      },
+      "metrics": {
+        "total_ms": 1047.754,
+        "ttft_ms": 1047.749,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 100.667,
+        "evidence_selection_ms": 22.821,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 924.024,
+        "generation_ms": 0.0,
+        "input_tokens": 457,
+        "output_tokens": 50,
+        "known_input_tokens": 457,
+        "known_output_tokens": 50,
+        "evidence_tokens": 1905,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_64d97aa6-4c85-4045-bfab-070342c89dab",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "bf71a4c26ff64f0183696cf608497d0b22381b69c1a932126940680a0f65cabf",
+            "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+            "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+            "785daebb4e0bb634bf0767fdbfef124aaf1da1019f8f1199a92a3a8d44f5cc71"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:03:13.078069+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75epypve0ftdxtrqqxfmsmv",
+          "completion_id": "chatcmpl-7d29c06d-8164-4297-9331-beb89f020080",
+          "finish_reason": "tool_calls",
+          "input_tokens": 457,
+          "output_tokens": 50,
+          "total_tokens": 507,
+          "duration_seconds": 0.9240240999997695,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2964,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 1.048
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U2",
+      "category": "unanswerable",
+      "question": "How much did it cost in dollars to train Moshi?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "The papers do not report a dollar training cost.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2062.762,
+        "ttft_ms": 2047.317,
+        "generation_first_token_ms": 560.086,
+        "retrieval_ms": 92.629,
+        "evidence_selection_ms": 21.121,
+        "citation_validation_ms": 0.007,
+        "planning_ms": 1359.846,
+        "generation_ms": 588.828,
+        "input_tokens": 3363,
+        "output_tokens": 68,
+        "known_input_tokens": 3363,
+        "known_output_tokens": 68,
+        "evidence_tokens": 1876,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_6122932a-e6c5-4e64-9fdd-02a391b1abab",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "d40c570aa785461b34a3d96a48be6e067b7ddb99678379cd21cf792e2cda0956",
+            "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+            "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+            "449ae6bbfb98258b69c54681752859936995ed95842e36354a174d8e2dc26c17"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:03:29.445769+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eqeq4e8m8nmfhpfwa567s",
+          "completion_id": "chatcmpl-c6a10e28-79b7-4af1-8598-11607f5b4957",
+          "finish_reason": "tool_calls",
+          "input_tokens": 450,
+          "output_tokens": 41,
+          "total_tokens": 491,
+          "duration_seconds": 1.3598458999995273,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2943,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:03:30.919563+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eqg4rehz9v299nx8cze5q",
+          "completion_id": "chatcmpl-ed6dcf69-a24b-4d3d-a2aa-dced53be0623",
+          "finish_reason": "stop",
+          "input_tokens": 2913,
+          "output_tokens": 27,
+          "total_tokens": 2940,
+          "duration_seconds": 0.5888277999993079,
+          "first_token_seconds": 0.5600861999992048,
+          "prompt_budget_upper_bound": 13154,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "rate_limit",
+          "retryable": true,
+          "elapsed_seconds": 1.3
+        },
+        {
+          "attempt": 2,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 2.063
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U3",
+      "category": "unanswerable",
+      "question": "What MMLU accuracy does Attention Is All You Need report for the original Transformer?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "Attention Is All You Need does not report MMLU results.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "MMLU in arXiv:1706.03762"
+        ]
+      },
+      "metrics": {
+        "total_ms": 923.202,
+        "ttft_ms": 923.197,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 117.949,
+        "evidence_selection_ms": 19.291,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 785.751,
+        "generation_ms": 0.0,
+        "input_tokens": 455,
+        "output_tokens": 47,
+        "known_input_tokens": 455,
+        "known_output_tokens": 47,
+        "evidence_tokens": 1170,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_fece03e3-60c0-4a31-8d4e-5fa1c106aa7a",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "e88a26b6ce42a665a5a1365c6c41b788f4679696d2871ff6468dec774c7bad35",
+            "d40c570aa785461b34a3d96a48be6e067b7ddb99678379cd21cf792e2cda0956",
+            "a9981e96fd148b63ced7f46c02ccd5878c1cc2b4cda8e452641e1915e7c6ba04",
+            "4fd9caf575d3535d6f9aeaf229c803630bf0b58a34efb50384947927a3346e2b"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:03:37.566088+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eqpmvevzb91bcqzfzrtra",
+          "completion_id": "chatcmpl-f4ab2975-577d-476e-9eaa-622deda602c4",
+          "finish_reason": "tool_calls",
+          "input_tokens": 455,
+          "output_tokens": 47,
+          "total_tokens": 502,
+          "duration_seconds": 0.7857512000000497,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2982,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "rate_limit",
+          "retryable": true,
+          "elapsed_seconds": 0.037
+        },
+        {
+          "attempt": 2,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 0.923
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U4",
+      "category": "unanswerable",
+      "question": "What benchmark results does the dynamic chunking paper report for a 70-billion-parameter H-Net?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "The paper does not report a 70-billion-parameter H-Net experiment.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "70 b parameter in arXiv:2507.07955"
+        ]
+      },
+      "metrics": {
+        "total_ms": 401.0,
+        "ttft_ms": 400.989,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 94.638,
+        "evidence_selection_ms": 22.888,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 283.274,
+        "generation_ms": 0.0,
+        "input_tokens": 458,
+        "output_tokens": 51,
+        "known_input_tokens": 458,
+        "known_output_tokens": 51,
+        "evidence_tokens": 1775,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_10a050f5-c4f3-4212-9f75-6d7b52eb81b7",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "f4a748fc7969923162e5815160c86c89be40b06a722a6e2241c4aac752cacf65",
+            "4e3ca8f21158d9be49df6dcc2d715fc038f9394a8dc3c5ef465666fe6ceafed8",
+            "3a46d8836b14242d419dc2c83acaa685b027d0b582fc2e5dccd94b40d23d182e",
+            "9efe6c3a13060637a9ece2c40ec127e99d903eb93f9bf169365a39e4a6d56c39"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:03:39.506818+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eqrgte8j8a0mtze9hy1g0",
+          "completion_id": "chatcmpl-93b003fa-db70-4ba1-ba0c-4a23fa647180",
+          "finish_reason": "tool_calls",
+          "input_tokens": 458,
+          "output_tokens": 51,
+          "total_tokens": 509,
+          "duration_seconds": 0.2832741000001988,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2991,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 0.401
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U5",
+      "category": "unanswerable",
+      "question": "What is the commercial API price per million Moshi speech tokens in November 2026?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "No dated commercial pricing appears in the supplied papers.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "API in arXiv:2410.00037",
+          "2026 in arXiv:2410.00037"
+        ]
+      },
+      "metrics": {
+        "total_ms": 647.279,
+        "ttft_ms": 647.274,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 117.093,
+        "evidence_selection_ms": 27.959,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 502.06,
+        "generation_ms": 0.0,
+        "input_tokens": 456,
+        "output_tokens": 53,
+        "known_input_tokens": 456,
+        "known_output_tokens": 53,
+        "evidence_tokens": 2265,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_f6549382-7618-4b38-996d-7c7f70bdb707",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "828ae3f3cb96aba1a125ac8062f22ebcb9ae636c48433666dc6890577c2a7640",
+            "258417cc4e1e9e6dd76dc6c434b05833c6d9fcc33800285d8de0240ef31ca156",
+            "d524fc5fd96b5370ba8a9aa1212195f0f81e1cb85b79e68ad6cab9c9af1c6eda",
+            "47473e67bda09adaddbc75febdc6b26420d4f1bf2af76ad51490bf3ceab5047c"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:03:45.965159+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75eqytmee780d1bs71s5839",
+          "completion_id": "chatcmpl-2f95e43a-8267-4f97-8c82-b7e9222db254",
+          "finish_reason": "tool_calls",
+          "input_tokens": 456,
+          "output_tokens": 53,
+          "total_tokens": 509,
+          "duration_seconds": 0.5020595999994839,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2978,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "rate_limit",
+          "retryable": true,
+          "elapsed_seconds": 0.037
+        },
+        {
+          "attempt": 2,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 0.647
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U6",
+      "category": "unanswerable",
+      "question": "What is the carbon footprint of training the Transformer big model?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "The Transformer paper reports training time and hardware but not a carbon footprint.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 2678.245,
+        "ttft_ms": 2671.011,
+        "generation_first_token_ms": 1187.861,
+        "retrieval_ms": 114.979,
+        "evidence_selection_ms": 16.514,
+        "citation_validation_ms": 0.008,
+        "planning_ms": 1346.774,
+        "generation_ms": 1199.596,
+        "input_tokens": 2862,
+        "output_tokens": 80,
+        "known_input_tokens": 2862,
+        "known_output_tokens": 80,
+        "evidence_tokens": 1392,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_b549ae50-de15-4d9e-9ef3-7fd3c6d7e9eb",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+            "afb1c9ce16ab3e3abc7a62240587f794e369e44096e8b5ec6d26f6b0bc12e23e",
+            "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+            "bac021c083e3887418f6237d430d7346d1abe0fb1886d8d78918340c0a450779"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:09:41.834311+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f2tcbe6pv30g0n420zndz",
+          "completion_id": "chatcmpl-cdd9389a-1f06-4820-93ca-8847d2c3a2c4",
+          "finish_reason": "tool_calls",
+          "input_tokens": 450,
+          "output_tokens": 42,
+          "total_tokens": 492,
+          "duration_seconds": 1.3467743999999584,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2963,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-11T14:09:43.312959+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75f2vsqexg84tv32enq9yzn",
+          "completion_id": "chatcmpl-23832ba4-6bee-452a-bce1-42a674f77490",
+          "finish_reason": "stop",
+          "input_tokens": 2412,
+          "output_tokens": 38,
+          "total_tokens": 2450,
+          "duration_seconds": 1.1995964999996431,
+          "first_token_seconds": 1.1878610999992816,
+          "prompt_budget_upper_bound": 10654,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 2.678
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U7",
+      "category": "unanswerable",
+      "question": "What accuracy does Moshi report on the GLUE benchmark?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "Moshi is evaluated as a speech-text dialogue system and the paper does not report GLUE accuracy.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "GLUE in arXiv:2410.00037"
+        ]
+      },
+      "metrics": {
+        "total_ms": 874.069,
+        "ttft_ms": 874.064,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 111.091,
+        "evidence_selection_ms": 25.348,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 737.431,
+        "generation_ms": 0.0,
+        "input_tokens": 450,
+        "output_tokens": 43,
+        "known_input_tokens": 450,
+        "known_output_tokens": 43,
+        "evidence_tokens": 1821,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_7eaca884-7ba0-48e9-8604-8446a220ff59",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "e88a26b6ce42a665a5a1365c6c41b788f4679696d2871ff6468dec774c7bad35",
+            "d40c570aa785461b34a3d96a48be6e067b7ddb99678379cd21cf792e2cda0956",
+            "f04ce8d9c1995b5205a33c90d4bfa509cfc349c8b45256c262bed67928a5d6e9",
+            "2d49870a9a99f56a29c65dd9d460294a7b2e22c1e164ce179455e175036db374"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:04:05.968717+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75erjbrex3a92nv53zbc2vn",
+          "completion_id": "chatcmpl-63c87a17-47c1-40a4-9a5c-e9a5a4070963",
+          "finish_reason": "tool_calls",
+          "input_tokens": 450,
+          "output_tokens": 43,
+          "total_tokens": 493,
+          "duration_seconds": 0.7374310999994123,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2950,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 0.874
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    },
+    {
+      "id": "U8",
+      "category": "unanswerable",
+      "question": "What BLEU score does H-Net achieve on WMT 2014 English-to-German translation?",
+      "expected_behavior": "refuse",
+      "relevant_paper": null,
+      "note": "The H-Net paper does not report WMT translation results; Transformer BLEU numbers must not be substituted.",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_refused",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "passage from arXiv:2507.07955",
+          "BLEU in arXiv:2507.07955",
+          "WMT in arXiv:2507.07955"
+        ]
+      },
+      "metrics": {
+        "total_ms": 1057.283,
+        "ttft_ms": 1057.279,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 95.122,
+        "evidence_selection_ms": 14.553,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 947.398,
+        "generation_ms": 0.0,
+        "input_tokens": 458,
+        "output_tokens": 49,
+        "known_input_tokens": 458,
+        "known_output_tokens": 49,
+        "evidence_tokens": 1310,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_07b2e994-9444-467a-8f0c-c7d81ad1971f",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+            "5b2ba86c3a2ae79623391890b5e673d8d642cd9a9795640a94a2e6ead8544e2c",
+            "549782c834b6366f535db1176c53aab83a55d43ed209455e95be0eaeb0a464cf",
+            "74b7f116797a39f0ed9e25f3d8d08f563abf1592bbee9f437de55ed74320ec16"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-11T14:04:07.865083+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m75erm72ehtrrbys9tam5e7g",
+          "completion_id": "chatcmpl-953553e7-ba25-458d-90b8-ccf1135382aa",
+          "finish_reason": "tool_calls",
+          "input_tokens": 458,
+          "output_tokens": 49,
+          "total_tokens": 507,
+          "duration_seconds": 0.9473981999999523,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2973,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "refused",
+          "error_code": null,
+          "retryable": false,
+          "elapsed_seconds": 1.057
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": "refused_correctly",
+      "final_grade": ""
+    }
+  ]
+}

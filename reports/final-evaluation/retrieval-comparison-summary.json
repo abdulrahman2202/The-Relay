@@ -1,0 +1,94 @@
+{
+  "generated_utc": "2026-11-11T14:00:56.929310+00:00",
+  "protocol": {
+    "generated_utc": "2026-11-11T14:00:56.929310+00:00",
+    "measurement_type": "offline_local_retrieval",
+    "simulated": false,
+    "questions_source": "reports\\phase3\\evaluation\\questions.json",
+    "gold_annotation_source": "reports\\rag\\improvements-2026-11-11\\evaluation-final\\evidence.json",
+    "gold_mapping": {
+      "A1": "M1",
+      "A2": "A4",
+      "A3": "A3",
+      "A4": "A2",
+      "A5": "M2",
+      "A6": "M3",
+      "A7": "M4",
+      "A8": "H1",
+      "A9": "H2",
+      "A10": "H3",
+      "A11": "H4",
+      "A12": "A1"
+    },
+    "strategies": [
+      "vector",
+      "bm25",
+      "hybrid"
+    ],
+    "preset": 600,
+    "top_k": 4,
+    "ranking_k": 50,
+    "max_context_tokens": 3000,
+    "chunking": {
+      "chunk_size": 600,
+      "overlap": 50,
+      "chunking": "boundary"
+    },
+    "bm25_k1": 1.5,
+    "bm25_b": 0.75,
+    "rrf_constant": 60,
+    "warmup": "One search per strategy before timing.",
+    "notes": [
+      "Production defaults were not changed.",
+      "Unanswerable questions have no gold answer span; coverage and rank are blank.",
+      "Coverage measures annotated evidence spans, not generated-answer correctness."
+    ]
+  },
+  "summary": [
+    {
+      "strategy": "vector",
+      "answerable_questions": 12,
+      "complete_coverage": 9,
+      "complete_context_coverage": 9,
+      "false_refusals": 0,
+      "mean_reciprocal_rank": 0.6566,
+      "mean_first_relevant_rank": 3.667,
+      "unsupported_questions": 8,
+      "unsupported_refusals": 6,
+      "mean_context_tokens": 1790.417,
+      "mean_retrieval_total_ms": 64.118,
+      "mean_ranking_latency_ms": 44.396,
+      "mean_context_tokens_all_questions": 1813.8
+    },
+    {
+      "strategy": "bm25",
+      "answerable_questions": 12,
+      "complete_coverage": 11,
+      "complete_context_coverage": 11,
+      "false_refusals": 0,
+      "mean_reciprocal_rank": 0.7292,
+      "mean_first_relevant_rank": 1.667,
+      "unsupported_questions": 8,
+      "unsupported_refusals": 6,
+      "mean_context_tokens": 1839.0,
+      "mean_retrieval_total_ms": 125.09,
+      "mean_ranking_latency_ms": 103.675,
+      "mean_context_tokens_all_questions": 1814.8
+    },
+    {
+      "strategy": "hybrid",
+      "answerable_questions": 12,
+      "complete_coverage": 10,
+      "complete_context_coverage": 10,
+      "false_refusals": 0,
+      "mean_reciprocal_rank": 0.7778,
+      "mean_first_relevant_rank": 1.833,
+      "unsupported_questions": 8,
+      "unsupported_refusals": 6,
+      "mean_context_tokens": 1919.083,
+      "mean_retrieval_total_ms": 150.977,
+      "mean_ranking_latency_ms": 129.056,
+      "mean_context_tokens_all_questions": 1914.25
+    }
+  ]
+}
