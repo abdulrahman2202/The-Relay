@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 from groq import Groq
 
@@ -10,12 +11,7 @@ model = os.environ["GROQ_MODEL"]
 
 response = client.chat.completions.create(
     model=model,
-    messages=[
-        {
-            "role": "user",
-            "content": "Explain the Transformer architecture in 3 sentences."
-        }
-    ],
+    messages=[{"role": "user", "content": "Explain the Transformer architecture in 3 sentences."}],
     temperature=0.2,
     max_completion_tokens=200,
 )
