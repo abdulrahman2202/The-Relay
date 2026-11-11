@@ -16,11 +16,28 @@ from retrieval.models import SearchHit, SourceSpan
 
 @pytest.fixture(autouse=True)
 def offline(monkeypatch):
-    def blocked(*args, **kwargs):
-        raise AssertionError("Automated Phase 3 tests must not contact a service")
+    original_connect = socket.socket.connect
+    original_connect_ex = socket.socket.connect_ex
+
+    def is_loopback(address):
+        # asyncio's event loop creates a loopback socketpair on Windows. Phase 4
+        # tests still must not contact Groq or any external service.
+        return (
+            isinstance(address, tuple) and len(address) >= 2 and address[0] in {"127.0.0.1", "::1"}
+        )
+
+    def blocked(self, address, *args, **kwargs):
+        if is_loopback(address):
+            return original_connect(self, address, *args, **kwargs)
+        raise AssertionError("Automated Phase 3/4 tests must not contact an external service")
+
+    def blocked_ex(self, address, *args, **kwargs):
+        if is_loopback(address):
+            return original_connect_ex(self, address, *args, **kwargs)
+        raise AssertionError("Automated Phase 3/4 tests must not contact an external service")
 
     monkeypatch.setattr(socket.socket, "connect", blocked)
-    monkeypatch.setattr(socket.socket, "connect_ex", blocked)
+    monkeypatch.setattr(socket.socket, "connect_ex", blocked_ex)
 
 
 @pytest.fixture

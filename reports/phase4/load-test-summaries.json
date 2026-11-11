@@ -1,0 +1,780 @@
+{
+  "generated_utc": "2026-11-11T13:09:12.001349+00:00",
+  "simulated_notice": "Every stand-in measurement is simulated by src/relay/mock. Real calibration rows are separate.",
+  "scenarios": [
+    {
+      "scenario": "A-steady",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 40,
+      "ok": 40,
+      "rate_limited": 0,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 0,
+      "retries": 0,
+      "tokens_in": 2760,
+      "tokens_out": 680,
+      "ttft_ms": {
+        "p50": 829.065,
+        "p95": 850.627,
+        "p99": 857.245,
+        "samples": 40
+      },
+      "total_ms": {
+        "p50": 829.239,
+        "p95": 850.777,
+        "p99": 857.437,
+        "samples": 40
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 40
+      },
+      "throughput_rps": 6.958,
+      "wall_seconds": 5.749,
+      "retry_policy": {
+        "max_attempts": 2,
+        "base_delay_seconds": 0.05,
+        "max_delay_seconds": 0.25,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 64,
+        "queue_timeout_seconds": 5.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 40,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 600,
+        "daily_request_budget": 10000,
+        "daily_token_budget": 10000000,
+        "processing_delay_ms": 650,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 64,
+        "max_queue_size": 256,
+        "queue_timeout_ms": 5000,
+        "load_latency_ms_per_active": 15,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "B-burst",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 30,
+      "ok": 30,
+      "rate_limited": 0,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 0,
+      "retries": 0,
+      "tokens_in": 2070,
+      "tokens_out": 510,
+      "ttft_ms": {
+        "p50": 817.115,
+        "p95": 842.938,
+        "p99": 845.627,
+        "samples": 30
+      },
+      "total_ms": {
+        "p50": 1643.186,
+        "p95": 3244.761,
+        "p99": 3246.141,
+        "samples": 30
+      },
+      "queue_wait_ms": {
+        "p50": 812.5,
+        "p95": 2406.0,
+        "p99": 2428.01,
+        "samples": 30
+      },
+      "throughput_rps": 9.224,
+      "wall_seconds": 3.252,
+      "retry_policy": {
+        "max_attempts": 2,
+        "base_delay_seconds": 0.05,
+        "max_delay_seconds": 0.25,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 64,
+        "queue_timeout_seconds": 5.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 30,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 600,
+        "daily_request_budget": 10000,
+        "daily_token_budget": 10000000,
+        "processing_delay_ms": 650,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 64,
+        "max_queue_size": 256,
+        "queue_timeout_ms": 5000,
+        "load_latency_ms_per_active": 15,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "C-overload",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 80,
+      "ok": 25,
+      "rate_limited": 0,
+      "timeouts": 35,
+      "errors": 20,
+      "given_up": 55,
+      "retries": 0,
+      "tokens_in": 1725,
+      "tokens_out": 425,
+      "ttft_ms": {
+        "p50": 387.041,
+        "p95": 651.615,
+        "p99": 658.333,
+        "samples": 25
+      },
+      "total_ms": {
+        "p50": 307.889,
+        "p95": 633.399,
+        "p99": 654.101,
+        "samples": 80
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 266.75,
+        "p99": 281.21,
+        "samples": 80
+      },
+      "throughput_rps": 17.315,
+      "wall_seconds": 4.62,
+      "retry_policy": {
+        "max_attempts": 1,
+        "base_delay_seconds": 0.2,
+        "max_delay_seconds": 2.0,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 20,
+        "max_queue_size": 128,
+        "queue_timeout_seconds": 2.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 80,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "overloaded",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 600,
+        "daily_request_budget": 10000,
+        "daily_token_budget": 10000000,
+        "processing_delay_ms": 150,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 2,
+        "max_queue_size": 4,
+        "queue_timeout_ms": 300,
+        "load_latency_ms_per_active": 120,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "D-per-minute-baseline",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 40,
+      "ok": 30,
+      "rate_limited": 10,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 10,
+      "retries": 0,
+      "tokens_in": 2070,
+      "tokens_out": 510,
+      "ttft_ms": {
+        "p50": 828.106,
+        "p95": 849.435,
+        "p99": 854.93,
+        "samples": 30
+      },
+      "total_ms": {
+        "p50": 821.692,
+        "p95": 848.947,
+        "p99": 854.407,
+        "samples": 40
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 40
+      },
+      "throughput_rps": 8.218,
+      "wall_seconds": 4.867,
+      "retry_policy": {
+        "max_attempts": 1,
+        "base_delay_seconds": 0.2,
+        "max_delay_seconds": 2.0,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 64,
+        "queue_timeout_seconds": 5.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 40,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 30,
+        "daily_request_budget": 10000,
+        "daily_token_budget": 10000000,
+        "processing_delay_ms": 650,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 64,
+        "max_queue_size": 256,
+        "queue_timeout_ms": 5000,
+        "load_latency_ms_per_active": 15,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "D-per-minute-halved",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 40,
+      "ok": 15,
+      "rate_limited": 25,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 25,
+      "retries": 0,
+      "tokens_in": 1035,
+      "tokens_out": 255,
+      "ttft_ms": {
+        "p50": 822.967,
+        "p95": 845.18,
+        "p99": 854.261,
+        "samples": 15
+      },
+      "total_ms": {
+        "p50": 1.48,
+        "p95": 840.005,
+        "p99": 850.344,
+        "samples": 40
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 40
+      },
+      "throughput_rps": 8.207,
+      "wall_seconds": 4.874,
+      "retry_policy": {
+        "max_attempts": 1,
+        "base_delay_seconds": 0.2,
+        "max_delay_seconds": 2.0,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 64,
+        "queue_timeout_seconds": 5.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 40,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 15,
+        "daily_request_budget": 10000,
+        "daily_token_budget": 10000000,
+        "processing_delay_ms": 650,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 64,
+        "max_queue_size": 256,
+        "queue_timeout_ms": 5000,
+        "load_latency_ms_per_active": 15,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "E-daily-budget",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 25,
+      "ok": 10,
+      "rate_limited": 15,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 15,
+      "retries": 0,
+      "tokens_in": 690,
+      "tokens_out": 170,
+      "ttft_ms": {
+        "p50": 206.678,
+        "p95": 225.683,
+        "p99": 227.055,
+        "samples": 10
+      },
+      "total_ms": {
+        "p50": 1.628,
+        "p95": 223.549,
+        "p99": 226.632,
+        "samples": 25
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 25
+      },
+      "throughput_rps": 10.407,
+      "wall_seconds": 2.402,
+      "retry_policy": {
+        "max_attempts": 2,
+        "base_delay_seconds": 0.01,
+        "max_delay_seconds": 2.0,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 64,
+        "queue_timeout_seconds": 5.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 25,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 600,
+        "daily_request_budget": 10,
+        "daily_token_budget": 10000000,
+        "processing_delay_ms": 100,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 64,
+        "max_queue_size": 256,
+        "queue_timeout_ms": 5000,
+        "load_latency_ms_per_active": 15,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "retry-recovers",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 1,
+      "ok": 1,
+      "rate_limited": 0,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 0,
+      "retries": 1,
+      "tokens_in": 69,
+      "tokens_out": 17,
+      "ttft_ms": {
+        "p50": 109.308,
+        "p95": 109.308,
+        "p99": 109.308,
+        "samples": 1
+      },
+      "total_ms": {
+        "p50": 153.097,
+        "p95": 153.097,
+        "p99": 153.097,
+        "samples": 1
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 1
+      },
+      "throughput_rps": 6.515,
+      "wall_seconds": 0.154,
+      "retry_policy": {
+        "max_attempts": 2,
+        "base_delay_seconds": 0.01,
+        "max_delay_seconds": 0.02,
+        "jitter_fraction": 0,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 2,
+        "max_queue_size": 4,
+        "queue_timeout_seconds": 1.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 2,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 120,
+        "daily_request_budget": 5000,
+        "daily_token_budget": 2000000,
+        "processing_delay_ms": 20,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [
+          1
+        ],
+        "failure_every": null,
+        "retry_after_seconds": 0.001,
+        "max_concurrency": 8,
+        "max_queue_size": 8,
+        "queue_timeout_ms": 1000,
+        "load_latency_ms_per_active": 80,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "retry-worsens-no-retry",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 6,
+      "ok": 3,
+      "rate_limited": 3,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 3,
+      "retries": 0,
+      "tokens_in": 207,
+      "tokens_out": 51,
+      "ttft_ms": {
+        "p50": 162.698,
+        "p95": 242.871,
+        "p99": 249.997,
+        "samples": 3
+      },
+      "total_ms": {
+        "p50": 44.868,
+        "p95": 229.65,
+        "p99": 247.462,
+        "samples": 6
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 6
+      },
+      "throughput_rps": 23.641,
+      "wall_seconds": 0.254,
+      "retry_policy": {
+        "max_attempts": 1,
+        "base_delay_seconds": 0.2,
+        "max_delay_seconds": 2.0,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 16,
+        "queue_timeout_seconds": 2.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 6,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 3,
+        "daily_request_budget": 5000,
+        "daily_token_budget": 2000000,
+        "processing_delay_ms": 10,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 8,
+        "max_queue_size": 8,
+        "queue_timeout_ms": 1000,
+        "load_latency_ms_per_active": 80,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "retry-worsens-with-retry",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 6,
+      "ok": 3,
+      "rate_limited": 3,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 3,
+      "retries": 6,
+      "tokens_in": 207,
+      "tokens_out": 51,
+      "ttft_ms": {
+        "p50": 185.02,
+        "p95": 239.112,
+        "p99": 243.921,
+        "samples": 3
+      },
+      "total_ms": {
+        "p50": 54.596,
+        "p95": 230.282,
+        "p99": 242.316,
+        "samples": 6
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 6
+      },
+      "throughput_rps": 24.218,
+      "wall_seconds": 0.248,
+      "retry_policy": {
+        "max_attempts": 3,
+        "base_delay_seconds": 0.01,
+        "max_delay_seconds": 0.02,
+        "jitter_fraction": 0,
+        "respect_retry_after": false
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 16,
+        "queue_timeout_seconds": 2.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 12,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 3,
+        "daily_request_budget": 5000,
+        "daily_token_budget": 2000000,
+        "processing_delay_ms": 10,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 8,
+        "max_queue_size": 8,
+        "queue_timeout_ms": 1000,
+        "load_latency_ms_per_active": 80,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    },
+    {
+      "scenario": "daily-budget-no-retry",
+      "source": "stand-in",
+      "simulated": true,
+      "requests": 5,
+      "ok": 3,
+      "rate_limited": 2,
+      "timeouts": 0,
+      "errors": 0,
+      "given_up": 2,
+      "retries": 0,
+      "tokens_in": 207,
+      "tokens_out": 51,
+      "ttft_ms": {
+        "p50": 207.914,
+        "p95": 267.8,
+        "p99": 273.124,
+        "samples": 3
+      },
+      "total_ms": {
+        "p50": 78.252,
+        "p95": 261.318,
+        "p99": 271.944,
+        "samples": 5
+      },
+      "queue_wait_ms": {
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "samples": 5
+      },
+      "throughput_rps": 18.008,
+      "wall_seconds": 0.278,
+      "retry_policy": {
+        "max_attempts": 3,
+        "base_delay_seconds": 0.01,
+        "max_delay_seconds": 2.0,
+        "jitter_fraction": 0.1,
+        "respect_retry_after": true
+      },
+      "manager": {
+        "max_concurrency": 8,
+        "max_queue_size": 16,
+        "queue_timeout_seconds": 2.0,
+        "stats": {
+          "active": 0,
+          "waiting": 0,
+          "admitted": 5,
+          "queue_full": 0,
+          "queue_timeouts": 0
+        }
+      },
+      "mock_config": {
+        "scenario": "normal",
+        "seed": 0,
+        "model": "mock/gpt-oss-20b",
+        "per_minute_limit": 120,
+        "daily_request_budget": 3,
+        "daily_token_budget": 2000000,
+        "processing_delay_ms": 10,
+        "slow_delay_ms": 2500,
+        "timeout_after_ms": 300,
+        "failure_status": 503,
+        "failure_probability": 0.0,
+        "failure_on_requests": [],
+        "failure_every": null,
+        "retry_after_seconds": 1.0,
+        "max_concurrency": 8,
+        "max_queue_size": 8,
+        "queue_timeout_ms": 1000,
+        "load_latency_ms_per_active": 80,
+        "streaming_chunks": 4,
+        "streaming_chunk_delay_ms": 20,
+        "answer_text": "Simulated deterministic answer from the Relay mock model service.",
+        "input_token_overhead": 56
+      }
+    }
+  ],
+  "results_csv": "results\\results.csv",
+  "raw_dir": "results\\phase4\\raw"
+}

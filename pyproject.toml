@@ -18,6 +18,9 @@ dependencies = [
     "huggingface-hub==2.4.0",
     "groq==1.7.0",
     "python-dotenv==1.2.4",
+    "fastapi==0.162.2",
+    "httpx==0.28.1",
+    "uvicorn==0.54.0",
 ]
 
 [project.optional-dependencies]
@@ -26,6 +29,7 @@ dev = ["pytest==9.2.0", "ruff==0.14.14"]
 [project.scripts]
 relay-rag = "retrieval.cli:main"
 relay = "relay.cli:main"
+relay-mock = "relay.mock.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -30,12 +30,29 @@ def pytest_collection_modifyitems(config, items):
 
 @pytest.fixture(scope="session", autouse=True)
 def no_network():
-    def blocked(*args, **kwargs):
+    original_connect = socket.socket.connect
+    original_connect_ex = socket.socket.connect_ex
+
+    def is_loopback(address):
+        # asyncio's event loop creates a loopback socketpair on Windows. Tests
+        # still must not contact Groq or any other external service.
+        return (
+            isinstance(address, tuple) and len(address) >= 2 and address[0] in {"127.0.0.1", "::1"}
+        )
+
+    def blocked(self, address, *args, **kwargs):
+        if is_loopback(address):
+            return original_connect(self, address, *args, **kwargs)
+        raise AssertionError("Tests must not open network connections")
+
+    def blocked_ex(self, address, *args, **kwargs):
+        if is_loopback(address):
+            return original_connect_ex(self, address, *args, **kwargs)
         raise AssertionError("Tests must not open network connections")
 
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(socket.socket, "connect", blocked)
-        patch.setattr(socket.socket, "connect_ex", blocked)
+        patch.setattr(socket.socket, "connect_ex", blocked_ex)
         yield
 
 
