@@ -1,0 +1,235 @@
+{
+  "collection": "relay_3aeaf9c0660db448b08e31b78fccf4a7",
+  "fingerprint": "3aeaf9c0660db448b08e31b78fccf4a7302fcbe8adca275018dac38605aa8576",
+  "configuration": {
+    "chunk_size": 300,
+    "overlap": 50,
+    "top_k": 3,
+    "batch_size": 16,
+    "chunking": "boundary",
+    "strategy": "vector",
+    "candidate_k": 50,
+    "bm25_k1": 1.5,
+    "bm25_b": 0.75,
+    "rrf_constant": 60
+  },
+  "descriptor": {
+    "pipeline": "relay-rag-v2",
+    "corpus": [
+      {
+        "title": "Attention Is All You Need",
+        "arxiv_id": "1706.03762",
+        "version": 7,
+        "filename": "attention_is_all_you_need.pdf",
+        "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+      },
+      {
+        "title": "Moshi: a speech-text foundation model for real-time dialogue",
+        "arxiv_id": "2410.00037",
+        "version": 1,
+        "filename": "moshi.pdf",
+        "sha256": "a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac"
+      },
+      {
+        "title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+        "arxiv_id": "2507.07955",
+        "version": 2,
+        "filename": "dynamic_chunking.pdf",
+        "sha256": "04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f"
+      }
+    ],
+    "chunking": {
+      "chunk_size": 300,
+      "overlap": 50,
+      "chunking": "boundary"
+    },
+    "embedding": {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+      "dimension": 384,
+      "window_tokens": 254,
+      "pooling": "token-weighted-normalized-windows-v1",
+      "device": "cpu",
+      "torch_threads": 1,
+      "seed": 0
+    },
+    "runtime": {
+      "pymupdf": "2.1",
+      "sentence-transformers": "6.2.0",
+      "chromadb": "1.5.9",
+      "numpy": "2.5.4",
+      "torch": "2.15.0",
+      "transformers": "5.22.2",
+      "tokenizers": "0.23.3",
+      "huggingface-hub": "2.4.0"
+    }
+  },
+  "total_chunks": 450,
+  "new_chunks": 450,
+  "reused_chunks": 0,
+  "documents": [
+    {
+      "title": "Attention Is All You Need",
+      "arxiv_id": "1706.03762",
+      "version": 7,
+      "filename": "attention_is_all_you_need.pdf",
+      "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697",
+      "document_id": "arxiv:1706.03762v7:bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697",
+      "page_count": 15,
+      "extracted_pages": 15,
+      "unique_pages": 15,
+      "issues": [
+        {
+          "kind": "math_layout_warning",
+          "page_number": 4,
+          "message": "Math glyphs retained as text; inspect the PDF for fractions and two-dimensional equations.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "math_layout_warning",
+          "page_number": 5,
+          "message": "Math glyphs retained as text; inspect the PDF for fractions and two-dimensional equations.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 8,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        }
+      ],
+      "chunks": 53
+    },
+    {
+      "title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "filename": "moshi.pdf",
+      "sha256": "a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac",
+      "document_id": "arxiv:2410.00037v1:a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac",
+      "page_count": 66,
+      "extracted_pages": 66,
+      "unique_pages": 66,
+      "issues": [
+        {
+          "kind": "table_layout_warning",
+          "page_number": 27,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 29,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 30,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 33,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 37,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 39,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 40,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        }
+      ],
+      "chunks": 219
+    },
+    {
+      "title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "filename": "dynamic_chunking.pdf",
+      "sha256": "04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f",
+      "document_id": "arxiv:2507.07955v2:04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f",
+      "page_count": 39,
+      "extracted_pages": 39,
+      "unique_pages": 39,
+      "issues": [
+        {
+          "kind": "math_layout_warning",
+          "page_number": 6,
+          "message": "Math glyphs retained as text; inspect the PDF for fractions and two-dimensional equations.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 7,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "math_layout_warning",
+          "page_number": 8,
+          "message": "Math glyphs retained as text; inspect the PDF for fractions and two-dimensional equations.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 13,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 14,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 17,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 21,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "math_layout_warning",
+          "page_number": 35,
+          "message": "Math glyphs retained as text; inspect the PDF for fractions and two-dimensional equations.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 38,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        },
+        {
+          "kind": "table_layout_warning",
+          "page_number": 39,
+          "message": "Table rows retained; spanning or ambiguous columns need the original PDF for interpretation.",
+          "duplicate_of": null
+        }
+      ],
+      "chunks": 178
+    }
+  ],
+  "duplicate_chunks": []
+}

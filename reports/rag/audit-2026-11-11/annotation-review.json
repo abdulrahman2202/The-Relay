@@ -1,0 +1,42 @@
+{
+  "purpose": "Manual review of alternate valid evidence after inspecting the saved rankings. Questions, retrieval settings, vectors, and rankings are unchanged. Raw annotations/results are retained alongside these reviewed annotations.",
+  "arithmetic_policy": "Credit transparent multiplication of an explicitly named model's batch token count by training steps. This is evidence support, not a claim that an answer generator performed the calculation.",
+  "additions": [
+    {
+      "question": "A3", "unit": 0,
+      "rationale": "Table 3 independently states the base model's h=8; the header plus base row are valid evidence, not only the prose on page 5.",
+      "alternatives": [[{"page": 9, "quote": "N\ndmodel\ndff\nh\ndk\ndv"}, {"page": 9, "quote": "base\n6\n512\n2048\n8\n64\n64"}]]
+    },
+    {
+      "question": "A3", "unit": 1,
+      "rationale": "The same Table 3 columns and base row state d_k=d_v=64.",
+      "alternatives": [[{"page": 9, "quote": "N\ndmodel\ndff\nh\ndk\ndv"}, {"page": 9, "quote": "base\n6\n512\n2048\n8\n64\n64"}]]
+    },
+    {
+      "question": "M3", "unit": 0,
+      "rationale": "The conclusion repeats Helium's 7B size; 7B references to other models are deliberately not accepted.",
+      "alternatives": [[{"page": 41, "quote": "Helium, a 7B parameter text LLM"}]]
+    },
+    {
+      "question": "M3", "unit": 1,
+      "rationale": "500,000 steps times 4.2 million tokens per step is approximately 2.1 trillion tokens. The model/column identity must also be present. This is an explicitly recorded arithmetic alternative, not an exact-phrase match.",
+      "alternatives": [
+        [{"page": 20, "quote": "Helium, is trained for 500k\nsteps, with a batch size of 4.2M tokens"}],
+        [{"page": 8, "quote": "Helium training\nMoshi training\nHyper-parameter\npre-training\npre-training"}, {"page": 8, "quote": "Batch size (text)\n4.2M tok."}, {"page": 8, "quote": "Training steps\n500k"}]
+      ]
+    },
+    {
+      "question": "M4", "unit": 0,
+      "rationale": "The related-work comparison explicitly describes aligned text/audio and the hierarchical text/semantic/acoustic chain. Alternatively, the conclusion's text-prefix statement plus the word-timestamp alignment explanation jointly support the answer.",
+      "alternatives": [
+        [{"page": 5, "quote": "aligned text and speech data. Inner Monologue decomposes speech into a chain of text, se-\nmantic and acoustic tokens, and predicts this structured sequence in a hierarchical manner"}],
+        [{"page": 41, "quote": "Inner Monologue, a new method that generates text tokens as a prefix to\naudio tokens"}, {"page": 16, "quote": "we need to align them to this framerate. For that,\nwe leverage the word-level timestamp provided by Whisper"}]
+      ]
+    },
+    {
+      "question": "H1", "unit": 0,
+      "rationale": "Figure 1 and its adjoining explanation describe learned boundaries, compression comparable to tokenization, and absence of fixed heuristics; these are valid answers to the broad existing smoke question.",
+      "alternatives": [[{"page": 3, "quote": "chunking module naturally compresses data to a similar resolution as BPE tokenizers (4.5-5 bytes/chunk) and qualitatively\nlearns meaningful boundaries, all without any external supervision or heuristics"}]]
+    }
+  ]
+}

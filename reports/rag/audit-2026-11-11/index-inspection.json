@@ -1,0 +1,77 @@
+{
+  "300": {
+    "collection": "relay_c7913dc6e7727636bf86bbe6bb8f767e",
+    "fingerprint": "c7913dc6e7727636bf86bbe6bb8f767eb70e5b2bc821b6873f68a0ca4646011c",
+    "chunks": 380,
+    "by_paper": {
+      "1706.03762": 38,
+      "2410.00037": 192,
+      "2507.07955": 150
+    },
+    "metadata_or_source_mismatches": [],
+    "word_interior_starts": 53,
+    "word_interior_ends": 46,
+    "ready": true,
+    "embedding_descriptor": {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+      "dimension": 384,
+      "window_tokens": 254,
+      "pooling": "token-weighted-normalized-windows-v1",
+      "device": "cpu",
+      "torch_threads": 1,
+      "seed": 0
+    },
+    "preparation_seconds": 3.682067300000199
+  },
+  "600": {
+    "collection": "relay_1eea3a80fcdb2868e6fde784f7e72299",
+    "fingerprint": "1eea3a80fcdb2868e6fde784f7e72299253b8ea76d58e8e7c966d2cf4899839f",
+    "chunks": 173,
+    "by_paper": {
+      "1706.03762": 17,
+      "2410.00037": 88,
+      "2507.07955": 68
+    },
+    "metadata_or_source_mismatches": [],
+    "word_interior_starts": 34,
+    "word_interior_ends": 31,
+    "ready": true,
+    "embedding_descriptor": {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+      "dimension": 384,
+      "window_tokens": 254,
+      "pooling": "token-weighted-normalized-windows-v1",
+      "device": "cpu",
+      "torch_threads": 1,
+      "seed": 0
+    },
+    "preparation_seconds": 78.01906030000009
+  },
+  "900": {
+    "collection": "relay_70bc1e0d057061b6ccb6dc1bf8915352",
+    "fingerprint": "70bc1e0d057061b6ccb6dc1bf8915352106f744cbab191856c76b51e05dfd8ed",
+    "chunks": 112,
+    "by_paper": {
+      "1706.03762": 11,
+      "2410.00037": 57,
+      "2507.07955": 44
+    },
+    "metadata_or_source_mismatches": [],
+    "word_interior_starts": 10,
+    "word_interior_ends": 12,
+    "ready": true,
+    "embedding_descriptor": {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+      "dimension": 384,
+      "window_tokens": 254,
+      "pooling": "token-weighted-normalized-windows-v1",
+      "device": "cpu",
+      "torch_threads": 1,
+      "seed": 0
+    },
+    "preparation_seconds": 78.55518720000009
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "query": "What p95 end-to-end latency does the Moshi paper measure on an iPhone 15 Pro running iOS?",
+  "hits": [
+    {
+      "chunk_id": "9a6f16eb2a4d9e57a3ce9a48a1dcdbed08272bbb8430e37e3666a81c15f014f9",
+      "text": "2.2.2\nDechunking\n\nThe dechunking layer (Dechunk in equation (3)) consists of a smoothing module and upsampler, as illustrated in Figure 1-\n( top-right ).\n\nSmoothing Module.\nThe critical challenge in training a dynamic chunking module lies in the discrete nature of chunk\nboundaries, which impedes gradient flow during backpropagation. We introduce the smoothing module as a technique\nto address this problem. As illustrated in Figure 1-(c), this component transforms discrete chunking operations into\n\n\n | n e w _ p r o d u c t ! _ |  |  |  |  | n e w _ p r o d u c t ! _ |  |  |  |  |  | n e w _ p r o d u c t ! _ |  |  | \n\u0302#new_ | #pro | #duct! | #ne | #new_ | #pro | #du | #duct! | #ne\u00e0 | #...ne | #new_ | #pro | #du | \u00e0 | #produ | \u0302#duct!\n | Upper Stages |  |  |  |  | Upper Stages |  |  |  |  |  | Upper Stages |  |  | \n!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!",
+      "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "pages": [
+        6,
+        7
+      ],
+      "sections": [
+        "2.2.2 Dechunking"
+      ],
+      "sources": [
+        {
+          "page_number": 6,
+          "section": "2.2.2 Dechunking",
+          "start_char": 0,
+          "end_char": 502
+        },
+        {
+          "page_number": 7,
+          "section": "2.2.2 Dechunking",
+          "start_char": 503,
+          "end_char": 918
+        }
+      ],
+      "distance": null,
+      "retrieval_method": "bm25",
+      "retrieval_score": 13.354295492071433,
+      "char_start": 22430,
+      "parent_chunk_id": null,
+      "score": 13.354295492071433,
+      "score_type": "bm25",
+      "citation": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, pp. 6, 7)",
+      "source_url": "https://arxiv.org/pdf/2507.07955v2#page=6"
+    },
+    {
+      "chunk_id": "6df5971bbb8f8787632a9f1cb5a55f8f9b53b0ff079865f4e491f85477dbbe18",
+      "text": "!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!\n | ... n e w _ p r o d u c t ! |  |  |  |  | ... n e w _ p r o d u c t ! |  |  |  |  |  | ... n e w _ p r o d u c t ! |  |  | \n\u25cf | \u25cf | \u25cf | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf\n | (a) Oracle Boundaries |  |  |  |  | (b) w/o Smoothing Module |  |  |  |  |  | (c) w/ Smoothing Module |  |  | \n\nFigure 2: Comparison of decompression strategies on the example sequence \"...new product!\". indicates a boundary\nwith high confidence (Pt = 1.0) and G# indicates a boundary with low confidence (Pt = 0.5). As each letter in the example\nis unique, we use the letters in subscripts to denote expected semantics of chunks. (a) Optimal chunking with oracle\nboundaries identifying linguistically meaningful units. (b) Suboptimal chunking without a smoothing module.",
+      "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "pages": [
+        7
+      ],
+      "sections": [
+        "2.2.2 Dechunking"
+      ],
+      "sources": [
+        {
+          "page_number": 7,
+          "section": "2.2.2 Dechunking",
+          "start_char": 0,
+          "end_char": 857
+        }
+      ],
+      "distance": null,
+      "retrieval_method": "bm25",
+      "retrieval_score": 12.27163111684868,
+      "char_start": 23255,
+      "parent_chunk_id": null,
+      "score": 12.27163111684868,
+      "score_type": "bm25",
+      "citation": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, p. 7)",
+      "source_url": "https://arxiv.org/pdf/2507.07955v2#page=7"
+    },
+    {
+      "chunk_id": "c7018105150d07013fb0bd993a5095a20dc0afa95c36a70d339e0b7b701b0107",
+      "text": "With the smoothing module (see\nFigure 2-(c)), chunks with low confidence are smoothed with previous context, ensuring proper information propagation\nand enabling the model to learn optimal chunk boundaries through gradient descent.\n\nUpsampler.\nWe carefully design the upsampler (see Figure 1-(d)) that decompresses \u0304z^{s+1} to match the original resolution\nof inputs in the previous stage z^{s} with the following definition:\n\n(\n\nct = p^{bt}\n\nt^{(1\u2212pt)1\u2212bt=}\n\n\u0303zt = \u0304z^{\u00cd}t\n\nk=1 ^{bk,}\n(8)\n\npt\nif bt = 1,\n1 \u2212 pt\notherwise,\n(6)\n\nUpsampler( \u0304z,c)t = STE (ct ) \u00b7 \u0303zt .\n(9)\n\nSTE(ct ) = ct + stopgradient(1 \u2212 ct ),\n(7)\n\nEach component serves a specific purpose in enabling stable end-to-end learning:\n\n8pro- \u2013 meaning forward or forth, -duct \u2013 from Latin ducere, meaning to lead or to bring\n\n\n\u2022 Confidence scoring (6): The coefficient c quantifies the routing module\u2019s confidence in its boundary decisions. For\npositions marked as boundaries (bt = 1), ct = pt rewards high boundary probabilities. In contrast, for non-boundary\npositions (bt = 0), ct = 1 \u2212 pt penalizes false boundary predictions.",
+      "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "pages": [
+        7,
+        8
+      ],
+      "sections": [
+        "2.2.2 Dechunking"
+      ],
+      "sources": [
+        {
+          "page_number": 7,
+          "section": "2.2.2 Dechunking",
+          "start_char": 0,
+          "end_char": 787
+        },
+        {
+          "page_number": 8,
+          "section": "2.2.2 Dechunking",
+          "start_char": 788,
+          "end_char": 1091
+        }
+      ],
+      "distance": null,
+      "retrieval_method": "bm25",
+      "retrieval_score": 9.853096652525476,
+      "char_start": 25945,
+      "parent_chunk_id": null,
+      "score": 9.853096652525476,
+      "score_type": "bm25",
+      "citation": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, pp. 7, 8)",
+      "source_url": "https://arxiv.org/pdf/2507.07955v2#page=7"
+    }
+  ],
+  "context": "[1] Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, pp. 6, 7)\n2.2.2\nDechunking\n\nThe dechunking layer (Dechunk in equation (3)) consists of a smoothing module and upsampler, as illustrated in Figure 1-\n( top-right ).\n\nSmoothing Module.\nThe critical challenge in training a dynamic chunking module lies in the discrete nature of chunk\nboundaries, which impedes gradient flow during backpropagation. We introduce the smoothing module as a technique\nto address this problem. As illustrated in Figure 1-(c), this component transforms discrete chunking operations into\n\n\n | n e w _ p r o d u c t ! _ |  |  |  |  | n e w _ p r o d u c t ! _ |  |  |  |  |  | n e w _ p r o d u c t ! _ |  |  | \n\u0302#new_ | #pro | #duct! | #ne | #new_ | #pro | #du | #duct! | #ne\u00e0 | #...ne | #new_ | #pro | #du | \u00e0 | #produ | \u0302#duct!\n | Upper Stages |  |  |  |  | Upper Stages |  |  |  |  |  | Upper Stages |  |  | \n!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!\n\n[2] Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, p. 7)\n!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!\n | ... n e w _ p r o d u c t ! |  |  |  |  | ... n e w _ p r o d u c t ! |  |  |  |  |  | ... n e w _ p r o d u c t ! |  |  | \n\u25cf | \u25cf | \u25cf | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf\n | (a) Oracle Boundaries |  |  |  |  | (b) w/o Smoothing Module |  |  |  |  |  | (c) w/ Smoothing Module |  |  | \n\nFigure 2: Comparison of decompression strategies on the example sequence \"...new product!\". indicates a boundary\nwith high confidence (Pt = 1.0) and G# indicates a boundary with low confidence (Pt = 0.5). As each letter in the example\nis unique, we use the letters in subscripts to denote expected semantics of chunks. (a) Optimal chunking with oracle\nboundaries identifying linguistically meaningful units. (b) Suboptimal chunking without a smoothing module.\n\n[3] Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, pp. 7, 8)\nWith the smoothing module (see\nFigure 2-(c)), chunks with low confidence are smoothed with previous context, ensuring proper information propagation\nand enabling the model to learn optimal chunk boundaries through gradient descent.\n\nUpsampler.\nWe carefully design the upsampler (see Figure 1-(d)) that decompresses \u0304z^{s+1} to match the original resolution\nof inputs in the previous stage z^{s} with the following definition:\n\n(\n\nct = p^{bt}\n\nt^{(1\u2212pt)1\u2212bt=}\n\n\u0303zt = \u0304z^{\u00cd}t\n\nk=1 ^{bk,}\n(8)\n\npt\nif bt = 1,\n1 \u2212 pt\notherwise,\n(6)\n\nUpsampler( \u0304z,c)t = STE (ct ) \u00b7 \u0303zt .\n(9)\n\nSTE(ct ) = ct + stopgradient(1 \u2212 ct ),\n(7)\n\nEach component serves a specific purpose in enabling stable end-to-end learning:\n\n8pro- \u2013 meaning forward or forth, -duct \u2013 from Latin ducere, meaning to lead or to bring\n\n\n\u2022 Confidence scoring (6): The coefficient c quantifies the routing module\u2019s confidence in its boundary decisions. For\npositions marked as boundaries (bt = 1), ct = pt rewards high boundary probabilities. In contrast, for non-boundary\npositions (bt = 0), ct = 1 \u2212 pt penalizes false boundary predictions.",
+  "context_tokens": 961,
+  "context_hits": [
+    {
+      "chunk_id": "9a6f16eb2a4d9e57a3ce9a48a1dcdbed08272bbb8430e37e3666a81c15f014f9",
+      "text": "2.2.2\nDechunking\n\nThe dechunking layer (Dechunk in equation (3)) consists of a smoothing module and upsampler, as illustrated in Figure 1-\n( top-right ).\n\nSmoothing Module.\nThe critical challenge in training a dynamic chunking module lies in the discrete nature of chunk\nboundaries, which impedes gradient flow during backpropagation. We introduce the smoothing module as a technique\nto address this problem. As illustrated in Figure 1-(c), this component transforms discrete chunking operations into\n\n\n | n e w _ p r o d u c t ! _ |  |  |  |  | n e w _ p r o d u c t ! _ |  |  |  |  |  | n e w _ p r o d u c t ! _ |  |  | \n\u0302#new_ | #pro | #duct! | #ne | #new_ | #pro | #du | #duct! | #ne\u00e0 | #...ne | #new_ | #pro | #du | \u00e0 | #produ | \u0302#duct!\n | Upper Stages |  |  |  |  | Upper Stages |  |  |  |  |  | Upper Stages |  |  | \n!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!",
+      "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "pages": [
+        6,
+        7
+      ],
+      "sections": [
+        "2.2.2 Dechunking"
+      ],
+      "sources": [
+        {
+          "page_number": 6,
+          "section": "2.2.2 Dechunking",
+          "start_char": 0,
+          "end_char": 502
+        },
+        {
+          "page_number": 7,
+          "section": "2.2.2 Dechunking",
+          "start_char": 503,
+          "end_char": 918
+        }
+      ],
+      "distance": null,
+      "retrieval_method": "bm25",
+      "retrieval_score": 13.354295492071433,
+      "char_start": 22430,
+      "parent_chunk_id": null,
+      "score": 13.354295492071433,
+      "score_type": "bm25",
+      "citation": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, pp. 6, 7)",
+      "source_url": "https://arxiv.org/pdf/2507.07955v2#page=6"
+    },
+    {
+      "chunk_id": "6df5971bbb8f8787632a9f1cb5a55f8f9b53b0ff079865f4e491f85477dbbe18",
+      "text": "!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!\n | ... n e w _ p r o d u c t ! |  |  |  |  | ... n e w _ p r o d u c t ! |  |  |  |  |  | ... n e w _ p r o d u c t ! |  |  | \n\u25cf | \u25cf | \u25cf | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf\n | (a) Oracle Boundaries |  |  |  |  | (b) w/o Smoothing Module |  |  |  |  |  | (c) w/ Smoothing Module |  |  | \n\nFigure 2: Comparison of decompression strategies on the example sequence \"...new product!\". indicates a boundary\nwith high confidence (Pt = 1.0) and G# indicates a boundary with low confidence (Pt = 0.5). As each letter in the example\nis unique, we use the letters in subscripts to denote expected semantics of chunks. (a) Optimal chunking with oracle\nboundaries identifying linguistically meaningful units. (b) Suboptimal chunking without a smoothing module.",
+      "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "pages": [
+        7
+      ],
+      "sections": [
+        "2.2.2 Dechunking"
+      ],
+      "sources": [
+        {
+          "page_number": 7,
+          "section": "2.2.2 Dechunking",
+          "start_char": 0,
+          "end_char": 857
+        }
+      ],
+      "distance": null,
+      "retrieval_method": "bm25",
+      "retrieval_score": 12.27163111684868,
+      "char_start": 23255,
+      "parent_chunk_id": null,
+      "score": 12.27163111684868,
+      "score_type": "bm25",
+      "citation": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, p. 7)",
+      "source_url": "https://arxiv.org/pdf/2507.07955v2#page=7"
+    },
+    {
+      "chunk_id": "c7018105150d07013fb0bd993a5095a20dc0afa95c36a70d339e0b7b701b0107",
+      "text": "With the smoothing module (see\nFigure 2-(c)), chunks with low confidence are smoothed with previous context, ensuring proper information propagation\nand enabling the model to learn optimal chunk boundaries through gradient descent.\n\nUpsampler.\nWe carefully design the upsampler (see Figure 1-(d)) that decompresses \u0304z^{s+1} to match the original resolution\nof inputs in the previous stage z^{s} with the following definition:\n\n(\n\nct = p^{bt}\n\nt^{(1\u2212pt)1\u2212bt=}\n\n\u0303zt = \u0304z^{\u00cd}t\n\nk=1 ^{bk,}\n(8)\n\npt\nif bt = 1,\n1 \u2212 pt\notherwise,\n(6)\n\nUpsampler( \u0304z,c)t = STE (ct ) \u00b7 \u0303zt .\n(9)\n\nSTE(ct ) = ct + stopgradient(1 \u2212 ct ),\n(7)\n\nEach component serves a specific purpose in enabling stable end-to-end learning:\n\n8pro- \u2013 meaning forward or forth, -duct \u2013 from Latin ducere, meaning to lead or to bring\n\n\n\u2022 Confidence scoring (6): The coefficient c quantifies the routing module\u2019s confidence in its boundary decisions. For\npositions marked as boundaries (bt = 1), ct = pt rewards high boundary probabilities. In contrast, for non-boundary\npositions (bt = 0), ct = 1 \u2212 pt penalizes false boundary predictions.",
+      "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+      "arxiv_id": "2507.07955",
+      "version": 2,
+      "pages": [
+        7,
+        8
+      ],
+      "sections": [
+        "2.2.2 Dechunking"
+      ],
+      "sources": [
+        {
+          "page_number": 7,
+          "section": "2.2.2 Dechunking",
+          "start_char": 0,
+          "end_char": 787
+        },
+        {
+          "page_number": 8,
+          "section": "2.2.2 Dechunking",
+          "start_char": 788,
+          "end_char": 1091
+        }
+      ],
+      "distance": null,
+      "retrieval_method": "bm25",
+      "retrieval_score": 9.853096652525476,
+      "char_start": 25945,
+      "parent_chunk_id": null,
+      "score": 9.853096652525476,
+      "score_type": "bm25",
+      "citation": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling (arXiv:2507.07955v2, pp. 7, 8)",
+      "source_url": "https://arxiv.org/pdf/2507.07955v2#page=7"
+    }
+  ],
+  "omitted_ids": [],
+  "evidence": {
+    "status": "insufficient_evidence",
+    "reason": "The retrieved context does not support all requested constraints.",
+    "missing": [
+      "passage from arXiv:2410.00037",
+      "p95 in arXiv:2410.00037",
+      "iPhone 15 Pro in arXiv:2410.00037",
+      "iOS in arXiv:2410.00037"
+    ],
+    "refused": true
+  },
+  "requirements": [
+    {
+      "label": "passage from arXiv:2410.00037",
+      "alternatives": [],
+      "arxiv_id": "2410.00037"
+    },
+    {
+      "label": "p95 in arXiv:2410.00037",
+      "alternatives": [
+        "p95"
+      ],
+      "arxiv_id": "2410.00037"
+    },
+    {
+      "label": "iPhone 15 Pro in arXiv:2410.00037",
+      "alternatives": [
+        "iPhone 15 Pro"
+      ],
+      "arxiv_id": "2410.00037"
+    },
+    {
+      "label": "iOS in arXiv:2410.00037",
+      "alternatives": [
+        "iOS"
+      ],
+      "arxiv_id": "2410.00037"
+    }
+  ]
+}

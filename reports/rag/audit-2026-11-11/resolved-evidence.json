@@ -1,0 +1,557 @@
+{
+  "purpose": "Diagnostic audit set, annotated before running retrieval comparisons. Not a held-out benchmark.",
+  "answerable": [
+    {
+      "id": "A1",
+      "paper": "1706.03762",
+      "kind": "explanation",
+      "existing_smoke": true,
+      "query": "Why does scaled dot-product attention divide by the square root of key dimension?",
+      "answer": "Large dot products push softmax into regions with very small gradients; scaling by 1/sqrt(d_k) counters this.",
+      "units": [
+        {
+          "label": "large dot products and small gradients",
+          "alternatives": [
+            [
+              {
+                "page": 4,
+                "quote": "the dot products grow large in magnitude, pushing the softmax function into regions where it has\nextremely small gradients",
+                "start_char": 10564,
+                "end_char": 10686
+              }
+            ]
+          ]
+        },
+        {
+          "label": "inverse square-root scaling",
+          "alternatives": [
+            [
+              {
+                "page": 4,
+                "quote": "To counteract this effect, we scale the dot products by\n1\n√dk",
+                "start_char": 10690,
+                "end_char": 10751
+              }
+            ],
+            [
+              {
+                "page": 4,
+                "quote": "divide each by √dk, and apply a softmax function",
+                "start_char": 9471,
+                "end_char": 9519
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A2",
+      "paper": "1706.03762",
+      "kind": "table",
+      "query": "According to Table 2, what BLEU scores does Transformer (big) report for EN-DE and EN-FR?",
+      "answer": "Table 2: EN-DE 28.4, EN-FR 41.8. The prose on page 8 separately says 41.0 for EN-FR; do not silently resolve the discrepancy.",
+      "units": [
+        {
+          "label": "BLEU column labels",
+          "alternatives": [
+            [
+              {
+                "page": 8,
+                "quote": "BLEU\nTraining Cost (FLOPs)\nModel\nEN-DE\nEN-FR",
+                "start_char": 21592,
+                "end_char": 21636
+              }
+            ]
+          ]
+        },
+        {
+          "label": "big-model row with both scores",
+          "alternatives": [
+            [
+              {
+                "page": 8,
+                "quote": "Transformer (big)\n28.4\n41.8",
+                "start_char": 22051,
+                "end_char": 22078
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A3",
+      "paper": "1706.03762",
+      "kind": "numerical",
+      "query": "How many attention heads does the base Transformer use, and what are the per-head key and value dimensions?",
+      "answer": "8 heads, d_k=d_v=d_model/h=64.",
+      "units": [
+        {
+          "label": "8 attention heads",
+          "alternatives": [
+            [
+              {
+                "page": 5,
+                "quote": "we employ h = 8 parallel attention layers, or heads",
+                "start_char": 11963,
+                "end_char": 12014
+              }
+            ]
+          ]
+        },
+        {
+          "label": "64-dimensional keys and values",
+          "alternatives": [
+            [
+              {
+                "page": 5,
+                "quote": "dk = dv = dmodel/h = 64",
+                "start_char": 12041,
+                "end_char": 12064
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A4",
+      "paper": "1706.03762",
+      "kind": "numerical",
+      "query": "Which Adam beta values, epsilon, and number of learning-rate warmup steps were used to train the Transformer?",
+      "answer": "beta1=0.9, beta2=0.98, epsilon=10^-9, warmup_steps=4000.",
+      "units": [
+        {
+          "label": "Adam hyperparameters",
+          "alternatives": [
+            [
+              {
+                "page": 7,
+                "quote": "Adam optimizer [20] with β1 = 0.9, β2 = 0.98 and ε = 10−9",
+                "start_char": 20886,
+                "end_char": 20943
+              }
+            ]
+          ]
+        },
+        {
+          "label": "4000 warmup steps",
+          "alternatives": [
+            [
+              {
+                "page": 7,
+                "quote": "warmup_steps = 4000",
+                "start_char": 21301,
+                "end_char": 21320
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M1",
+      "paper": "2410.00037",
+      "kind": "numerical",
+      "existing_smoke": true,
+      "query": "What are the theoretical and practical latency of Moshi full-duplex speech dialogue?",
+      "answer": "160 ms theoretical and 200 ms in practice.",
+      "units": [
+        {
+          "label": "160 ms theoretical",
+          "alternatives": [
+            [
+              {
+                "page": 1,
+                "quote": "theoret-\nical latency of 160ms",
+                "start_char": 1893,
+                "end_char": 1923
+              }
+            ],
+            [
+              {
+                "page": 2,
+                "quote": "theo-\nretical latency of 160 ms",
+                "start_char": 4961,
+                "end_char": 4992
+              }
+            ],
+            [
+              {
+                "page": 26,
+                "quote": "theoretical latency of 160ms",
+                "start_char": 79917,
+                "end_char": 79945
+              }
+            ],
+            [
+              {
+                "page": 41,
+                "quote": "160ms theoretical latency",
+                "start_char": 124834,
+                "end_char": 124859
+              }
+            ]
+          ]
+        },
+        {
+          "label": "200 ms practical",
+          "alternatives": [
+            [
+              {
+                "page": 1,
+                "quote": "200ms in practice",
+                "start_char": 1925,
+                "end_char": 1942
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "paper": "2410.00037",
+      "kind": "numerical",
+      "query": "How many quantizers and entries per codebook does Mimi use, at what frame rate and resulting bitrate?",
+      "answer": "8 quantizers, 2048 entries per codebook, 12.5 Hz, 1.1 kbps.",
+      "units": [
+        {
+          "label": "8 quantizers and 2048 entries",
+          "alternatives": [
+            [
+              {
+                "page": 11,
+                "quote": "Q = 8 quantizers, each with a codebook size of NA = 2048",
+                "start_char": 31747,
+                "end_char": 31803
+              }
+            ]
+          ]
+        },
+        {
+          "label": "12.5 Hz and 1.1 kbps",
+          "alternatives": [
+            [
+              {
+                "page": 11,
+                "quote": "At 12.5Hz, this represents a bitrate of 1.1kbps",
+                "start_char": 31805,
+                "end_char": 31852
+              }
+            ],
+            [
+              {
+                "page": 23,
+                "quote": "Mimi, adv. loss only\n24kHz\n12.5Hz\n1.1kbps",
+                "start_char": 68040,
+                "end_char": 68081
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3",
+      "paper": "2410.00037",
+      "kind": "numerical",
+      "query": "How many parameters does Helium have, and how many tokens were used to pretrain it?",
+      "answer": "7 billion parameters and 2.1 trillion public-English tokens.",
+      "units": [
+        {
+          "label": "7B parameters",
+          "alternatives": [
+            [
+              {
+                "page": 3,
+                "quote": "Helium, a 7B-parameter text LLM",
+                "start_char": 5817,
+                "end_char": 5848
+              }
+            ],
+            [
+              {
+                "page": 8,
+                "quote": "7B-parameter Helium language model",
+                "start_char": 22703,
+                "end_char": 22737
+              }
+            ]
+          ]
+        },
+        {
+          "label": "2.1T pretraining tokens",
+          "alternatives": [
+            [
+              {
+                "page": 3,
+                "quote": "we pretrain on 2.1T tokens of\npublic English data",
+                "start_char": 5854,
+                "end_char": 5903
+              }
+            ],
+            [
+              {
+                "page": 22,
+                "quote": "2.1T tokens that are used to train Helium",
+                "start_char": 66346,
+                "end_char": 66387
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M4",
+      "paper": "2410.00037",
+      "kind": "explanation",
+      "query": "How does Moshi's Inner Monologue order and align text tokens with audio tokens?",
+      "answer": "It predicts time-aligned text before semantic/acoustic audio tokens, as a prefix in hierarchical generation.",
+      "units": [
+        {
+          "label": "time-aligned text before audio",
+          "alternatives": [
+            [
+              {
+                "page": 1,
+                "quote": "predict time-aligned text tokens as a prefix to audio tokens",
+                "start_char": 1541,
+                "end_char": 1601
+              }
+            ],
+            [
+              {
+                "page": 3,
+                "quote": "predicting time-aligned text tokens before audio to-\nkens",
+                "start_char": 7672,
+                "end_char": 7729
+              }
+            ],
+            [
+              {
+                "page": 15,
+                "quote": "We insert W as the first sub-sequence in V , such that it acts as a prefix to the\ngeneration of semantic tokens",
+                "start_char": 45140,
+                "end_char": 45251
+              }
+            ],
+            [
+              {
+                "page": 26,
+                "quote": "modeling text tokens as a prefix to audio tokens with Inner Monologue",
+                "start_char": 79565,
+                "end_char": 79634
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H1",
+      "paper": "2507.07955",
+      "kind": "explanation",
+      "existing_smoke": true,
+      "query": "How does H-Net replace tokenization using a learned dynamic chunking mechanism?",
+      "answer": "Joint end-to-end learning replaces handcrafted tokenization with content/context-dependent segmentation and compression.",
+      "units": [
+        {
+          "label": "learned content-dependent segmentation",
+          "alternatives": [
+            [
+              {
+                "page": 1,
+                "quote": "learns content- and context- dependent segmentation strategies learned jointly with the rest of the model",
+                "start_char": 745,
+                "end_char": 850
+              }
+            ],
+            [
+              {
+                "page": 2,
+                "quote": "replacing handcrafted heuristics with content-aware and context-dependent\nsegmentation learned from data",
+                "start_char": 5818,
+                "end_char": 5922
+              }
+            ],
+            [
+              {
+                "page": 2,
+                "quote": "H-Net learns segmentation strategies optimized jointly with the main backbone, dynamically compressing input\nvectors based on contextual information into meaningful chunks",
+                "start_char": 8309,
+                "end_char": 8480
+              }
+            ],
+            [
+              {
+                "page": 4,
+                "quote": "data-dependent dynamic subsampling that is learned\nend-to-end together with the rest of the model",
+                "start_char": 12565,
+                "end_char": 12662
+              }
+            ],
+            [
+              {
+                "page": 6,
+                "quote": "H-Net learns chunking boundaries through end-to-end training, allowing it to identify semantically meaningful units\nadaptively",
+                "start_char": 19952,
+                "end_char": 20078
+              }
+            ],
+            [
+              {
+                "page": 23,
+                "quote": "learn content- and context-\ndependent discrete segmentation strategies through standard gradient-based optimization",
+                "start_char": 85227,
+                "end_char": 85342
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "paper": "2507.07955",
+      "kind": "equation",
+      "query": "What threshold turns H-Net routing probabilities into chunk boundaries, and what boundary probability is forced at the first position?",
+      "answer": "b_t=1 when p_t>=0.5; p_1=1.0 guarantees a boundary at the start.",
+      "units": [
+        {
+          "label": "threshold >=0.5",
+          "alternatives": [
+            [
+              {
+                "page": 6,
+                "quote": "bt = 1{pt ≥0.5}",
+                "start_char": 21005,
+                "end_char": 21020
+              }
+            ]
+          ]
+        },
+        {
+          "label": "initial probability 1.0",
+          "alternatives": [
+            [
+              {
+                "page": 6,
+                "quote": "p1 = 1.0 by definition, ensuring the sequence begins with a boundary",
+                "start_char": 21055,
+                "end_char": 21123
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H3",
+      "paper": "2507.07955",
+      "kind": "table",
+      "query": "According to Table 4, what XWinograd-zh accuracies do the Transformer and H-Net (2-stage) achieve?",
+      "answer": "Transformer 0.599 (59.9%); H-Net (2-stage) 0.663 (66.3%).",
+      "units": [
+        {
+          "label": "XW-zh column identification",
+          "alternatives": [
+            [
+              {
+                "page": 17,
+                "quote": "Model\nChinese\nCode\nBPIC\nMain arch.\nVal. BPB ↓\nXW-zh. acc. ↑",
+                "start_char": 63170,
+                "end_char": 63229
+              }
+            ]
+          ]
+        },
+        {
+          "label": "Transformer row",
+          "alternatives": [
+            [
+              {
+                "page": 17,
+                "quote": "Transformer\n3.62\nT15\n0.7404\n0.599",
+                "start_char": 63257,
+                "end_char": 63290
+              }
+            ]
+          ]
+        },
+        {
+          "label": "H-Net two-stage row",
+          "alternatives": [
+            [
+              {
+                "page": 17,
+                "quote": "H-Net (2-stage)\n5.81\nT30\n0.7032\n0.663",
+                "start_char": 63359,
+                "end_char": 63396
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H4",
+      "paper": "2507.07955",
+      "kind": "figure",
+      "query": "What data-efficiency improvement over isotropic models does Figure 6 report for H-Net on HG38 DNA?",
+      "answer": "Approximately 3.6 times greater data efficiency (about 3.6 times less data at matched pre-decay perplexity).",
+      "units": [
+        {
+          "label": "3.6x improvement with direction and comparison",
+          "alternatives": [
+            [
+              {
+                "page": 17,
+                "quote": "Each H-Net model achieves the same pre-\ndecay perplexity of the corresponding isotropic model with\napproximately 3.6× less data",
+                "start_char": 63845,
+                "end_char": 63972
+              }
+            ],
+            [
+              {
+                "page": 37,
+                "quote": "H-Net (1-stage) with an M3T1 encoder achieves 3.6× the data efficiency of an isotropic architecture (Figure 6)",
+                "start_char": 136174,
+                "end_char": 136284
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "unanswerable": [
+    {
+      "id": "U1",
+      "query": "What p95 end-to-end latency does the Moshi paper measure on an iPhone 15 Pro running iOS?",
+      "reason": "No iPhone/iOS deployment or p95 device-specific measurement is reported. The generic 160/200 ms statement cannot answer this hardware-specific question."
+    },
+    {
+      "id": "U2",
+      "query": "What benchmark results does the Dynamic Chunking paper report for a 70-billion-parameter H-Net?",
+      "reason": "No 70B-parameter H-Net experiment. Page 23 discusses FLOP-matching a 1.3B Transformer and leaves larger scales for future validation; 70B elsewhere refers to data or comparisons, not such a model."
+    },
+    {
+      "id": "U3",
+      "query": "What MMLU accuracy does Attention Is All You Need report for the original Transformer?",
+      "reason": "Attention does not report MMLU. MMLU numbers in the other papers are for different models and are not an answer."
+    },
+    {
+      "id": "U4",
+      "query": "What is the commercial API price per million Moshi speech tokens in November 2026?",
+      "reason": "The supplied papers do not provide that dated commercial pricing."
+    },
+    {
+      "id": "U5",
+      "query": "By how many BLEU points does Moshi outperform H-Net on WMT 2014 English-to-French?",
+      "reason": "Neither Moshi nor H-Net reports that paired benchmark comparison; Transformer BLEU numbers cannot be substituted."
+    }
+  ]
+}

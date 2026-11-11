@@ -1,0 +1,15 @@
+{
+  "preservation": {
+    "files_checked": 39,
+    "changed_files": [],
+    "unchanged": true
+  },
+  "question_and_runner_hashes_match_protocol": true,
+  "summary_groups_checked_against_csv": 40,
+  "report_score_rows_checked": 9,
+  "report_local_links_checked": 26,
+  "missing_report_links": [],
+  "citation_chunks_checked": 665,
+  "citation_spans_checked": 1403,
+  "hnsw_query_configuration_checks": 51
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "question": "H3",
+    "page": 17,
+    "original": "Model\nChinese\nCode\nBPIC\nMain arch.\nVal. BPB ↓\nXW-zh. acc. ↑",
+    "adapted": "Chinese\nCode\nModel\nBPIC\nMain arch.\nVal. BPB ↓\nXW-zh. acc. ↑",
+    "reason": "Header row order follows PDF baselines; labels, values and evidence rule unchanged."
+  }
+]

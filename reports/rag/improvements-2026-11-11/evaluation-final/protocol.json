@@ -1,0 +1,207 @@
+{
+  "baseline": "reports/rag/audit-2026-11-11",
+  "max_context_tokens": 4096,
+  "questions_sha256": "bd4ec56caa73b5b3d1aadf1e768cff0afa2ce7b38896760a33dc78218bc87562",
+  "source_sha256": {
+    "src/retrieval/__init__.py": "5d24dcdc862b8cb6ea4438c49160a138f70efb64be4a83f749b7900d27cd5172",
+    "src/retrieval/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/retrieval/catalog.py": "ca0c12874498cb3a18b77198fb0ea8fa26b4088c9cebf4b4a6afdad990281d2a",
+    "src/retrieval/chunking.py": "7fb0996becca5ffe5b0713405b3afb5393f0f41abefb504d7bccf54cf2207402",
+    "src/retrieval/cli.py": "51242e63e9794390483615221946386d9e007831fdb7f7c384ca7f5386de5f8d",
+    "src/retrieval/config.py": "b8595acd8e526401e6d41a35265e36ca7adbc402288ed2545c5fe8d2bbfc4760",
+    "src/retrieval/context.py": "4f6eef2a1ec9bddae039f5efb85215ed6acfabaf8f7a63480717cc3d07ef04de",
+    "src/retrieval/embeddings.py": "7722ac237bd8ef6ea4e6013085a4cc39b627e5ff2bdc909d0b9507769c6befbf",
+    "src/retrieval/errors.py": "c672a7fc1b8e8c3229c00a716a069b2c092899a7b2232cc5bf26263a47c8ff3b",
+    "src/retrieval/evidence.py": "ba110cd5d8c3ea234c949e36440ffefa3681d5d8e05397e2170190c62875a522",
+    "src/retrieval/extraction.py": "5d4e80005e524e363eafd6b9b98fd43f7b37ea9e6be18e29a9c7f29c18e5a5bc",
+    "src/retrieval/index.py": "f1860b767dd1a019dc92828194d92569f7c20e9ce2a8bace36b190794c8753e4",
+    "src/retrieval/layout.py": "3941038e4f13ce88bcbabee4f872af8a4861a4715e0acf6928232e01fd15244b",
+    "src/retrieval/lexical.py": "6f2f504e75dcd33d4f0311bc2ac5c30a23dad39df88c19b7f7a3c3ca9a512bcc",
+    "src/retrieval/models.py": "23b705ce594c4d0bd5aaa8ce8c2af782dc0d3554dbf686474b5415384564747b",
+    "src/retrieval/pipeline.py": "9b0a5a52f6fb8b9ae244d2ad28896b599cd3e01180c63a81e6850b6b0ffba44c",
+    "src/retrieval/text.py": "9f2b9a538c1b46dc36195b848dc921a5eb00163b05feee173a56791449056730"
+  },
+  "indexing": {
+    "300": {
+      "chunks": 443,
+      "descriptor": {
+        "pipeline": "relay-rag-v2.1",
+        "corpus": [
+          {
+            "title": "Attention Is All You Need",
+            "arxiv_id": "1706.03762",
+            "version": 7,
+            "filename": "attention_is_all_you_need.pdf",
+            "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+          },
+          {
+            "title": "Moshi: a speech-text foundation model for real-time dialogue",
+            "arxiv_id": "2410.00037",
+            "version": 1,
+            "filename": "moshi.pdf",
+            "sha256": "a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac"
+          },
+          {
+            "title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+            "arxiv_id": "2507.07955",
+            "version": 2,
+            "filename": "dynamic_chunking.pdf",
+            "sha256": "04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f"
+          }
+        ],
+        "chunking": {
+          "chunk_size": 300,
+          "overlap": 50,
+          "chunking": "boundary"
+        },
+        "embedding": {
+          "model": "sentence-transformers/all-MiniLM-L6-v2",
+          "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+          "dimension": 384,
+          "window_tokens": 254,
+          "pooling": "token-weighted-normalized-windows-v1",
+          "device": "cpu",
+          "torch_threads": 1,
+          "seed": 0
+        },
+        "runtime": {
+          "pymupdf": "2.1",
+          "sentence-transformers": "6.2.0",
+          "chromadb": "1.5.9",
+          "numpy": "2.5.4",
+          "torch": "2.15.0",
+          "transformers": "5.22.2",
+          "tokenizers": "0.23.3",
+          "huggingface-hub": "2.4.0"
+        }
+      },
+      "verification": {
+        "chunks_checked": 443,
+        "source_spans_checked": 582,
+        "word_interior_starts": 0,
+        "word_interior_ends": 0
+      }
+    },
+    "600": {
+      "chunks": 243,
+      "descriptor": {
+        "pipeline": "relay-rag-v2.1",
+        "corpus": [
+          {
+            "title": "Attention Is All You Need",
+            "arxiv_id": "1706.03762",
+            "version": 7,
+            "filename": "attention_is_all_you_need.pdf",
+            "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+          },
+          {
+            "title": "Moshi: a speech-text foundation model for real-time dialogue",
+            "arxiv_id": "2410.00037",
+            "version": 1,
+            "filename": "moshi.pdf",
+            "sha256": "a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac"
+          },
+          {
+            "title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+            "arxiv_id": "2507.07955",
+            "version": 2,
+            "filename": "dynamic_chunking.pdf",
+            "sha256": "04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f"
+          }
+        ],
+        "chunking": {
+          "chunk_size": 600,
+          "overlap": 50,
+          "chunking": "boundary"
+        },
+        "embedding": {
+          "model": "sentence-transformers/all-MiniLM-L6-v2",
+          "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+          "dimension": 384,
+          "window_tokens": 254,
+          "pooling": "token-weighted-normalized-windows-v1",
+          "device": "cpu",
+          "torch_threads": 1,
+          "seed": 0
+        },
+        "runtime": {
+          "pymupdf": "2.1",
+          "sentence-transformers": "6.2.0",
+          "chromadb": "1.5.9",
+          "numpy": "2.5.4",
+          "torch": "2.15.0",
+          "transformers": "5.22.2",
+          "tokenizers": "0.23.3",
+          "huggingface-hub": "2.4.0"
+        }
+      },
+      "verification": {
+        "chunks_checked": 243,
+        "source_spans_checked": 368,
+        "word_interior_starts": 0,
+        "word_interior_ends": 0
+      }
+    },
+    "900": {
+      "chunks": 173,
+      "descriptor": {
+        "pipeline": "relay-rag-v2.1",
+        "corpus": [
+          {
+            "title": "Attention Is All You Need",
+            "arxiv_id": "1706.03762",
+            "version": 7,
+            "filename": "attention_is_all_you_need.pdf",
+            "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+          },
+          {
+            "title": "Moshi: a speech-text foundation model for real-time dialogue",
+            "arxiv_id": "2410.00037",
+            "version": 1,
+            "filename": "moshi.pdf",
+            "sha256": "a687144cc77bea86b0c60ae800ccb1d3e0816033fa5c7960388fe29a0dbfcfac"
+          },
+          {
+            "title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+            "arxiv_id": "2507.07955",
+            "version": 2,
+            "filename": "dynamic_chunking.pdf",
+            "sha256": "04a2b32e6e82853cfc23c5db132750874a86cde99219ec6f664128f4aa83122f"
+          }
+        ],
+        "chunking": {
+          "chunk_size": 900,
+          "overlap": 50,
+          "chunking": "boundary"
+        },
+        "embedding": {
+          "model": "sentence-transformers/all-MiniLM-L6-v2",
+          "revision": "c9745ed1d9f207416be6d2e6f8de32d1f16199bf",
+          "dimension": 384,
+          "window_tokens": 254,
+          "pooling": "token-weighted-normalized-windows-v1",
+          "device": "cpu",
+          "torch_threads": 1,
+          "seed": 0
+        },
+        "runtime": {
+          "pymupdf": "2.1",
+          "sentence-transformers": "6.2.0",
+          "chromadb": "1.5.9",
+          "numpy": "2.5.4",
+          "torch": "2.15.0",
+          "transformers": "5.22.2",
+          "tokenizers": "0.23.3",
+          "huggingface-hub": "2.4.0"
+        }
+      },
+      "verification": {
+        "chunks_checked": 173,
+        "source_spans_checked": 290,
+        "word_interior_starts": 0,
+        "word_interior_ends": 0
+      }
+    }
+  },
+  "limits": "Same 12 diagnostic questions and five unsupported questions; not held out. Coverage measures annotated evidence, not generated answer accuracy. Refusal is a literal-constraint check, not semantic entailment."
+}

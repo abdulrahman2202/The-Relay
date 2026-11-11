@@ -1,0 +1,200 @@
+[
+  {
+    "size": "300",
+    "question": "M3",
+    "method": "vector",
+    "k": 3,
+    "before": [
+      false,
+      false
+    ],
+    "after": [
+      false,
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "M3",
+    "method": "vector",
+    "k": 5,
+    "before": [
+      true,
+      false
+    ],
+    "after": [
+      true,
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "M3",
+    "method": "hybrid_rrf",
+    "k": 3,
+    "before": [
+      false,
+      false
+    ],
+    "after": [
+      false,
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "M4",
+    "method": "bm25",
+    "k": 3,
+    "before": [
+      false
+    ],
+    "after": [
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "M4",
+    "method": "bm25",
+    "k": 5,
+    "before": [
+      false
+    ],
+    "after": [
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "M4",
+    "method": "bm25_raw",
+    "k": 3,
+    "before": [
+      false
+    ],
+    "after": [
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "M4",
+    "method": "bm25_raw",
+    "k": 5,
+    "before": [
+      false
+    ],
+    "after": [
+      true
+    ]
+  },
+  {
+    "size": "300",
+    "question": "H1",
+    "method": "hybrid_rrf",
+    "k": 3,
+    "before": [
+      false
+    ],
+    "after": [
+      true
+    ]
+  },
+  {
+    "size": "600",
+    "question": "A3",
+    "method": "bm25",
+    "k": 3,
+    "before": [
+      false,
+      false
+    ],
+    "after": [
+      true,
+      true
+    ]
+  },
+  {
+    "size": "600",
+    "question": "A3",
+    "method": "bm25_raw",
+    "k": 3,
+    "before": [
+      false,
+      false
+    ],
+    "after": [
+      true,
+      true
+    ]
+  },
+  {
+    "size": "600",
+    "question": "M3",
+    "method": "vector",
+    "k": 3,
+    "before": [
+      true,
+      false
+    ],
+    "after": [
+      true,
+      true
+    ]
+  },
+  {
+    "size": "600",
+    "question": "M3",
+    "method": "vector",
+    "k": 4,
+    "before": [
+      true,
+      false
+    ],
+    "after": [
+      true,
+      true
+    ]
+  },
+  {
+    "size": "600",
+    "question": "M3",
+    "method": "vector",
+    "k": 5,
+    "before": [
+      true,
+      false
+    ],
+    "after": [
+      true,
+      true
+    ]
+  },
+  {
+    "size": "600",
+    "question": "H1",
+    "method": "vector",
+    "k": 3,
+    "before": [
+      false
+    ],
+    "after": [
+      true
+    ]
+  },
+  {
+    "size": "900",
+    "question": "M3",
+    "method": "vector",
+    "k": 3,
+    "before": [
+      false,
+      false
+    ],
+    "after": [
+      false,
+      true
+    ]
+  }
+]

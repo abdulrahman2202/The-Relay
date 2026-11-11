@@ -145,3 +145,8 @@ cython_debug/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local RAG artifacts
+data/chroma/
+data/chroma-v2/
+.ruff_cache/

@@ -1,0 +1,33 @@
+{
+  "scope": "RAG production source, automated tests and evaluation script. Existing Phase 1 manual Groq scripts and preserved audit experiments are outside these lint targets.",
+  "checks": [
+    {
+      "name": "ruff_lint",
+      "command": ".venv/Scripts/python.exe -m ruff check src/retrieval tests/rag scripts/evaluate_rag.py",
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "name": "ruff_format",
+      "command": ".venv/Scripts/python.exe -m ruff format --check src/retrieval tests/rag scripts/evaluate_rag.py",
+      "exit_code": 0,
+      "output": "31 files already formatted\n"
+    },
+    {
+      "name": "git_diff_check",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output": "warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "tests": {
+    "command": ".venv/Scripts/python.exe -m pytest --run-integration -q --junitxml=reports/rag/improvements-2026-11-11/pytest-final.xml",
+    "report": "pytest-final.xml",
+    "tests": 93,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suite_time_seconds": 444.988,
+    "verification": "Counts and suite duration read from the completed JUnit report; suite was not repeated during final documentation and bytecode cleanup."
+  }
+}

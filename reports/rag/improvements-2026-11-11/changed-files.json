@@ -1,0 +1,98 @@
+[
+  {
+    "path": ".gitignore",
+    "kind": "modified"
+  },
+  {
+    "path": "README.md",
+    "kind": "modified"
+  },
+  {
+    "path": "docs/rag.md",
+    "kind": "modified"
+  },
+  {
+    "path": "scripts/evaluate_rag.py",
+    "kind": "created"
+  },
+  {
+    "path": "src/retrieval/chunking.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/cli.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/config.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/context.py",
+    "kind": "created"
+  },
+  {
+    "path": "src/retrieval/evidence.py",
+    "kind": "created"
+  },
+  {
+    "path": "src/retrieval/extraction.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/index.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/layout.py",
+    "kind": "created"
+  },
+  {
+    "path": "src/retrieval/lexical.py",
+    "kind": "created"
+  },
+  {
+    "path": "src/retrieval/models.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/pipeline.py",
+    "kind": "modified"
+  },
+  {
+    "path": "src/retrieval/text.py",
+    "kind": "created"
+  },
+  {
+    "path": "tests/rag/test_chunking.py",
+    "kind": "modified"
+  },
+  {
+    "path": "tests/rag/test_context.py",
+    "kind": "created"
+  },
+  {
+    "path": "tests/rag/test_evidence.py",
+    "kind": "created"
+  },
+  {
+    "path": "tests/rag/test_extraction.py",
+    "kind": "modified"
+  },
+  {
+    "path": "tests/rag/test_integration.py",
+    "kind": "modified"
+  },
+  {
+    "path": "tests/rag/test_lexical.py",
+    "kind": "created"
+  },
+  {
+    "path": "tests/rag/test_pipeline.py",
+    "kind": "modified"
+  },
+  {
+    "path": "tests/rag/test_regressions.py",
+    "kind": "created"
+  }
+]

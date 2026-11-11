@@ -1,0 +1,217 @@
+{
+  "query": "What are the theoretical and practical latency of Moshi full-duplex speech dialogue?",
+  "hits": [
+    {
+      "chunk_id": "a09eb449011ad4d772808c591638cf2ba42e61b19c684ccc0ce10b01bef3314d",
+      "text": "The only previous full-duplex dialogue system is dGSLM (Nguyen\net al., 2023), which models user and system speech as separate audio token streams and proposes a Siamese architecture to process both streams jointly. While dGSLM is full-duplex,\nit remains a proof-of-concept: it does not run in an online fashion, it does not benefit from\nthe knowledge of a text language model, and it does not model acoustic information as it\nonly models semantic tokens. Moshi addresses these limitations altogether: by modeling\ntwo streams of semantic and acoustic tokens hierarchically, Moshi is full duplex and can\nexploit all the information from the user (linguistic and non-linguistic) while producing\nspeech in real time. Thanks to text pretraining and Inner Monologue, Moshi benefits from\nthe knowledge of its Helium backbone. Finally, as the model produces acoustic tokens along\nwith text and semantic tokens, it can generate an arbitrary range of emotions, voices and\nacoustic conditions. To the best of our knowledge, Moshi is the first audio language model\nthat successfully addresses the many aforementioned challenges of spoken dialogue.",
+      "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "pages": [
+        6
+      ],
+      "sections": [
+        "2 Related Work"
+      ],
+      "sources": [
+        {
+          "page_number": 6,
+          "section": "2 Related Work",
+          "start_char": 0,
+          "end_char": 1135
+        }
+      ],
+      "distance": 0.3252614736557007,
+      "retrieval_method": "vector",
+      "retrieval_score": null,
+      "char_start": 17778,
+      "parent_chunk_id": null,
+      "score": 0.6747385263442993,
+      "score_type": "cosine_similarity",
+      "citation": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 6)",
+      "source_url": "https://arxiv.org/pdf/2410.00037v1#page=6"
+    },
+    {
+      "chunk_id": "53b84cdd1b48157d8e21ebfe78538818ff0c66b5af45c1283fc86c9e8cd63a37",
+      "text": "Not only this \u201cInner\nMonologue\u201d method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech. Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.\nKeywords:\nspeech, text, multimodal, foundation, spoken dialogue\n\n1",
+      "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "pages": [
+        1
+      ],
+      "sections": [
+        "Abstract"
+      ],
+      "sources": [
+        {
+          "page_number": 1,
+          "section": "Abstract",
+          "start_char": 0,
+          "end_char": 453
+        }
+      ],
+      "distance": 0.3653653860092163,
+      "retrieval_method": "vector",
+      "retrieval_score": null,
+      "char_start": 1608,
+      "parent_chunk_id": null,
+      "score": 0.6346346139907837,
+      "score_type": "cosine_similarity",
+      "citation": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)",
+      "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1"
+    },
+    {
+      "chunk_id": "2a5c7bebc4bd02ebe907d1f22497722b3460026d36e93424306b334d5a8635f2",
+      "text": "Finally,\nwe show in Section 3.4.4 how Inner Monologue, when combined with a delay between token\ntypes, allows deriving streaming TTS and ASR systems from Moshi.\n\nSpoken Dialogue Models.\nSpoken dialogue is one of the less explored tasks in speech\ngeneration, as it requires addressing several challenges: 1) The model should run in real\ntime and allow for long conversations in full-duplex\u2014the model always listens and can speak\nat any moment; 2) it should be speech-to-speech to handle paralinguistic communication;\n3) it should display knowledge and reasoning abilities that make it amenable to helpful and\nenjoyable conversations. Spectron benefits from its underlying text LLM (as measured by\nspoken question answering), however it is not compatible with real-time generation due to\nChain-of-Modality. PSLM proposes generating speech and text tokens in parallel to reduce\nthis latency, however it reduces the quality of answers, and the model still relies on ASR,\nwhich removes paralinguistic information. More importantly, these models cannot handle\nfull-duplex communication, where there is no boundary between speaker turns, as any side\nof the conversation can be active at any time. An attempt at modeling these dynamics has\n\n5\n\n\nFigure 1: Overview of Moshi. Moshi is a speech-text foundation model which enables\nreal-time spoken dialogue.",
+      "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "pages": [
+        5,
+        6
+      ],
+      "sections": [
+        "2 Related Work"
+      ],
+      "sources": [
+        {
+          "page_number": 5,
+          "section": "2 Related Work",
+          "start_char": 0,
+          "end_char": 1236
+        },
+        {
+          "page_number": 6,
+          "section": "2 Related Work",
+          "start_char": 1237,
+          "end_char": 1346
+        }
+      ],
+      "distance": 0.37258535623550415,
+      "retrieval_method": "vector",
+      "retrieval_score": null,
+      "char_start": 15597,
+      "parent_chunk_id": null,
+      "score": 0.6274146437644958,
+      "score_type": "cosine_similarity",
+      "citation": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, pp. 5, 6)",
+      "source_url": "https://arxiv.org/pdf/2410.00037v1#page=5"
+    }
+  ],
+  "context": "[1] Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 6)\nThe only previous full-duplex dialogue system is dGSLM (Nguyen\net al., 2023), which models user and system speech as separate audio token streams and proposes a Siamese architecture to process both streams jointly. While dGSLM is full-duplex,\nit remains a proof-of-concept: it does not run in an online fashion, it does not benefit from\nthe knowledge of a text language model, and it does not model acoustic information as it\nonly models semantic tokens. Moshi addresses these limitations altogether: by modeling\ntwo streams of semantic and acoustic tokens hierarchically, Moshi is full duplex and can\nexploit all the information from the user (linguistic and non-linguistic) while producing\nspeech in real time. Thanks to text pretraining and Inner Monologue, Moshi benefits from\nthe knowledge of its Helium backbone. Finally, as the model produces acoustic tokens along\nwith text and semantic tokens, it can generate an arbitrary range of emotions, voices and\nacoustic conditions. To the best of our knowledge, Moshi is the first audio language model\nthat successfully addresses the many aforementioned challenges of spoken dialogue.\n\n[2] Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)\nNot only this \u201cInner\nMonologue\u201d method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech. Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.\nKeywords:\nspeech, text, multimodal, foundation, spoken dialogue\n\n1\n\n[3] Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, pp. 5, 6)\nFinally,\nwe show in Section 3.4.4 how Inner Monologue, when combined with a delay between token\ntypes, allows deriving streaming TTS and ASR systems from Moshi.\n\nSpoken Dialogue Models.\nSpoken dialogue is one of the less explored tasks in speech\ngeneration, as it requires addressing several challenges: 1) The model should run in real\ntime and allow for long conversations in full-duplex\u2014the model always listens and can speak\nat any moment; 2) it should be speech-to-speech to handle paralinguistic communication;\n3) it should display knowledge and reasoning abilities that make it amenable to helpful and\nenjoyable conversations. Spectron benefits from its underlying text LLM (as measured by\nspoken question answering), however it is not compatible with real-time generation due to\nChain-of-Modality. PSLM proposes generating speech and text tokens in parallel to reduce\nthis latency, however it reduces the quality of answers, and the model still relies on ASR,\nwhich removes paralinguistic information. More importantly, these models cannot handle\nfull-duplex communication, where there is no boundary between speaker turns, as any side\nof the conversation can be active at any time. An attempt at modeling these dynamics has\n\n5\n\n\nFigure 1: Overview of Moshi. Moshi is a speech-text foundation model which enables\nreal-time spoken dialogue.",
+  "context_tokens": 718,
+  "context_hits": [
+    {
+      "chunk_id": "a09eb449011ad4d772808c591638cf2ba42e61b19c684ccc0ce10b01bef3314d",
+      "text": "The only previous full-duplex dialogue system is dGSLM (Nguyen\net al., 2023), which models user and system speech as separate audio token streams and proposes a Siamese architecture to process both streams jointly. While dGSLM is full-duplex,\nit remains a proof-of-concept: it does not run in an online fashion, it does not benefit from\nthe knowledge of a text language model, and it does not model acoustic information as it\nonly models semantic tokens. Moshi addresses these limitations altogether: by modeling\ntwo streams of semantic and acoustic tokens hierarchically, Moshi is full duplex and can\nexploit all the information from the user (linguistic and non-linguistic) while producing\nspeech in real time. Thanks to text pretraining and Inner Monologue, Moshi benefits from\nthe knowledge of its Helium backbone. Finally, as the model produces acoustic tokens along\nwith text and semantic tokens, it can generate an arbitrary range of emotions, voices and\nacoustic conditions. To the best of our knowledge, Moshi is the first audio language model\nthat successfully addresses the many aforementioned challenges of spoken dialogue.",
+      "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "pages": [
+        6
+      ],
+      "sections": [
+        "2 Related Work"
+      ],
+      "sources": [
+        {
+          "page_number": 6,
+          "section": "2 Related Work",
+          "start_char": 0,
+          "end_char": 1135
+        }
+      ],
+      "distance": 0.3252614736557007,
+      "retrieval_method": "vector",
+      "retrieval_score": null,
+      "char_start": 17778,
+      "parent_chunk_id": null,
+      "score": 0.6747385263442993,
+      "score_type": "cosine_similarity",
+      "citation": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 6)",
+      "source_url": "https://arxiv.org/pdf/2410.00037v1#page=6"
+    },
+    {
+      "chunk_id": "53b84cdd1b48157d8e21ebfe78538818ff0c66b5af45c1283fc86c9e8cd63a37",
+      "text": "Not only this \u201cInner\nMonologue\u201d method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech. Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.\nKeywords:\nspeech, text, multimodal, foundation, spoken dialogue\n\n1",
+      "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "pages": [
+        1
+      ],
+      "sections": [
+        "Abstract"
+      ],
+      "sources": [
+        {
+          "page_number": 1,
+          "section": "Abstract",
+          "start_char": 0,
+          "end_char": 453
+        }
+      ],
+      "distance": 0.3653653860092163,
+      "retrieval_method": "vector",
+      "retrieval_score": null,
+      "char_start": 1608,
+      "parent_chunk_id": null,
+      "score": 0.6346346139907837,
+      "score_type": "cosine_similarity",
+      "citation": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, p. 1)",
+      "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1"
+    },
+    {
+      "chunk_id": "2a5c7bebc4bd02ebe907d1f22497722b3460026d36e93424306b334d5a8635f2",
+      "text": "Finally,\nwe show in Section 3.4.4 how Inner Monologue, when combined with a delay between token\ntypes, allows deriving streaming TTS and ASR systems from Moshi.\n\nSpoken Dialogue Models.\nSpoken dialogue is one of the less explored tasks in speech\ngeneration, as it requires addressing several challenges: 1) The model should run in real\ntime and allow for long conversations in full-duplex\u2014the model always listens and can speak\nat any moment; 2) it should be speech-to-speech to handle paralinguistic communication;\n3) it should display knowledge and reasoning abilities that make it amenable to helpful and\nenjoyable conversations. Spectron benefits from its underlying text LLM (as measured by\nspoken question answering), however it is not compatible with real-time generation due to\nChain-of-Modality. PSLM proposes generating speech and text tokens in parallel to reduce\nthis latency, however it reduces the quality of answers, and the model still relies on ASR,\nwhich removes paralinguistic information. More importantly, these models cannot handle\nfull-duplex communication, where there is no boundary between speaker turns, as any side\nof the conversation can be active at any time. An attempt at modeling these dynamics has\n\n5\n\n\nFigure 1: Overview of Moshi. Moshi is a speech-text foundation model which enables\nreal-time spoken dialogue.",
+      "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+      "arxiv_id": "2410.00037",
+      "version": 1,
+      "pages": [
+        5,
+        6
+      ],
+      "sections": [
+        "2 Related Work"
+      ],
+      "sources": [
+        {
+          "page_number": 5,
+          "section": "2 Related Work",
+          "start_char": 0,
+          "end_char": 1236
+        },
+        {
+          "page_number": 6,
+          "section": "2 Related Work",
+          "start_char": 1237,
+          "end_char": 1346
+        }
+      ],
+      "distance": 0.37258535623550415,
+      "retrieval_method": "vector",
+      "retrieval_score": null,
+      "char_start": 15597,
+      "parent_chunk_id": null,
+      "score": 0.6274146437644958,
+      "score_type": "cosine_similarity",
+      "citation": "Moshi: a speech-text foundation model for real-time dialogue (arXiv:2410.00037v1, pp. 5, 6)",
+      "source_url": "https://arxiv.org/pdf/2410.00037v1#page=5"
+    }
+  ],
+  "omitted_ids": [],
+  "evidence": {
+    "status": "candidate_evidence",
+    "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+    "missing": [],
+    "refused": false
+  },
+  "requirements": [
+    {
+      "label": "passage from arXiv:2410.00037",
+      "alternatives": [],
+      "arxiv_id": "2410.00037"
+    }
+  ]
+}

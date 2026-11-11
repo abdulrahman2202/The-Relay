@@ -1,0 +1,2524 @@
+--- baseline/.gitignore
++++ current/.gitignore
+@@ -148,4 +148,5 @@
+ 
+ # Local RAG artifacts
+ data/chroma/
++data/chroma-v2/
+ .ruff_cache/
+--- baseline/README.md
++++ current/README.md
+@@ -1,21 +1,25 @@
+ # The Relay
+ 
+-Phase 2 implements local research-paper ingestion and semantic retrieval in
++Phase 2 implements local research-paper ingestion and vector/BM25 retrieval in
+ `src/retrieval`. It accepts exactly the three supplied, version-pinned PDFs in
+ `papers/` and returns passages with paper, section, and physical PDF page citations.
+ 
+ See [the RAG module guide](docs/rag.md) for setup, commands, architecture,
+ reproducibility details, evaluation configurations, and limitations.
++The audit-driven changes, measured comparisons and verification record are in
++[the implementation review](reports/rag/improvements-2026-11-11/review.md).
++The v2 database defaults to `data/chroma-v2/`; the v1 database and audit are preserved.
+ 
+ ```powershell
+ .venv\Scripts\python.exe -m pip install -c requirements.txt -e ".[dev]"
+ .venv\Scripts\python.exe -m retrieval extract
+ .venv\Scripts\python.exe -m retrieval ingest --preset 300
+ .venv\Scripts\python.exe -m retrieval search "How does scaled dot-product attention work?" --preset 300
++.venv\Scripts\python.exe -m retrieval retrieve "What are Moshi's theoretical and practical latency?" --preset 300 --strategy bm25
+ .venv\Scripts\python.exe -m pytest -q
+ .venv\Scripts\python.exe -m pytest -q --run-integration
+-.venv\Scripts\python.exe -m ruff check src/retrieval tests/rag
+-.venv\Scripts\python.exe -m ruff format --check src/retrieval tests/rag
++.venv\Scripts\python.exe -m ruff check src/retrieval tests/rag scripts/evaluate_rag.py
++.venv\Scripts\python.exe -m ruff format --check src/retrieval tests/rag scripts/evaluate_rag.py
+ ```
+ 
+ The embedding model must already be cached; the guide includes its pinned download
+--- baseline/docs/rag.md
++++ current/docs/rag.md
+@@ -15,6 +15,12 @@
+ version can have different bytes and is intentionally rejected. Updating the corpus
+ requires an explicit manifest review.
+ 
++The current pipeline is `relay-rag-v2.1`. Its default database is `data/chroma-v2/`;
++the v1 database in `data/chroma/` and the original audit reports remain intact.
++Reingestion is required for the new extraction/chunking semantics. The previous
++source, tests and guide are preserved in
++[`baseline-source.zip`](../reports/rag/improvements-2026-11-11/baseline-source.zip).
++
+ ## Setup
+ 
+ The implementation was developed with Python 3.12.2. Use the existing virtual
+@@ -51,13 +57,13 @@
+ Logs go to stderr. `--output` also writes the JSON result as UTF-8.
+ 
+ ```powershell
+-.venv\Scripts\python.exe -m retrieval extract --output reports/rag/extraction.json
++.venv\Scripts\python.exe -m retrieval extract --output reports/rag/v2-extraction.json
+ ```
+ 
+ Ingest and query the default 300-token / top-3 configuration:
+ 
+ ```powershell
+-.venv\Scripts\python.exe -m retrieval ingest --preset 300 --output reports/rag/ingestion-300.json
++.venv\Scripts\python.exe -m retrieval ingest --preset 300 --output reports/rag/v2-ingestion-300.json
+ .venv\Scripts\python.exe -m retrieval search "Why are attention scores scaled by the square root of the key dimension?" --preset 300
+ .venv\Scripts\python.exe -m retrieval search "What is Moshi's theoretical latency?" --preset 300 --arxiv-id 2410.00037 --top-k 3
+ ```
+@@ -65,8 +71,8 @@
+ Prepare the other evaluation configurations in the same local database:
+ 
+ ```powershell
+-.venv\Scripts\python.exe -m retrieval ingest --preset 600 --output reports/rag/ingestion-600.json
+-.venv\Scripts\python.exe -m retrieval ingest --preset 900 --output reports/rag/ingestion-900.json
++.venv\Scripts\python.exe -m retrieval ingest --preset 600 --output reports/rag/v2-ingestion-600.json
++.venv\Scripts\python.exe -m retrieval ingest --preset 900 --output reports/rag/v2-ingestion-900.json
+ .venv\Scripts\python.exe -m retrieval search "How does H-Net learn dynamic chunk boundaries?" --preset 600
+ .venv\Scripts\python.exe -m retrieval search "How does H-Net learn dynamic chunk boundaries?" --preset 900
+ ```
+@@ -77,11 +83,14 @@
+ | 600 | 600 | 50 | 4 |
+ | 900 | 900 | 50 | 5 |
+ 
+-Overlap stays at 50 across the presets. These are candidate configurations, with
++Configured overlap stays at 50 across the presets. Boundary alignment can reduce
++the actual overlap, and sections do not overlap. These are candidate configurations, with
+ no quality ranking implied. `--chunk-size`, `--overlap`, and `--top-k` override
+ preset values. Overlap must be nonnegative and less than chunk size; chunk size,
+ top-k, and `--batch-size` must be positive integers. Changing chunk size/overlap
+-requires ingestion of that configuration before querying it. Top-k is query-only
++requires ingestion of that configuration before querying it. `--chunking boundary`
++is the default; `--chunking fixed` retains token-window behavior for comparisons.
++Changing chunking mode also requires ingestion. Top-k is query-only
+ and reuses the same index. Search caps top-k at the available matching chunk count.
+ 
+ ```powershell
+@@ -89,12 +98,33 @@
+ .venv\Scripts\python.exe -m retrieval search "Explain Inner Monologue" --chunk-size 600 --overlap 80 --top-k 4
+ ```
+ 
+-`--papers-dir` defaults to `papers`; `--db-dir` defaults to `data/chroma`. Chroma data
++`--papers-dir` defaults to `papers`; `--db-dir` defaults to `data/chroma-v2`. Chroma data
+ is local and git-ignored. Different chunk, model, or recorded runtime settings have
+ separate fingerprinted collections. Ingestion retries reuse stored deterministic
+ IDs and embed only missing chunks. There is no automatic deletion of collections;
+ use a separate `--db-dir` for a fresh experiment.
+ 
++Select retrieval explicitly; the default remains `vector`. BM25 and hybrid search
++use the same Chroma documents and source metadata. Strategy, `--bm25-k1` (1.5),
++`--bm25-b` (0.75), `--candidate-k` (50), and `--rrf-constant` (60) are query settings
++and do not require another index. Hybrid combines the top candidates from vector
++and BM25 with equal-weight reciprocal-rank fusion. It is not automatically selected
++for numerical queries or enabled everywhere.
++
++```powershell
++.venv\Scripts\python.exe -m retrieval search "What are the theoretical and practical latency of Moshi full-duplex speech dialogue?" --preset 300 --strategy bm25
++.venv\Scripts\python.exe -m retrieval search "How does H-Net learn chunk boundaries?" --preset 600 --strategy hybrid --top-k 5
++.venv\Scripts\python.exe -m retrieval retrieve "What p95 latency does Moshi measure on an iPhone 15 Pro running iOS?" --strategy bm25 --max-context-tokens 2000
++.venv\Scripts\python.exe -m retrieval retrieve "What latency does Moshi report?" --strategy bm25 --arxiv-id 2410.00037 --require "160 ms" --require "200 ms"
++```
++
++`search` returns ranked neighbors. `retrieve` additionally returns bounded context,
++the selected passages and an evidence assessment. Missing requested constraints
++produce `evidence.refused=true` and `status=insufficient_evidence`, with explicit
++missing labels. A successful literal check yields `candidate_evidence`, not an
++assertion that a complete answer is entailed. Both outcomes use exit status 0;
++refusal is a normal result, while invalid input/storage errors use status 1.
++
+ Use `python -m retrieval --verbose ...` for a traceback and debug logs when diagnosing
+ an error. Expected validation, extraction, embedding, and storage errors exit with
+ status 1; invalid command syntax exits with status 2. Neither logs nor embedding
+@@ -106,26 +136,41 @@
+ Fixed PDF manifest -> validation -> page/section extraction
+     -> WordPiece chunks + source spans -> local MiniLM windows
+     -> normalized pooled embeddings -> persistent Chroma collection
+-Query -> same local embedding procedure -> cosine search -> cited passages
++Query -> vector / BM25 / optional rank fusion -> cited passages
++    -> query-focused bounded context -> explicit evidence-constraint assessment
+ ```
+ 
+ | Module | Responsibility |
+ | --- | --- |
+ | `catalog.py` | Exact corpus identities, checksums, and version validation |
+-| `extraction.py` | PyMuPDF text, physical page numbering, section spans, extraction issues |
+-| `chunking.py` | Configurable token windows and character-to-source mapping |
++| `layout.py`, `extraction.py` | PDF geometry, numeric text, physical pages, sections and extraction warnings |
++| `chunking.py`, `text.py` | Boundary-aware/fixed chunks, normalization and source offsets |
+ | `embeddings.py` | Pinned SentenceTransformer tokenizer and CPU inference |
+ | `index.py` | Local Chroma storage, readiness checks, and semantic search |
+-| `pipeline.py` | Ingestion/retry orchestration and bounded context construction |
++| `lexical.py` | Local BM25 and configurable reciprocal-rank fusion |
++| `context.py` | Passage selection, overlap deduplication, exact budgets and citation slicing |
++| `evidence.py` | Explicit evidence constraints and conservative refusal support |
++| `pipeline.py` | Ingestion/retry and retrieval orchestration |
+ | `models.py`, `config.py`, `errors.py` | Typed records, validated settings, and public error types |
+ | `cli.py` | JSON command-line interface |
+ 
+ PyMuPDF reads text spans in geometric order. Extraction normalizes Unicode with
+-NFKC and collapses whitespace within lines. It removes rotated margin text, isolated
+-bottom page numbers, and exact paper-title headers near the top margin. Section
+-recognition matches PDF outline titles against lines on the bookmarked physical page
+-and also recognizes
+-named or visually emphasized numbered headings. The most recent recognized section
++NFKC and collapses whitespace within lines. Superscripts become explicit `^{...}`
++before normalization; alphabetic line-end hyphenation is joined within text blocks.
++The rotation filter targets the arXiv margin stamp and keeps rotated body/figure
++labels. Only a matching physical-page footer number is removed near the bottom.
++Table detection supplies geometry, while original text spans supply cell content
++to avoid the table parser's decimal-point reordering. Rows have `|` separators;
++ambiguous or spanning columns produce `table_layout_warning` issues. No missing
++cell values are inferred. Fractions and general two-dimensional equations are not
++reconstructed; recognized uncertain math produces `math_layout_warning` issues.
++`PageText.regions` retains block types, offsets and PDF bounding boxes.
++
++Section recognition prefers outline titles on their bookmarked page, favoring an
++actual numbered heading over a matching diagram label. Table regions cannot become
++headings. Standalone section numbers are joined only with plausible heading geometry;
++already-numbered headings do not acquire the preceding table value. Strict typography
++and text heuristics provide a fallback for PDFs without outlines. The recognized section
+ carries to the next page. Unrecognized front matter has `section=None`; no section
+ is invented from a page number alone.
+ 
+@@ -135,13 +180,18 @@
+ unreadable PDF or page extraction exception aborts ingestion; there is no silent
+ partial-corpus indexing. Extraction completes for all papers before any store write.
+ 
+-Chunks use the pinned MiniLM WordPiece tokenizer, excluding special tokens. They
+-can cross page and section boundaries but never paper boundaries. Source spans map
++Chunks use the pinned MiniLM WordPiece tokenizer, excluding special tokens. Boundary
++chunks stay within a section (carrying an otherwise orphaned parent heading into
++its child), prefer complete sentences, preserve a table as one
++unit when it fits, and split long tables at rows where feasible. They can cross
++pages within a section and never cross papers. Fixed mode permits page/section
++crossings as before. Source spans map
+ each piece back to its exact extracted page/section. Final windows can be shorter
+ than the configured maximum. Token offsets determine overlap; a cut inside a
+-WordPiece can change the substring's tokenization, so the returned text is recounted
+-and the window shortened when necessary. Extremely small chunk sizes may be rejected
+-if a tokenizer boundary cannot be represented within the limit.
++WordPiece can change the substring's tokenization, so returned text is always
++recounted. Boundary mode avoids cuts between alphanumeric characters and rejects a
++chunk size too small for one complete word. Oversized sentences may still split at
++word boundaries; this is not a semantic discourse parser.
+ 
+ Each Chroma record stores the original extracted chunk text, document ID, paper
+ title, arXiv ID, version, PDF checksum, relative source filename, versioned source
+@@ -181,7 +231,7 @@
+ 
+ rag = RetrievalPipeline(
+     papers_dir=Path("papers"),
+-    db_dir=Path("data/chroma"),
++    db_dir=Path("data/chroma-v2"),
+     config=PRESETS[600],
+ )
+ report = rag.ingest()
+@@ -191,17 +241,38 @@
+     print(hit.text)
+ 
+ # Optional input for a future answer-generation layer. This performs no LLM call.
+-context = build_context(hits, rag.embedder.tokenizer, max_tokens=3000)
++context = build_context(hits, rag.embedder.tokenizer, max_tokens=3000,
++                        query="How does Moshi handle overlapping speech?")
+ ```
+ 
+ `SearchHit.to_dict()` provides serializable text, sources, physical pages, sections,
+-versioned citation, URL with a PDF page fragment, cosine distance, and cosine
+-similarity (`1 - distance`). Similarity is not a factual-confidence probability.
+-`build_context` includes complete cited hits in rank order, stops at the first hit
+-that would exceed its token budget, and counts citation headers and separators.
+-It returns an empty string if no complete cited hit fits. No entire-paper context is
++versioned citation, URL with a PDF page fragment, and an explicit `score_type`:
++`cosine_similarity`, `bm25` or `rrf`. `distance` is nullable for hits without a vector
++score. Ranking scores are not factual-confidence probabilities. BM25 performs no
++query embedding; the pipeline still loads the cached model/tokenizer to validate
++the collection descriptor. Its in-memory lexical index is rebuilt from the ready
++Chroma documents per request, appropriate for this small fixed corpus.
++
++`build_context` remains available from `retrieval.pipeline`. Without a query, it
++packs complete cited hits and skips oversized hits so later evidence can fit.
++With a query, long hits are focused into complete sentence windows or table rows
++using local lexical ranking. Budget shares redistribute space unused by short hits;
++whole passages are restored when spare capacity permits. Duplicate/fully contained
++passages from the same paper are omitted. `select_context` also exposes selected
++hits, exact token counts and omitted IDs. Every clipped passage has adjusted source
++spans, physical pages, a parent chunk ID and paper-relative character offset.
++Final counts include citation headers, ordinals and separators. No entire-paper context is
+ constructed or sent to an LLM. Budget counts use the supplied tokenizer; a future
+ generation model with a different tokenizer needs its own final prompt budget check.
++
++`EvidenceRequirement` accepts a label, alternative literal phrases (OR), and an
++optional paper ID. Multiple requirements use AND semantics. `retrieve` also
++recognizes some high-specificity query constraints: named papers/models, acronyms,
++percentiles, certain hardware names, parameter-count phrases and explicit dates.
++Checks apply to the actual bounded context, including paper attribution. They
++are deliberately limited: absence from retrieved context does not prove absence
++from the corpus, and passing literal checks does not prove semantic sufficiency.
++Use explicit requirements for facts the automatic heuristic cannot recognize.
+ 
+ ## Reproducibility, tests, and evaluation preparation
+ 
+@@ -217,9 +288,11 @@
+ PyTorch algorithms, and one PyTorch thread. These PyTorch settings affect the
+ hosting process. Chroma HNSW uses one thread. Reports include configuration,
+ fingerprint, dependencies, per-paper counts/issues, and new/reused/duplicate counts.
+-
+-```powershell
+-# Fast offline suite, including actual PDF extraction and real temporary Chroma DBs.
++Within one pipeline instance, extraction is cached after validation; every reuse
++still rechecks PDF checksums. A new process performs extraction again.
++
++```powershell
++# Offline unit suite, including actual PDF extraction and temporary Chroma DBs.
+ .venv\Scripts\python.exe -m pytest -q
+ 
+ # Full suite, adding cached-model inference and retrieval for all three presets.
+@@ -228,8 +301,8 @@
+ # Run only the real-model integration tests.
+ .venv\Scripts\python.exe -m pytest -q --run-integration -m integration
+ 
+-.venv\Scripts\python.exe -m ruff check src/retrieval tests/rag
+-.venv\Scripts\python.exe -m ruff format --check src/retrieval tests/rag
++.venv\Scripts\python.exe -m ruff check src/retrieval tests/rag scripts/evaluate_rag.py
++.venv\Scripts\python.exe -m ruff format --check src/retrieval tests/rag scripts/evaluate_rag.py
+ ```
+ 
+ The default suite uses explicitly synthetic embeddings for storage/orchestration
+@@ -244,29 +317,42 @@
+ 
+ The integration checks compare short-input embeddings with standard
+ SentenceTransformers output, verify that long-input suffixes affect embeddings, and
+-check cited retrieval for one known question per paper across all three presets.
+-These assertions check paper/page hits, not whether the particular chunk contains
+-every fact needed to answer the question. The saved 300-token Moshi latency example
+-returns relevant pages but omits the requested numerical values; see
+-[`reports/rag/validation.md`](../reports/rag/validation.md).
+-These are smoke checks, not an evaluation dataset or evidence of configuration
+-superiority. For a later measured comparison, freeze a larger query set with
+-annotated relevant passages/pages, use identical PDFs/model/overlap, and record
+-Recall@k, precision, MRR/nDCG, citation correctness, query latency, index size, and
+-context-token cost for every preset. Record unanswerable and cross-paper questions
+-as well. Choose a configuration only after measuring the agreed metrics.
++check cited retrieval across all three presets. The Moshi regression now requires
++both numerical latency values in correctly attributed BM25 top-3 evidence.
++Other tests cover decimal/exponent retention, table rows, section false positives,
++rotated labels, numerical sentence boundaries, lexical/fusion behavior, context
++budgets, citation slicing and missing evidence constraints.
++
++Run the existing audit's 12 answerable and five unsupported questions through all
++three strategies and chunk configurations with a new output directory:
++
++```powershell
++.venv\Scripts\python.exe scripts/evaluate_rag.py --output reports/rag/evaluation-new-run
++```
++
++The evaluator uses the production search/context/evidence functions, checks source
++alignment before retrieval, blocks Python sockets and saves raw rankings, exact
++passages, `results.csv`, context coverage, refusal outcomes and a baseline comparison.
++It will not overwrite an existing `results.csv`. Presentation-only annotation
++adaptations are recorded. Results are complete annotated evidence coverage across
++returned spans, not answer-generation accuracy. This is a small diagnostic set,
++not held-out validation; the original audit is preserved. See the
++[implementation review](../reports/rag/improvements-2026-11-11/review.md) for actual results.
+ 
+ ## Known limitations
+ 
+-- Extraction does not perform OCR, reconstruct tables, or interpret figures and
+-  mathematical notation. Two-column pages, captions, footnotes, ligatures, and
+-  line-end hyphenation can retain imperfect reading order/text. Rotated body text
+-  is omitted along with margin stamps. Empty-page detection cannot identify every
+-  image whose only extractable text is a caption or header.
++- Extraction does not perform OCR or reconstruct general equations. Table row
++  geometry improves association but merged cells, complex headers, two-column
++  layouts and figure reading order remain imperfect. Superscripts are represented
++  explicitly; subscripts and fractions can still need the original PDF. Line-end
++  joining can remove a genuine compound-word hyphen. Empty-page detection cannot
++  identify every figure whose only extractable text is a caption or header.
+ - Section detection uses bookmarks and layout/text heuristics, not a document-layout
+   model. Some section names may be absent or imperfect. Citations always use
+   physical PDF pages, which can differ from printed page labels.
+-- WordPiece windows can split sentences or words. Pooling every local window avoids
++- Oversized sentences/table rows and fixed-mode windows can split evidence. Long
++  tables may lose header context when split or focused into a limited budget.
++  Pooling every local window avoids
+   data loss from truncation but cannot model interactions across the full 600/900
+   tokens in one transformer pass. It may dilute a small relevant passage inside a
+   large chunk. No size or pooling strategy is claimed superior without evaluation.
+@@ -278,10 +364,15 @@
+   across dependency, CPU, or operating-system changes is not guaranteed. Changing
+   recorded dependencies creates another collection. Index manifests should be
+   treated as trusted local data, and ingestion should have one writer at a time.
+-- Search returns the nearest passages even for out-of-domain questions. There is
+-  no calibrated relevance threshold, reranker, query expansion, answer generation,
+-  contradiction resolution, or automated full retrieval benchmark in this module.
++- Vector search still returns neighbors for unsupported questions. The separate
++  evidence assessment provides explicit, limited refusal support; it is not a
++  calibrated entailment model. Lexical overlap and rank fusion can introduce
++  regressions. There is no cross-encoder, LLM, contradiction resolver or load test.
++- The PDFs contain conflicting statements (Attention EN-FR BLEU 41.8 in Table 2
++  versus 41.0 in prose, and H-Net's 3.6× data-efficiency wording). Extraction keeps
++  both statements. A future answer layer must cite the requested source and expose
++  conflicts rather than silently resolve them.
+ 
+ The module ends at cited retrieval and bounded context preparation. Application
+-integration and selection of the best retrieval configuration await review and
+-measurement.
++integration and selection of a production retrieval configuration await final
++review and broader held-out measurement.
+--- baseline/scripts/evaluate_rag.py
++++ current/scripts/evaluate_rag.py
+@@ -0,0 +1,360 @@
++"""Repeat the audit questions against production retrieval; no answer generation.
++
++Run from the repository root. Baseline reports are read-only. Each output directory
++is an experiment record and must be new for a full run.
++"""
++
++from __future__ import annotations
++
++import argparse
++import copy
++import csv
++import hashlib
++import json
++import logging
++import re
++import socket
++import unicodedata
++from collections import defaultdict
++from dataclasses import asdict
++from pathlib import Path
++from typing import Any
++
++from retrieval.config import PRESETS
++from retrieval.context import select_context
++from retrieval.evidence import assess_evidence, infer_requirements
++from retrieval.index import ChromaIndex
++from retrieval.models import ExtractedPaper, SearchHit
++from retrieval.pipeline import RetrievalPipeline
++
++ROOT = Path(__file__).resolve().parents[1]
++BASELINE = ROOT / "reports/rag/audit-2026-11-11"
++
++
++def write_json(path: Path, value: Any) -> None:
++    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
++
++
++def canonical(text: str) -> tuple[str, list[int]]:
++    """Map presentation changes to source positions; retain decimal signs/operators."""
++    removed = set()
++    for match in re.finditer(r"(?<=\w)-\s*\n\s*(?=\w)", text):
++        removed.update(range(match.start(), match.end()))
++    chars, positions = [], []
++    for index, value in enumerate(text):
++        if index in removed:
++            continue
++        for char in unicodedata.normalize("NFKC", value).casefold():
++            decimal_point = (
++                char == "."
++                and 0 < index < len(text) - 1
++                and text[index - 1].isdigit()
++                and text[index + 1].isdigit()
++            )
++            if char.isalnum() or char in "√≥≤−+/" or decimal_point:
++                chars.append(char)
++                positions.append(index)
++    return "".join(chars), positions
++
++
++def resolve_evidence(
++    questions: dict[str, Any], documents: list[ExtractedPaper]
++) -> list[dict[str, Any]]:
++    pages = {}
++    for document in documents:
++        position = 0
++        for page in document.pages:
++            if page.duplicate_of is not None:
++                continue
++            pages[(document.paper.arxiv_id, page.page_number)] = (position, page.text)
++            position += len(page.text) + 1
++    adaptations = []
++    failures = []
++    for question in questions["answerable"]:
++        for unit in question["units"]:
++            for alternative in unit["alternatives"]:
++                for span in alternative:
++                    offset, text = pages[(question["paper"], span["page"])]
++                    target, positions = canonical(text)
++                    quote = span["quote"]
++                    # Same Table 4 header facts, now serialized in geometric row order.
++                    if question["id"] == "H3" and quote.startswith("Model\nChinese\nCode"):
++                        quote = quote.replace("Model\nChinese\nCode", "Chinese\nCode\nModel", 1)
++                        adaptations.append(
++                            {
++                                "question": question["id"],
++                                "page": span["page"],
++                                "original": span["quote"],
++                                "adapted": quote,
++                                "reason": "Header row order follows PDF baselines; "
++                                "labels, values and evidence rule unchanged.",
++                            }
++                        )
++                    needle, _ = canonical(quote)
++                    matches = list(re.finditer(re.escape(needle), target))
++                    if len(matches) != 1:
++                        failures.append(
++                            {
++                                "question": question["id"],
++                                "page": span["page"],
++                                "quote": quote,
++                                "matches": len(matches),
++                            }
++                        )
++                        continue
++                    match = matches[0]
++                    span["start_char"] = offset + positions[match.start()]
++                    span["end_char"] = offset + positions[match.end() - 1] + 1
++    if failures:
++        raise ValueError(
++            "Evidence alignment failed before retrieval:\n"
++            + json.dumps(failures, ensure_ascii=False, indent=2)
++        )
++    return adaptations
++
++
++def covered(start: int, end: int, intervals: list[tuple[int, int]]) -> bool:
++    cursor = start
++    for left, right in sorted(intervals):
++        if right <= cursor:
++            continue
++        if left > cursor:
++            return False
++        cursor = max(cursor, right)
++        if cursor >= end:
++            return True
++    return cursor >= end
++
++
++def coverage(question: dict[str, Any], hits: list[SearchHit] | tuple[SearchHit, ...]) -> list[bool]:
++    intervals = [
++        (hit.char_start, hit.char_start + len(hit.text))
++        for hit in hits
++        if hit.arxiv_id == question["paper"] and hit.char_start is not None
++    ]
++    return [
++        any(
++            all(covered(span["start_char"], span["end_char"], intervals) for span in alternative)
++            for alternative in unit["alternatives"]
++        )
++        for unit in question["units"]
++    ]
++
++
++def block_network(*args: Any, **kwargs: Any) -> None:
++    raise RuntimeError("Network connections are disabled for this local evaluation")
++
++
++def validate_records(
++    records: dict[str, Any], documents: list[ExtractedPaper], tokenizer: Any
++) -> dict[str, int]:
++    pages, parents, papers = {}, {}, {}
++    for doc in documents:
++        position, parts = 0, []
++        papers[doc.paper.arxiv_id] = doc.paper
++        for page in doc.pages:
++            if page.duplicate_of is not None:
++                continue
++            pages[(doc.paper.arxiv_id, page.page_number)] = (position, page.text)
++            parts.append(page.text + "\n")
++            position += len(page.text) + 1
++        parents[doc.paper.arxiv_id] = "".join(parts)
++    spans, starts, ends = 0, 0, 0
++    for row in records.values():
++        meta, text = row["metadata"], row["text"]
++        paper = papers[meta["arxiv_id"]]
++        assert (meta["paper_title"], meta["version"], meta["pdf_sha256"], meta["source_url"]) == (
++            paper.title,
++            paper.version,
++            paper.sha256,
++            paper.url,
++        )
++        parent = parents[paper.arxiv_id]
++        a, b = meta["char_start"], meta["char_end"]
++        assert parent[a:b] == text
++        assert (
++            len(tokenizer.encode(text, add_special_tokens=False, truncation=False, verbose=False))
++            == meta["token_count"]
++        )
++        starts += int(a > 0 and parent[a - 1].isalnum() and parent[a].isalnum())
++        ends += int(b < len(parent) and parent[b - 1].isalnum() and parent[b].isalnum())
++        sources = json.loads(meta["source_spans_json"])
++        assert sorted({s["page_number"] for s in sources}) == json.loads(meta["page_numbers_json"])
++        for source in sources:
++            spans += 1
++            offset, page_text = pages[(paper.arxiv_id, source["page_number"])]
++            left, right = source["start_char"], source["end_char"]
++            assert 0 <= left < right <= len(text)
++            assert page_text[a + left - offset : a + right - offset] == text[left:right]
++    assert not starts and not ends, "Boundary chunks must not cut inside words or numbers"
++    return {
++        "chunks_checked": len(records),
++        "source_spans_checked": spans,
++        "word_interior_starts": starts,
++        "word_interior_ends": ends,
++    }
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, required=True)
++    parser.add_argument("--db-dir", type=Path, default=ROOT / "data/chroma-v2")
++    parser.add_argument("--prepare-only", action="store_true")
++    parser.add_argument("--max-context-tokens", type=int, default=4096)
++    args = parser.parse_args()
++    if args.max_context_tokens < 1:
++        parser.error("--max-context-tokens must be positive")
++    if (args.output / "results.csv").exists():
++        parser.error("Output already contains results.csv; use a new experiment directory")
++    args.output.mkdir(parents=True, exist_ok=True)
++    logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(message)s")
++    socket.socket.connect = block_network
++    socket.socket.connect_ex = block_network
++    pipeline = RetrievalPipeline(papers_dir=ROOT / "papers", db_dir=args.db_dir)
++    documents = pipeline.extract()
++    questions = copy.deepcopy(
++        json.loads((BASELINE / "evidence-reviewed.json").read_text(encoding="utf-8"))
++    )
++    adaptations = resolve_evidence(questions, documents)
++    write_json(args.output / "evidence.json", questions)
++    write_json(args.output / "evidence-adaptations.json", adaptations)
++    write_json(
++        args.output / "extraction.json",
++        [
++            {
++                "paper": doc.paper.arxiv_id,
++                "issues": [asdict(issue) for issue in doc.issues],
++                "pages": [asdict(page) for page in doc.pages],
++            }
++            for doc in documents
++        ],
++    )
++    print("Evidence aligned before retrieval.", flush=True)
++    if args.prepare_only:
++        return
++    model = pipeline.embedder
++    rows, rankings, inspections = [], {}, {}
++    for size, config in PRESETS.items():
++        pipeline.config = config
++        ingestion = pipeline.ingest()
++        write_json(args.output / f"ingestion-{size}.json", ingestion)
++        index = ChromaIndex(args.db_dir, pipeline.descriptor)
++        raw = index.collection.get(include=["documents", "metadatas"])
++        records = {
++            identifier: {"text": text, "metadata": meta}
++            for identifier, text, meta in zip(
++                raw["ids"], raw["documents"], raw["metadatas"], strict=True
++            )
++        }
++        write_json(args.output / f"chunks-{size}.json", records)
++        inspections[str(size)] = {
++            "chunks": len(records),
++            "descriptor": pipeline.descriptor,
++            "verification": validate_records(records, documents, model.tokenizer),
++        }
++        rankings[str(size)] = {}
++        for question in questions["answerable"] + questions["unanswerable"]:
++            qid, query = question["id"], question["query"]
++            case = {"query": query, "rankings": {}, "cutoffs": {}}
++            for strategy, method in (
++                ("vector", "vector"),
++                ("bm25", "bm25"),
++                ("hybrid", "hybrid_rrf"),
++            ):
++                ranked = pipeline.search(query, strategy=strategy, top_k=50)
++                case["rankings"][method] = [[hit.chunk_id, hit.score] for hit in ranked]
++                case["cutoffs"][method] = {}
++                for k in sorted({3, 5, 10, config.top_k}):
++                    hits = pipeline.search(query, strategy=strategy, top_k=k)
++                    context = select_context(
++                        hits, model.tokenizer, max_tokens=args.max_context_tokens, query=query
++                    )
++                    assessment = assess_evidence(context.hits, infer_requirements(query))
++                    detail = {
++                        "ids": [hit.chunk_id for hit in hits],
++                        "context_hits": [hit.to_dict() for hit in context.hits],
++                        "context_tokens": context.token_count,
++                        "assessment": asdict(assessment),
++                    }
++                    row = {
++                        "size": size,
++                        "method": method,
++                        "k": k,
++                        "question": qid,
++                        "answerable": int("units" in question),
++                        "complete": "",
++                        "context_complete": "",
++                        "refused": int(assessment.refused),
++                        "context_tokens": context.token_count,
++                        "context_chunks": len(context.hits),
++                    }
++                    if "units" in question:
++                        units, context_units = (
++                            coverage(question, hits),
++                            coverage(question, context.hits),
++                        )
++                        detail.update(units=units, context_units=context_units)
++                        row.update(
++                            complete=int(all(units)), context_complete=int(all(context_units))
++                        )
++                    case["cutoffs"][method][str(k)] = detail
++                    rows.append(row)
++            rankings[str(size)][qid] = case
++            print(f"{size} {qid} evaluated", flush=True)
++        write_json(args.output / "rankings.json", rankings)
++    with (args.output / "results.csv").open("w", encoding="utf-8", newline="") as handle:
++        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
++        writer.writeheader()
++        writer.writerows(rows)
++    groups = defaultdict(list)
++    for row in rows:
++        groups[(row["size"], row["method"], row["k"])].append(row)
++    summary = []
++    baseline = json.loads((BASELINE / "summary-reviewed.json").read_text(encoding="utf-8"))
++    for (size, method, k), values in sorted(groups.items()):
++        positive = [row for row in values if row["answerable"]]
++        negative = [row for row in values if not row["answerable"]]
++        before = next(
++            row for row in baseline if (row["size"], row["method"], row["k"]) == (size, method, k)
++        )
++        summary.append(
++            {
++                "size": size,
++                "method": method,
++                "k": k,
++                "questions": len(positive),
++                "baseline_complete": before["complete_questions"],
++                "complete": sum(row["complete"] for row in positive),
++                "baseline_context_complete": before["context_complete_questions"],
++                "context_complete": sum(row["context_complete"] for row in positive),
++                "false_refusals": sum(row["refused"] for row in positive),
++                "unsupported_questions": len(negative),
++                "unsupported_refusals": sum(row["refused"] for row in negative),
++                "mean_context_tokens": sum(row["context_tokens"] for row in positive)
++                / len(positive),
++            }
++        )
++    write_json(args.output / "summary.json", summary)
++    write_json(
++        args.output / "protocol.json",
++        {
++            "baseline": BASELINE.relative_to(ROOT).as_posix(),
++            "max_context_tokens": args.max_context_tokens,
++            "questions_sha256": hashlib.sha256(
++                (BASELINE / "evidence-reviewed.json").read_bytes()
++            ).hexdigest(),
++            "source_sha256": {
++                path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
++                for path in sorted((ROOT / "src/retrieval").glob("*.py"))
++            },
++            "indexing": inspections,
++            "limits": "Same 12 diagnostic questions and five unsupported questions; "
++            "not held out. Coverage measures annotated evidence, not generated answer accuracy. "
++            "Refusal is a literal-constraint check, not semantic entailment.",
++        },
++    )
++    print(json.dumps(summary, indent=2), flush=True)
++
++
++if __name__ == "__main__":
++    main()
+--- baseline/src/retrieval/chunking.py
++++ current/src/retrieval/chunking.py
+@@ -1,21 +1,29 @@
+ """Token windows that retain the exact extracted text and its source spans."""
+ 
++from bisect import bisect_left, bisect_right
+ from typing import Any
+ 
+ from .config import MODEL_NAME, MODEL_REVISION, PIPELINE_VERSION, RagConfig
+ from .models import Chunk, ExtractedPaper, SourceSpan, stable_hash
++from .text import sentence_spans
++
++
++def _inside_word(text: str, position: int) -> bool:
++    return 0 < position < len(text) and text[position - 1].isalnum() and text[position].isalnum()
+ 
+ 
+ def chunk_paper(document: ExtractedPaper, tokenizer: Any, config: RagConfig) -> list[Chunk]:
+     """Chunk one paper using the embedding model's tokenizer, without special tokens.
+ 
+-    Windows may cross pages or sections, but never papers. Duplicate pages are omitted
++    Boundary windows stay within sections and prefer complete sentences/tables.
++    Fixed windows retain the original configurable behavior. Duplicate pages are omitted
+     with their original page numbers retained in the extraction report. Source spans
+     retain all page/section transitions within a window.
+     """
+     parts: list[str] = []
+     spans: list[SourceSpan] = []
+     position = 0
++    tables: list[tuple[int, int]] = []
+     for page in document.pages:
+         if page.duplicate_of is not None:
+             continue
+@@ -28,6 +36,11 @@
+                     position + section.end_char,
+                 )
+             )
++        tables.extend(
++            (position + r.start_char, position + r.end_char)
++            for r in page.regions
++            if r.kind == "table"
++        )
+         parts.append(page.text + "\n")
+         position += len(page.text) + 1
+     text = "".join(parts)
+@@ -39,10 +52,52 @@
+         verbose=False,
+     )
+     offsets = encoded["offset_mapping"]
++    if not offsets:
++        return []
++    starts = [offset[0] for offset in offsets]
++    section_ends = [len(offsets)]
++    preferred = set()
++    atomic = []
++    if config.chunking == "boundary":
++        for previous, current in zip(spans, spans[1:], strict=False):
++            if previous.section != current.section:
++                previous_text = " ".join(text[previous.start_char : previous.end_char].split())
++                # A parent heading immediately followed by a subsection has no
++                # standalone evidence. Carry it into the child's first chunk.
++                if previous_text != previous.section:
++                    section_ends.append(bisect_left(starts, current.start_char))
++        section_ends = sorted(set(section_ends))
++        preferred.update(bisect_left(starts, end) for _, end in sentence_spans(text))
++        for left, right in tables:
++            a, b = bisect_left(starts, left), bisect_left(starts, right)
++            preferred.update((a, b))
++            if b - a <= config.chunk_size:
++                atomic.append((a, b))
++            else:
++                # Large tables split at row boundaries, retaining complete cells.
++                cursor = left
++                for row in text[left:right].splitlines(keepends=True):
++                    cursor += len(row)
++                    preferred.add(bisect_left(starts, cursor))
++        preferred = {end for end in preferred if not any(a < end < b for a, b in atomic)}
++    preferred_ends = sorted(preferred)
+     chunks: list[Chunk] = []
+     start = 0
+     while start < len(offsets):
+         end = min(start + config.chunk_size, len(offsets))
++        section_end = section_ends[bisect_right(section_ends, start)]
++        if config.chunking == "boundary":
++            end = min(end, section_end)
++            for left, right in atomic:
++                if left < end < right and left > start:
++                    end = left
++            candidate = bisect_right(preferred_ends, end) - 1
++            if candidate >= 0 and preferred_ends[candidate] > start:
++                end = preferred_ends[candidate]
++            while end > start and _inside_word(text, offsets[end - 1][1]):
++                end -= 1
++            if end <= start:
++                raise ValueError("chunk_size cannot fit one complete word; increase chunk_size")
+         char_start = offsets[start][0]
+         # A cut through a WordPiece can change tokenization of the returned substring.
+         # Recount it, shrinking if needed, so chunk_size is an actual upper bound.
+@@ -57,6 +112,9 @@
+             if token_count <= config.chunk_size:
+                 break
+             end -= 1
++            if config.chunking == "boundary":
++                while end > start and _inside_word(text, offsets[end - 1][1]):
++                    end -= 1
+             if end <= start:
+                 raise ValueError("chunk_size is too small for this tokenizer boundary")
+         chunk_sources = tuple(
+@@ -93,5 +151,15 @@
+         )
+         if end == len(offsets):
+             break
+-        start = max(start + 1, end - config.overlap)
++        next_start = max(start + 1, end - config.overlap)
++        if config.chunking == "boundary":
++            if end == section_end:
++                next_start = end
++            else:
++                candidate = bisect_left(preferred_ends, next_start)
++                if candidate < len(preferred_ends) and preferred_ends[candidate] < end:
++                    next_start = preferred_ends[candidate]
++                while next_start < end and _inside_word(text, offsets[next_start][0]):
++                    next_start += 1
++        start = next_start
+     return chunks
+--- baseline/src/retrieval/cli.py
++++ current/src/retrieval/cli.py
+@@ -15,22 +15,36 @@
+     parser = argparse.ArgumentParser(description="The Relay: local research-paper retrieval")
+     parser.add_argument("--verbose", action="store_true", help="Show debug logging")
+     commands = parser.add_subparsers(dest="command", required=True)
+-    for name in ("extract", "ingest", "search"):
++    for name in ("extract", "ingest", "search", "retrieve"):
+         command = commands.add_parser(name)
+         command.add_argument("--papers-dir", type=Path, default=Path("papers"))
+         command.add_argument("--output", type=Path, help="Also save the JSON result to this file")
+         if name == "extract":
+             continue
+-        command.add_argument("--db-dir", type=Path, default=Path("data/chroma"))
++        command.add_argument("--db-dir", type=Path, default=Path("data/chroma-v2"))
+         command.add_argument("--preset", type=int, choices=tuple(PRESETS), default=300)
+         command.add_argument("--chunk-size", type=int, help="Override the preset's token count")
+         command.add_argument("--overlap", type=int, help="Overlap in tokenizer tokens")
+         command.add_argument("--top-k", type=int, help="Number of retrieved chunks")
+         command.add_argument("--batch-size", type=int, default=16)
+         command.add_argument("--model-cache", type=Path, help="Hugging Face hub cache directory")
+-        if name == "search":
++        command.add_argument("--chunking", choices=("boundary", "fixed"), default="boundary")
++        command.add_argument("--strategy", choices=("vector", "bm25", "hybrid"), default="vector")
++        command.add_argument("--candidate-k", type=int, default=50)
++        command.add_argument("--rrf-constant", type=int, default=60)
++        command.add_argument("--bm25-k1", type=float, default=1.5)
++        command.add_argument("--bm25-b", type=float, default=0.75)
++        if name in {"search", "retrieve"}:
+             command.add_argument("query")
+             command.add_argument("--arxiv-id", help="Restrict results to one supplied paper")
++        if name == "retrieve":
++            command.add_argument("--max-context-tokens", type=int, default=4096)
++            command.add_argument(
++                "--require",
++                action="append",
++                default=[],
++                help="Required evidence phrase (repeatable; AND semantics)",
++            )
+     return parser
+ 
+ 
+@@ -50,7 +64,18 @@
+         else:
+             overrides = {
+                 key: value
+-                for key in ("chunk_size", "overlap", "top_k", "batch_size")
++                for key in (
++                    "chunk_size",
++                    "overlap",
++                    "top_k",
++                    "batch_size",
++                    "chunking",
++                    "strategy",
++                    "candidate_k",
++                    "rrf_constant",
++                    "bm25_k1",
++                    "bm25_b",
++                )
+                 if (value := getattr(args, key)) is not None
+             }
+             config = replace(PRESETS[args.preset], **overrides)
+@@ -62,6 +87,18 @@
+             )
+             if args.command == "ingest":
+                 result = pipeline.ingest()
++            elif args.command == "retrieve":
++                from .evidence import EvidenceRequirement
++
++                requirements = tuple(
++                    EvidenceRequirement(phrase, (phrase,), args.arxiv_id) for phrase in args.require
++                )
++                result = pipeline.retrieve(
++                    args.query,
++                    arxiv_id=args.arxiv_id,
++                    max_tokens=args.max_context_tokens,
++                    requirements=requirements,
++                )
+             else:
+                 hits = pipeline.search(args.query, arxiv_id=args.arxiv_id)
+                 result = {"query": args.query, "hits": [hit.to_dict() for hit in hits]}
+--- baseline/src/retrieval/config.py
++++ current/src/retrieval/config.py
+@@ -1,11 +1,12 @@
+ """Immutable settings; query-only settings do not change the index identity."""
+ 
++import math
+ from dataclasses import dataclass
+ from types import MappingProxyType
+ 
+ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+ MODEL_REVISION = "c9745ed1d9f207416be6d2e6f8de32d1f16199bf"
+-PIPELINE_VERSION = "relay-rag-v1"
++PIPELINE_VERSION = "relay-rag-v2.1"
+ 
+ 
+ @dataclass(frozen=True)
+@@ -14,18 +15,36 @@
+     overlap: int = 50
+     top_k: int = 3
+     batch_size: int = 16
++    chunking: str = "boundary"
++    strategy: str = "vector"
++    candidate_k: int = 50
++    bm25_k1: float = 1.5
++    bm25_b: float = 0.75
++    rrf_constant: int = 60
+ 
+     def __post_init__(self) -> None:
+-        for name in ("chunk_size", "top_k", "batch_size"):
++        for name in ("chunk_size", "top_k", "batch_size", "candidate_k", "rrf_constant"):
+             value = getattr(self, name)
+             if type(value) is not int or value < 1:
+                 raise ValueError(f"{name} must be a positive integer")
+         if type(self.overlap) is not int or not 0 <= self.overlap < self.chunk_size:
+             raise ValueError("overlap must be an integer in [0, chunk_size)")
++        if self.chunking not in {"boundary", "fixed"}:
++            raise ValueError("chunking must be boundary or fixed")
++        if self.strategy not in {"vector", "bm25", "hybrid"}:
++            raise ValueError("strategy must be vector, bm25, or hybrid")
++        for name, low, high in (("bm25_k1", 0, math.inf), ("bm25_b", 0, 1)):
++            value = getattr(self, name)
++            if isinstance(value, bool) or not isinstance(value, (int, float)):
++                raise ValueError(f"{name} must be a finite number")
++            if not math.isfinite(value) or not low <= value <= high:
++                raise ValueError(f"{name} is outside its allowed range")
++        if self.bm25_k1 == 0:
++            raise ValueError("bm25_k1 must be positive")
+ 
+     @property
+-    def indexing_settings(self) -> dict[str, int]:
+-        return {"chunk_size": self.chunk_size, "overlap": self.overlap}
++    def indexing_settings(self) -> dict[str, int | str]:
++        return {"chunk_size": self.chunk_size, "overlap": self.overlap, "chunking": self.chunking}
+ 
+ 
+ # A constant overlap keeps this variable fixed across the requested comparisons.
+--- baseline/src/retrieval/context.py
++++ current/src/retrieval/context.py
+@@ -0,0 +1,160 @@
++"""Bounded, cited context selection with exact span provenance."""
++
++from dataclasses import dataclass, replace
++from typing import Any
++
++from .lexical import BM25
++from .models import SearchHit, SourceSpan, content_hash
++from .text import sentence_spans
++
++
++@dataclass(frozen=True)
++class ContextSelection:
++    text: str
++    hits: tuple[SearchHit, ...]
++    token_count: int
++    omitted_ids: tuple[str, ...]
++
++
++def slice_hit(hit: SearchHit, start: int, end: int) -> SearchHit:
++    if not 0 <= start < end <= len(hit.text):
++        raise ValueError("Invalid evidence passage bounds")
++    sources = tuple(
++        SourceSpan(
++            span.page_number,
++            span.section,
++            max(span.start_char, start) - start,
++            min(span.end_char, end) - start,
++        )
++        for span in hit.sources
++        if span.start_char < end and span.end_char > start
++    )
++    if not sources:
++        raise ValueError("Evidence passage has no source attribution")
++    return replace(
++        hit,
++        chunk_id=f"{hit.chunk_id}:{start}:{end}",
++        text=hit.text[start:end],
++        pages=tuple(sorted({span.page_number for span in sources})),
++        sections=tuple(dict.fromkeys(span.section for span in sources if span.section)),
++        sources=sources,
++        char_start=hit.char_start + start if hit.char_start is not None else None,
++        parent_chunk_id=hit.parent_chunk_id or hit.chunk_id,
++    )
++
++
++def _count(text: str, tokenizer: Any) -> int:
++    return len(tokenizer.encode(text, add_special_tokens=False, truncation=False, verbose=False))
++
++
++def _body_budgets(hits: list[SearchHit], tokenizer: Any, max_tokens: int) -> list[int]:
++    """Distribute capacity after small passages and citation overhead are paid."""
++    costs = [_count(hit.text, tokenizer) for hit in hits]
++    headers = sum(_count(f"[{i}] {hit.citation}\n", tokenizer) for i, hit in enumerate(hits, 1))
++    available = max(0, max_tokens - headers - 2 * len(hits))
++    lower, upper = 0, max(costs, default=0)
++    while lower < upper:
++        middle = (lower + upper + 1) // 2
++        if sum(min(cost, middle) for cost in costs) <= available:
++            lower = middle
++        else:
++            upper = middle - 1
++    return [min(cost, lower) for cost in costs]
++
++
++def _render(hits: list[SearchHit]) -> str:
++    return "\n\n".join(f"[{i}] {hit.citation}\n{hit.text}" for i, hit in enumerate(hits, 1))
++
++
++def _focused_hit(hit: SearchHit, query: str, tokenizer: Any, budget: int) -> SearchHit | None:
++    if _count(hit.text, tokenizer) <= budget:
++        return hit
++    spans = sentence_spans(hit.text)
++    candidates = []
++    for index, (start, end) in enumerate(spans):
++        if _count(hit.text[start:end], tokenizer) > budget:
++            # Long tables retain rows, including separators; never chop a value.
++            row_start = start
++            for row in hit.text[start:end].splitlines(keepends=True):
++                row_end = row_start + len(row.rstrip())
++                if row_end > row_start and _count(hit.text[row_start:row_end], tokenizer) <= budget:
++                    candidates.append(slice_hit(hit, row_start, row_end))
++                row_start += len(row)
++            continue
++        for _, next_end in spans[index + 1 :]:
++            if _count(hit.text[start:next_end], tokenizer) > budget:
++                break
++            end = next_end
++        candidates.append(slice_hit(hit, start, end))
++    ranked = BM25(candidates).search(query, top_k=1)
++    # When none of the query words occur, retain the leading complete passage.
++    if ranked:
++        return next(
++            candidate for candidate in candidates if candidate.chunk_id == ranked[0].chunk_id
++        )
++    return candidates[0] if candidates else None
++
++
++def select_context(
++    hits: list[SearchHit], tokenizer: Any, *, max_tokens: int = 4096, query: str | None = None
++) -> ContextSelection:
++    if type(max_tokens) is not int or max_tokens < 1:
++        raise ValueError("max_tokens must be a positive integer")
++    if query is not None and (not isinstance(query, str) or not query.strip()):
++        raise ValueError("query must be a nonempty string")
++    # Give later hits room, but redistribute the space unused by short hits.
++    # Final full-context tokenization below remains the authoritative budget check.
++    budgets = _body_budgets(hits, tokenizer, max_tokens) if query else []
++    selected: list[SearchHit] = []
++    omitted = []
++    seen = set()
++    context = ""
++    for index, original in enumerate(hits):
++        hit = original
++        if query:
++            hit = _focused_hit(hit, query, tokenizer, budgets[index]) if budgets[index] else None
++        if hit is None:
++            omitted.append(original.chunk_id)
++            continue
++        identity = (hit.arxiv_id, hit.version, content_hash(hit.text))
++        contained = any(
++            prior.arxiv_id == hit.arxiv_id
++            and prior.version == hit.version
++            and prior.char_start is not None
++            and hit.char_start is not None
++            and prior.char_start <= hit.char_start
++            and hit.char_start + len(hit.text) <= prior.char_start + len(prior.text)
++            for prior in selected
++        )
++        if identity in seen or contained:
++            omitted.append(original.chunk_id)
++            continue
++        block = f"[{len(selected) + 1}] {hit.citation}\n{hit.text}"
++        candidate = f"{context}\n\n{block}" if context else block
++        if _count(candidate, tokenizer) > max_tokens:
++            omitted.append(original.chunk_id)
++            continue
++        selected.append(hit)
++        seen.add(identity)
++        context = candidate
++    # Sentence boundaries and shorter citation headers can leave spare capacity.
++    # Restore whole original passages when they now fit; never invent fragments.
++    if query:
++        originals = {hit.chunk_id: hit for hit in hits}
++        for index, hit in enumerate(selected):
++            if not hit.parent_chunk_id or hit.parent_chunk_id not in originals:
++                continue
++            replacement = [*selected]
++            replacement[index] = originals[hit.parent_chunk_id]
++            candidate = _render(replacement)
++            if _count(candidate, tokenizer) <= max_tokens:
++                selected = replacement
++                context = candidate
++    return ContextSelection(context, tuple(selected), _count(context, tokenizer), tuple(omitted))
++
++
++def build_context(
++    hits: list[SearchHit], tokenizer: Any, *, max_tokens: int = 4096, query: str | None = None
++) -> str:
++    """Backwards-compatible string API; pass query to focus long passages."""
++    return select_context(hits, tokenizer, max_tokens=max_tokens, query=query).text
+--- baseline/src/retrieval/evidence.py
++++ current/src/retrieval/evidence.py
+@@ -0,0 +1,135 @@
++"""Conservative evidence checks, not an answer generator or entailment model."""
++
++import re
++from dataclasses import dataclass
++
++from .catalog import PAPERS
++from .models import SearchHit
++from .text import lexical_tokens
++
++
++@dataclass(frozen=True)
++class EvidenceRequirement:
++    """At least one literal alternative must occur in the specified paper's evidence.
++
++    Empty alternatives mean paper presence only. Separate requirements are ANDed;
++    alternatives are ORed. This permits explicit model/metric/device/unit checks.
++    """
++
++    label: str
++    alternatives: tuple[str, ...] = ()
++    arxiv_id: str | None = None
++
++    def __post_init__(self) -> None:
++        if not self.label.strip():
++            raise ValueError("Evidence requirement needs a label")
++        if not self.alternatives and self.arxiv_id is None:
++            raise ValueError("Evidence requirement needs alternatives or a paper")
++        if any(not lexical_tokens(value) for value in self.alternatives):
++            raise ValueError("Evidence alternatives must contain searchable terms")
++        if self.arxiv_id is not None and self.arxiv_id not in {p.arxiv_id for p in PAPERS}:
++            raise ValueError("Evidence paper must be one of the supplied papers")
++
++
++@dataclass(frozen=True)
++class EvidenceAssessment:
++    status: str
++    reason: str
++    missing: tuple[str, ...]
++
++    @property
++    def refused(self) -> bool:
++        return self.status == "insufficient_evidence"
++
++
++def infer_requirements(
++    query: str, *, arxiv_id: str | None = None
++) -> tuple[EvidenceRequirement, ...]:
++    """Recognize high-specificity constraints; do not pretend to parse every claim.
++
++    Callers can supply explicit requirements for facts this small local heuristic
++    cannot recognize. No question/answer lookup or evaluation annotations are used.
++    """
++    aliases = {
++        "1706.03762": r"attention is all you need",
++        "2410.00037": r"\b(?:moshi|mimi|helium)\b",
++        "2507.07955": r"\bh[- ]?net\b|dynamic chunking",
++    }
++    scopes = [paper for paper, pattern in aliases.items() if re.search(pattern, query, re.I)]
++    if arxiv_id and arxiv_id not in scopes:
++        scopes.append(arxiv_id)
++    requirements = [
++        EvidenceRequirement(f"passage from arXiv:{paper}", arxiv_id=paper) for paper in scopes
++    ]
++    phrases: list[tuple[str, ...]] = []
++    phrases.extend((match.group(),) for match in re.finditer(r"\b[A-Z][A-Z0-9]{2,}\b", query))
++    phrases.extend(
++        (match.group(),)
++        for match in re.finditer(
++            r"\bp\d{2}\b|\biOS\b|\bAndroid\b|\biPhone\s+\d+(?:\s+(?:Pro|Max|Plus)){0,2}\b",
++            query,
++            re.I,
++        )
++    )
++    for match in re.finditer(
++        r"\b(\d+(?:\.\d+)?)\s*[- ]?\s*(billion|million|b|m)\s*[- ]?\s*parameters?\b",
++        query,
++        re.I,
++    ):
++        value, unit = match.groups()
++        units = ("b", "billion") if unit.casefold() in {"b", "billion"} else ("m", "million")
++        phrases.append(
++            tuple(f"{value} {u} {p}" for u in units for p in ("parameter", "parameters"))
++        )
++    for match in re.finditer(r"\b(?:in|as of|during)\s+(?:[A-Za-z]+\s+)?(20\d{2})\b", query, re.I):
++        phrases.append((match.group(1),))
++    seen = set()
++    for alternatives in phrases:
++        key = tuple(" ".join(lexical_tokens(text)) for text in alternatives)
++        if key in seen:
++            continue
++        seen.add(key)
++        for scope in scopes or [None]:
++            label = alternatives[0] + (f" in arXiv:{scope}" if scope else "")
++            requirements.append(EvidenceRequirement(label, alternatives, scope))
++    return tuple(requirements)
++
++
++def assess_evidence(
++    hits: list[SearchHit] | tuple[SearchHit, ...], requirements: tuple[EvidenceRequirement, ...]
++) -> EvidenceAssessment:
++    if not hits:
++        return EvidenceAssessment(
++            "insufficient_evidence", "No cited evidence fits the request.", ("cited passage",)
++        )
++    missing = []
++    normalized = {hit.chunk_id: " " + " ".join(lexical_tokens(hit.text)) + " " for hit in hits}
++    for requirement in requirements:
++        candidates = [
++            hit
++            for hit in hits
++            if requirement.arxiv_id is None or hit.arxiv_id == requirement.arxiv_id
++        ]
++        found = (
++            bool(candidates)
++            if not requirement.alternatives
++            else any(
++                " " + " ".join(lexical_tokens(alternative)) + " " in normalized[hit.chunk_id]
++                for hit in candidates
++                for alternative in requirement.alternatives
++            )
++        )
++        if not found:
++            missing.append(requirement.label)
++    if missing:
++        return EvidenceAssessment(
++            "insufficient_evidence",
++            "The retrieved context does not support all requested constraints.",
++            tuple(missing),
++        )
++    return EvidenceAssessment(
++        "candidate_evidence",
++        "Cited passages pass the requested literal constraints; "
++        "this does not establish full answer entailment.",
++        (),
++    )
+--- baseline/src/retrieval/extraction.py
++++ current/src/retrieval/extraction.py
+@@ -2,7 +2,6 @@
+ 
+ import logging
+ import re
+-import unicodedata
+ from collections import defaultdict
+ from pathlib import Path
+ from statistics import median
+@@ -10,94 +9,111 @@
+ import pymupdf
+ 
+ from .errors import ExtractionError
++from .layout import PageLayout, TextLine, normalize, read_page
+ from .models import (
+     ExtractedPaper,
+     ExtractionIssue,
+     PageText,
+     PaperSpec,
+     SectionSpan,
++    TextRegion,
+     content_hash,
+ )
++from .text import dehyphenate
+ 
+ logger = logging.getLogger(__name__)
+-_SECTION_PREFIX = re.compile(r"^(?:\d+(?:\.\d+)*\.?|[A-Z](?:\.\d+)*)\s+")
+-_SECTION_NUMBER = re.compile(r"(?:\d+(?:\.\d+)*\.?|[A-Z](?:\.\d+)*)")
++_SECTION_PREFIX = re.compile(r"^(?:\d{1,2}(?:\.\d{1,2})*\.?|[A-Z](?:\.\d{1,2})*)\s+")
++_SECTION_NUMBER = re.compile(r"(?:\d{1,2}(?:\.\d{1,2})*|[A-Z](?:\.\d{1,2})*)")
+ _NAMED_HEADINGS = {"abstract", "references", "acknowledgments", "acknowledgements", "appendix"}
+ 
+ 
+-def _normalize(text: str) -> str:
+-    return " ".join(unicodedata.normalize("NFKC", text).replace("\x00", "").split())
++def _heading_key(text: str) -> str:
++    return _SECTION_PREFIX.sub("", normalize(text)).casefold().rstrip(".")
+ 
+ 
+-def _heading_key(text: str) -> str:
+-    return _SECTION_PREFIX.sub("", _normalize(text)).casefold().rstrip(".")
+-
+-
+-def _page_lines(page: pymupdf.Page, title: str) -> list[tuple[str, bool, float]]:
+-    lines = []
+-    for block in page.get_text("dict", sort=True)["blocks"]:
+-        if block["type"] != 0:
+-            continue
+-        for line in block["lines"]:
+-            dx, dy = line.get("dir", (1, 0))
+-            if abs(dy) > abs(dx):
+-                # The rotated arXiv margin stamp otherwise interleaves with body text.
+-                continue
+-            spans = line["spans"]
+-            fragments: list[str] = []
+-            for index, span in enumerate(spans):
+-                if index and span["bbox"][0] - spans[index - 1]["bbox"][2] > 1:
+-                    fragments.append(" ")
+-                fragments.append(span["text"])
+-            text = _normalize("".join(fragments))
+-            if not text:
+-                continue
+-            y = line["bbox"][1]
+-            if text.isdigit() and y > page.rect.height * 0.88:
+-                continue
+-            if y < page.rect.height * 0.09 and text.casefold() == title.casefold():
+-                continue
+-            bold = any(span["flags"] & 16 for span in spans)
+-            size = max((span["size"] for span in spans), default=0)
+-            lines.append((text, bold, size))
+-    return lines
++def _page_lines(page: pymupdf.Page, title: str) -> PageLayout:
++    return read_page(page, title)
+ 
+ 
+ def _assemble_page(
+-    lines: list[tuple[str, bool, float]],
++    lines: tuple[TextLine, ...],
+     known_headings: set[str],
+     current_section: str | None,
+-) -> tuple[str, tuple[SectionSpan, ...], str | None]:
++    *,
++    has_outline: bool = False,
++) -> tuple[str, tuple[SectionSpan, ...], str | None, tuple[TextRegion, ...]]:
+     parts: list[str] = []
+     sections: list[SectionSpan] = []
+     position = 0
+     section_start = 0
+-    body_size = median(size for _, _, size in lines) if lines else 0
+-    for text, bold, size in lines:
++    regions = []
++    body_size = median(line.size for line in lines) if lines else 0
++    candidates: dict[str, list[tuple[int, int, str]]] = defaultdict(list)
++    for index, line in enumerate(lines):
++        text = line.text
++        if line.kind != "text" or "\n" in text:
++            continue
+         key = _heading_key(text)
+-        numbered_heading = (
+-            _SECTION_PREFIX.match(text)
+-            and (bold or size > body_size * 1.12)
+-            and len(text) < 140
+-            and not text.endswith((".", ",", ";"))
++        prefix = _SECTION_PREFIX.match(text)
++        previous = lines[index - 1] if index else None
++        split_number = bool(
++            not prefix
++            and previous
++            and previous.kind == "text"
++            and _SECTION_NUMBER.fullmatch(previous.text)
++            and 0 <= line.bbox[0] - previous.bbox[0] < 100
++            and -3 <= line.bbox[1] - previous.bbox[1] < 35
+         )
+-        is_heading = key in known_headings or key in _NAMED_HEADINGS or numbered_heading
+-        if is_heading:
+-            heading_start = position
+-            section_name = text
+-            if parts and _SECTION_NUMBER.fullmatch(parts[-1].strip()):
+-                section_name = f"{parts[-1].strip()} {text}"
+-                heading_start -= len(parts[-1])
+-            if section_name != current_section:
+-                if heading_start > section_start:
+-                    sections.append(SectionSpan(section_start, heading_start, current_section))
+-                section_start = heading_start
+-                current_section = section_name
+-        parts.append(text + "\n")
+-        position += len(text) + 1
++        fallback = (
++            not has_outline
++            and prefix
++            and (line.bold or line.size > body_size * 1.2)
++            and len(text) <= 90
++            and len(text.split()) <= 12
++            and re.match(r"[A-Z][A-Za-z]", text[prefix.end() :])
++            and not text.endswith((".", ",", ";", ":"))
++        )
++        if key in known_headings or key in _NAMED_HEADINGS or fallback:
++            start = index - 1 if split_number else index
++            label = f"{previous.text} {text}" if split_number else text
++            candidates[key].append((int(bool(prefix or split_number)), start, label))
++    headings = {}
++    for matches in candidates.values():
++        # A numbered heading takes precedence over a same-page figure label.
++        _, start, label = max(matches, key=lambda item: (item[0], -item[1]))
++        headings[start] = label
++    index = 0
++    while index < len(lines):
++        line = lines[index]
++        if index in headings and headings[index] != current_section:
++            if position > section_start:
++                sections.append(SectionSpan(section_start, position, current_section))
++            current_section = headings[index]
++            section_start = position
++        group = [line]
++        index += 1
++        while (
++            index < len(lines)
++            and index not in headings
++            and lines[index].block == line.block
++            and lines[index].kind == line.kind
++            and line.kind == "text"
++        ):
++            group.append(lines[index])
++            index += 1
++        text = dehyphenate("\n".join(item.text for item in group))
++        bbox = (
++            min(item.bbox[0] for item in group),
++            min(item.bbox[1] for item in group),
++            max(item.bbox[2] for item in group),
++            max(item.bbox[3] for item in group),
++        )
++        regions.append(TextRegion(position, position + len(text), line.kind, bbox))
++        parts.append(text + "\n\n")
++        position += len(text) + 2
+     if position > section_start:
+         sections.append(SectionSpan(section_start, position, current_section))
+-    return "".join(parts), tuple(sections), current_section
++    return "".join(parts), tuple(sections), current_section, tuple(regions)
+ 
+ 
+ def extract_pdf(paper: PaperSpec, papers_dir: Path) -> ExtractedPaper:
+@@ -116,15 +132,20 @@
+             if document.needs_pass:
+                 raise ExtractionError(f"Encrypted PDF requires a password: {path}")
+             headings_by_page: dict[int, set[str]] = defaultdict(set)
+-            for _, title, heading_page in document.get_toc():
++            outline = document.get_toc()
++            for _, title, heading_page in outline:
+                 headings_by_page[heading_page].add(_heading_key(title))
+             page_count = document.page_count
+             for page_index in range(page_count):
+                 page_number = page_index + 1
+                 try:
+-                    lines = _page_lines(document[page_index], paper.title)
+-                    text, sections, next_section = _assemble_page(
+-                        lines, headings_by_page[page_number], current_section
++                    layout = _page_lines(document[page_index], paper.title)
++                    issues.extend(layout.issues)
++                    text, sections, next_section, regions = _assemble_page(
++                        layout.lines,
++                        headings_by_page[page_number],
++                        current_section,
++                        has_outline=bool(outline),
+                     )
+                 except Exception as exc:
+                     raise ExtractionError(
+@@ -148,7 +169,7 @@
+                 else:
+                     seen[digest] = page_number
+                     current_section = next_section
+-                pages.append(PageText(page_number, text, sections, digest, duplicate_of))
++                pages.append(PageText(page_number, text, sections, digest, duplicate_of, regions))
+     except ExtractionError:
+         raise
+     except Exception as exc:
+--- baseline/src/retrieval/index.py
++++ current/src/retrieval/index.py
+@@ -13,6 +13,21 @@
+ from .models import Chunk, SearchHit, SourceSpan, stable_hash
+ 
+ logger = logging.getLogger(__name__)
++
++
++def _hit(chunk_id: str, text: str, metadata: dict[str, Any], distance: float | None) -> SearchHit:
++    return SearchHit(
++        chunk_id=chunk_id,
++        text=text,
++        paper_title=metadata["paper_title"],
++        arxiv_id=metadata["arxiv_id"],
++        version=metadata["version"],
++        pages=tuple(json.loads(metadata["page_numbers_json"])),
++        sections=tuple(json.loads(metadata["sections_json"])),
++        sources=tuple(SourceSpan(**span) for span in json.loads(metadata["source_spans_json"])),
++        distance=distance,
++        char_start=metadata["char_start"],
++    )
+ 
+ 
+ class ChromaIndex:
+@@ -151,22 +166,28 @@
+                 result["distances"][0],
+                 strict=True,
+             ):
+-                hits.append(
+-                    SearchHit(
+-                        chunk_id=chunk_id,
+-                        text=text,
+-                        paper_title=metadata["paper_title"],
+-                        arxiv_id=metadata["arxiv_id"],
+-                        version=metadata["version"],
+-                        pages=tuple(json.loads(metadata["page_numbers_json"])),
+-                        sections=tuple(json.loads(metadata["sections_json"])),
+-                        sources=tuple(
+-                            SourceSpan(**span) for span in json.loads(metadata["source_spans_json"])
+-                        ),
+-                        distance=float(distance),
+-                    )
+-                )
++                hits.append(_hit(chunk_id, text, metadata, float(distance)))
+             # Stable ordering for equal distances within the returned candidate set.
+             return sorted(hits, key=lambda hit: (hit.distance, hit.chunk_id))
+         except Exception as exc:
+             raise IndexingError(f"Semantic search failed: {exc}") from exc
++
++    def documents(self, *, arxiv_id: str | None = None) -> list[SearchHit]:
++        """Read the same ready collection for lexical retrieval; no second store."""
++        self.ensure_ready()
++        try:
++            result = self.collection.get(
++                where={"arxiv_id": arxiv_id} if arxiv_id else None,
++                include=["documents", "metadatas"],
++            )
++            return sorted(
++                (
++                    _hit(identifier, text, meta, None)
++                    for identifier, text, meta in zip(
++                        result["ids"], result["documents"], result["metadatas"], strict=True
++                    )
++                ),
++                key=lambda hit: hit.chunk_id,
++            )
++        except Exception as exc:
++            raise IndexingError(f"Cannot read lexical search documents: {exc}") from exc
+--- baseline/src/retrieval/layout.py
++++ current/src/retrieval/layout.py
+@@ -0,0 +1,211 @@
++"""PDF geometry and text normalization, without interpreting scientific results."""
++
++import logging
++import re
++import unicodedata
++from collections import Counter
++from dataclasses import dataclass, replace
++from statistics import median
++from typing import Any
++
++import pymupdf
++
++from .models import ExtractionIssue
++
++logger = logging.getLogger(__name__)
++
++
++@dataclass(frozen=True)
++class TextLine:
++    text: str
++    bold: bool
++    size: float
++    bbox: tuple[float, float, float, float]
++    baseline: float
++    block: int
++    kind: str = "text"
++
++
++@dataclass(frozen=True)
++class PageLayout:
++    lines: tuple[TextLine, ...]
++    issues: tuple[ExtractionIssue, ...]
++
++
++def normalize(text: str) -> str:
++    text = re.sub(r"[\x00-\x08\x0b-\x1f]", "", text)
++    return " ".join(unicodedata.normalize("NFKC", text).split())
++
++
++def _span_text(spans: list[dict[str, Any]]) -> str:
++    fragments = []
++    for index, span in enumerate(spans):
++        value = span["text"]
++        # Keep superscript meaning before NFKC erases typographical distinctions.
++        if span["flags"] & 1 and value.strip():
++            value = "^{" + value.strip() + "}"
++        elif index and span["bbox"][0] - spans[index - 1]["bbox"][2] > 1:
++            fragments.append(" ")
++        fragments.append(value)
++    return normalize("".join(fragments).replace("}^{", ""))
++
++
++def _bounds(lines: list[TextLine]) -> tuple[float, float, float, float]:
++    return (
++        min(line.bbox[0] for line in lines),
++        min(line.bbox[1] for line in lines),
++        max(line.bbox[2] for line in lines),
++        max(line.bbox[3] for line in lines),
++    )
++
++
++def _table_text(lines: list[TextLine]) -> tuple[str, bool]:
++    """Use detected geometry, but original spans, to keep decimal points intact.
++
++    Rows contain explicit separators. Missing cells remain empty when a modal
++    row supplies unambiguous column positions. Spanning/multi-line headers remain
++    separate rows; no numeric cell is inferred or filled from a neighboring row.
++    """
++    rows: list[list[TextLine]] = []
++    for line in sorted(lines, key=lambda line: (line.baseline, line.bbox[0])):
++        if rows and abs(line.baseline - median(item.baseline for item in rows[-1])) <= 2.5:
++            rows[-1].append(line)
++        else:
++            rows.append([line])
++    for row in rows:
++        row.sort(key=lambda line: line.bbox[0])
++    counts = Counter(len(row) for row in rows if len(row) > 1)
++    width = max(counts) if counts else 1
++    regular = [row for row in rows if len(row) == width]
++    centers = (
++        [median((row[i].bbox[0] + row[i].bbox[2]) / 2 for row in regular) for i in range(width)]
++        if regular
++        else []
++    )
++    rendered = []
++    ambiguous = False
++    for row in rows:
++        cells = [""] * width
++        assigned = set()
++        for line in row:
++            center = (line.bbox[0] + line.bbox[2]) / 2
++            column = min(range(width), key=lambda i: abs(center - centers[i])) if centers else 0
++            nearest_gap = min(
++                (abs(centers[column] - other) for i, other in enumerate(centers) if i != column),
++                default=float("inf"),
++            )
++            if column in assigned or abs(center - centers[column]) > nearest_gap * 0.3:
++                # A spanning header has no trustworthy one-to-one column mapping.
++                cells = [item.text for item in row]
++                ambiguous = True
++                break
++            assigned.add(column)
++            cells[column] = line.text
++        rendered.append(" | ".join(cells))
++    return "\n".join(rendered), ambiguous
++
++
++def read_page(page: pymupdf.Page, title: str) -> PageLayout:
++    lines = []
++    issues = []
++    math_warning = False
++    for block_number, block in enumerate(page.get_text("dict", sort=True)["blocks"]):
++        if block["type"] != 0:
++            continue
++        for line in block["lines"]:
++            spans = line["spans"]
++            raw = "".join(span["text"] for span in spans)
++            if re.search(r"[\x00-\x08\x0b-\x1f]", raw) or any(ch in raw for ch in "√∑∫"):
++                math_warning = True
++            text = _span_text(spans)
++            if not text:
++                continue
++            bbox = tuple(line["bbox"])
++            dx, dy = line.get("dir", (1, 0))
++            rotated = abs(dy) > abs(dx)
++            if rotated and bbox[0] < page.rect.width * 0.08 and re.match(r"arXiv:\d", text):
++                continue
++            if text == str(page.number + 1) and bbox[1] > page.rect.height * 0.92:
++                continue
++            if bbox[1] < page.rect.height * 0.09 and text.casefold() == title.casefold():
++                continue
++            weights = [len(span["text"].strip()) for span in spans]
++            total = sum(weights) or 1
++            bold = sum(w for w, span in zip(weights, spans, strict=True) if span["flags"] & 16)
++            sizes = [span["size"] for span in spans if not span["flags"] & 1]
++            origins = [span["origin"][1] for span in spans if not span["flags"] & 1]
++            lines.append(
++                TextLine(
++                    text,
++                    bold / total >= 0.8,
++                    median(sizes or [0]),
++                    bbox,
++                    median(origins or [bbox[3]]),
++                    block_number,
++                    "figure" if rotated else "text",
++                )
++            )
++    # Use table detection for regions only. Its cell strings can reorder decimal
++    # points and superscripts, so they must never replace the original PDF spans.
++    try:
++        boxes = [tuple(table.bbox) for table in page.find_tables().tables] if lines else []
++    except Exception as exc:
++        boxes = []
++        issues.append(
++            ExtractionIssue(
++                "table_detection_failed",
++                page.number + 1,
++                f"Retained original text; table geometry unavailable: {exc}",
++            )
++        )
++    used = set()
++    replacements = {}
++    table_warning = False
++    for box in boxes:
++        selected = []
++        for index, line in enumerate(lines):
++            cx = (line.bbox[0] + line.bbox[2]) / 2
++            cy = (line.bbox[1] + line.bbox[3]) / 2
++            if (
++                index not in used
++                and line.kind == "text"
++                and box[0] - 3 <= cx <= box[2] + 3
++                and box[1] - 3 <= cy <= box[3] + 3
++            ):
++                selected.append(index)
++        if len(selected) < 4:
++            continue
++        members = [lines[index] for index in selected]
++        used.update(selected)
++        table_text, ambiguous = _table_text(members)
++        table_warning |= ambiguous
++        replacements[min(selected)] = replace(
++            members[0], text=table_text, bbox=_bounds(members), bold=False, kind="table"
++        )
++    result = []
++    for index, line in enumerate(lines):
++        if index in replacements:
++            result.append(replacements[index])
++        elif index not in used:
++            result.append(line)
++    if math_warning:
++        issues.append(
++            ExtractionIssue(
++                "math_layout_warning",
++                page.number + 1,
++                "Math glyphs retained as text; inspect the PDF for fractions "
++                "and two-dimensional equations.",
++            )
++        )
++    if table_warning:
++        issues.append(
++            ExtractionIssue(
++                "table_layout_warning",
++                page.number + 1,
++                "Table rows retained; spanning or ambiguous columns need "
++                "the original PDF for interpretation.",
++            )
++        )
++    for issue in issues:
++        logger.warning("Page %d: %s", issue.page_number, issue.message)
++    return PageLayout(tuple(result), tuple(issues))
+--- baseline/src/retrieval/lexical.py
++++ current/src/retrieval/lexical.py
+@@ -0,0 +1,67 @@
++"""Local BM25 and rank fusion over the same cited Chroma documents."""
++
++import math
++from collections import Counter
++from dataclasses import replace
++
++from .models import SearchHit
++from .text import lexical_tokens
++
++
++class BM25:
++    def __init__(self, documents: list[SearchHit], *, k1: float = 1.5, b: float = 0.75) -> None:
++        if not math.isfinite(k1) or k1 <= 0 or not math.isfinite(b) or not 0 <= b <= 1:
++            raise ValueError("BM25 requires k1 > 0 and 0 <= b <= 1")
++        self.documents = documents
++        self.k1, self.b = k1, b
++        self.counts = [Counter(lexical_tokens(hit.text)) for hit in documents]
++        self.lengths = [sum(count.values()) for count in self.counts]
++        self.average = sum(self.lengths) / len(documents) if documents else 0
++        self.frequencies = Counter(term for count in self.counts for term in count)
++
++    def search(self, query: str, *, top_k: int) -> list[SearchHit]:
++        if type(top_k) is not int or top_k < 1:
++            raise ValueError("top_k must be a positive integer")
++        if not self.average:
++            return []
++        terms = set(lexical_tokens(query))
++        results = []
++        n = len(self.documents)
++        for hit, counts, length in zip(self.documents, self.counts, self.lengths, strict=True):
++            score = 0.0
++            for term in sorted(terms):
++                frequency = counts[term]
++                if not frequency:
++                    continue
++                df = self.frequencies[term]
++                idf = math.log(1 + (n - df + 0.5) / (df + 0.5))
++                denominator = frequency + self.k1 * (1 - self.b + self.b * length / self.average)
++                score += idf * frequency * (self.k1 + 1) / denominator
++            if score > 0:
++                results.append(
++                    replace(hit, distance=None, retrieval_method="bm25", retrieval_score=score)
++                )
++        return sorted(results, key=lambda hit: (-hit.score, hit.chunk_id))[:top_k]
++
++
++def reciprocal_rank_fusion(
++    vector: list[SearchHit], lexical: list[SearchHit], *, top_k: int, constant: int = 60
++) -> list[SearchHit]:
++    if type(constant) is not int or constant < 1 or type(top_k) is not int or top_k < 1:
++        raise ValueError("RRF constant and top_k must be positive integers")
++    scores: Counter[str] = Counter()
++    documents = {}
++    for ranking in (vector, lexical):
++        seen = set()
++        for rank, hit in enumerate(ranking, 1):
++            if hit.chunk_id in seen:
++                continue
++            seen.add(hit.chunk_id)
++            documents.setdefault(hit.chunk_id, hit)
++            scores[hit.chunk_id] += 1 / (constant + rank)
++    return [
++        replace(documents[identifier], retrieval_method="hybrid", retrieval_score=score)
++        for identifier, score in sorted(scores.items(), key=lambda item: (-item[1], item[0]))[
++            :top_k
++        ]
++    ]
+--- baseline/src/retrieval/models.py
++++ current/src/retrieval/models.py
+@@ -49,12 +49,23 @@
+ 
+ 
+ @dataclass(frozen=True)
++class TextRegion:
++    """A normalized text block with its physical PDF bounding box."""
++
++    start_char: int
++    end_char: int
++    kind: str
++    bbox: tuple[float, float, float, float]
++
++
++@dataclass(frozen=True)
+ class PageText:
+     page_number: int
+     text: str
+     sections: tuple[SectionSpan, ...]
+     content_hash: str
+     duplicate_of: int | None = None
++    regions: tuple[TextRegion, ...] = ()
+ 
+ 
+ @dataclass(frozen=True)
+@@ -127,12 +138,18 @@
+     pages: tuple[int, ...]
+     sections: tuple[str, ...]
+     sources: tuple[SourceSpan, ...]
+-    distance: float
++    distance: float | None
++    retrieval_method: str = "vector"
++    retrieval_score: float | None = None
++    char_start: int | None = None
++    parent_chunk_id: str | None = None
+ 
+     @property
+     def score(self) -> float:
+-        """Cosine similarity, not an estimate of factual correctness."""
+-        return 1.0 - self.distance
++        """Method-specific ranking score; never a factual-confidence estimate."""
++        if self.retrieval_score is not None:
++            return self.retrieval_score
++        return 1.0 - self.distance if self.distance is not None else 0.0
+ 
+     @property
+     def citation(self) -> str:
+@@ -148,6 +165,9 @@
+         return {
+             **asdict(self),
+             "score": self.score,
++            "score_type": {"vector": "cosine_similarity", "bm25": "bm25", "hybrid": "rrf"}[
++                self.retrieval_method
++            ],
+             "citation": self.citation,
+             "source_url": self.source_url,
+         }
+--- baseline/src/retrieval/pipeline.py
++++ current/src/retrieval/pipeline.py
+@@ -10,10 +10,13 @@
+ from .catalog import PAPERS, validate_corpus
+ from .chunking import chunk_paper
+ from .config import PIPELINE_VERSION, RagConfig
++from .context import build_context, select_context
+ from .embeddings import Embedder, LocalEmbedder
+ from .errors import IndexingError
++from .evidence import EvidenceRequirement, assess_evidence, infer_requirements
+ from .extraction import extract_pdf
+ from .index import ChromaIndex
++from .lexical import BM25, reciprocal_rank_fusion
+ from .models import Chunk, ExtractedPaper, SearchHit, content_hash
+ 
+ logger = logging.getLogger(__name__)
+@@ -51,7 +54,7 @@
+         self,
+         *,
+         papers_dir: Path = Path("papers"),
+-        db_dir: Path = Path("data/chroma"),
++        db_dir: Path = Path("data/chroma-v2"),
+         config: RagConfig | None = None,
+         model_cache: Path | None = None,
+         embedder: Embedder | None = None,
+@@ -61,6 +64,7 @@
+         self.config = config if config is not None else RagConfig()
+         self.model_cache = model_cache
+         self._embedder = embedder
++        self._extracted: tuple[ExtractedPaper, ...] | None = None
+ 
+     @property
+     def embedder(self) -> Embedder:
+@@ -82,7 +86,11 @@
+ 
+     def extract(self) -> list[ExtractedPaper]:
+         papers = validate_corpus(self.papers_dir)
+-        return [extract_pdf(paper, self.papers_dir) for paper in papers]
++        # Recheck the exact PDF bytes on every call. Immutable extraction results
++        # may then be reused within this instance, including ingestion retries.
++        if self._extracted is None:
++            self._extracted = tuple(extract_pdf(paper, self.papers_dir) for paper in papers)
++        return list(self._extracted)
+ 
+     def ingest(self) -> dict[str, Any]:
+         # Complete validation/extraction/chunking before mutating the persistent store.
+@@ -163,7 +171,12 @@
+         }
+ 
+     def search(
+-        self, query: str, *, top_k: int | None = None, arxiv_id: str | None = None
++        self,
++        query: str,
++        *,
++        top_k: int | None = None,
++        arxiv_id: str | None = None,
++        strategy: str | None = None,
+     ) -> list[SearchHit]:
+         if not isinstance(query, str) or not query.strip():
+             raise ValueError("query must be a nonempty string")
+@@ -172,28 +185,53 @@
+             raise ValueError("top_k must be a positive integer")
+         if arxiv_id is not None and arxiv_id not in {paper.arxiv_id for paper in PAPERS}:
+             raise ValueError("arxiv_id must identify one of the three supplied papers")
++        method = self.config.strategy if strategy is None else strategy
++        if method not in {"vector", "bm25", "hybrid"}:
++            raise ValueError("strategy must be vector, bm25, or hybrid")
+         index = ChromaIndex(self.db_dir, self.descriptor)
+         index.ensure_ready()
+-        vector = self.embedder.embed([query])[0]
+-        return index.search(vector, top_k=k, arxiv_id=arxiv_id)
+-
+-
+-def build_context(hits: list[SearchHit], tokenizer: Any, *, max_tokens: int = 4096) -> str:
+-    """Build a bounded future LLM context from complete cited hits only.
+-
+-    Counts include citation headers and separators. A hit that does not fit ends the
+-    context, so no citation is detached from its passage. This function never calls an LLM.
+-    """
+-    if type(max_tokens) is not int or max_tokens < 1:
+-        raise ValueError("max_tokens must be a positive integer")
+-    context = ""
+-    for index, hit in enumerate(hits, start=1):
+-        block = f"[{index}] {hit.citation}\n{hit.text}"
+-        candidate = f"{context}\n\n{block}" if context else block
+-        if (
+-            len(tokenizer.encode(candidate, add_special_tokens=False, truncation=False))
+-            > max_tokens
+-        ):
+-            break
+-        context = candidate
+-    return context
++        count = max(k, self.config.candidate_k) if method == "hybrid" else k
++        dense = []
++        if method != "bm25":
++            vector = self.embedder.embed([query])[0]
++            dense = index.search(vector, top_k=count, arxiv_id=arxiv_id)
++        if method == "vector":
++            return dense
++        lexical = BM25(
++            index.documents(arxiv_id=arxiv_id), k1=self.config.bm25_k1, b=self.config.bm25_b
++        ).search(query, top_k=count)
++        if method == "bm25":
++            return lexical
++        return reciprocal_rank_fusion(dense, lexical, top_k=k, constant=self.config.rrf_constant)
++
++    def retrieve(
++        self,
++        query: str,
++        *,
++        top_k: int | None = None,
++        arxiv_id: str | None = None,
++        strategy: str | None = None,
++        max_tokens: int = 4096,
++        requirements: tuple[EvidenceRequirement, ...] = (),
++    ) -> dict[str, Any]:
++        """Retrieve and assess bounded evidence, without generating an answer."""
++        if type(max_tokens) is not int or max_tokens < 1:
++            raise ValueError("max_tokens must be a positive integer")
++        hits = self.search(query, top_k=top_k, arxiv_id=arxiv_id, strategy=strategy)
++        context = select_context(hits, self.embedder.tokenizer, max_tokens=max_tokens, query=query)
++        checks = infer_requirements(query, arxiv_id=arxiv_id) + requirements
++        assessment = assess_evidence(context.hits, checks)
++        return {
++            "query": query,
++            "hits": [hit.to_dict() for hit in hits],
++            "context": context.text,
++            "context_tokens": context.token_count,
++            "context_hits": [hit.to_dict() for hit in context.hits],
++            "omitted_ids": list(context.omitted_ids),
++            "evidence": {**asdict(assessment), "refused": assessment.refused},
++            "requirements": [asdict(requirement) for requirement in checks],
++        }
++
++
++# Preserve the original public import path for clients.
++__all__ = ["RetrievalPipeline", "build_context", "extraction_summary", "runtime_versions"]
+--- baseline/src/retrieval/text.py
++++ current/src/retrieval/text.py
+@@ -0,0 +1,42 @@
++"""Shared, deterministic text normalization and evidence boundaries."""
++
++import re
++import unicodedata
++
++# Match the audit's fixed lexical settings; no corpus-specific vocabulary tuning.
++STOPWORDS = frozenset(
++    "a an and are as at be been by did do does for from had has have how in into is it "
++    "its of on or that the their there these this to was were what when where which "
++    "who why will with would".split()
++)
++
++
++def dehyphenate(text: str) -> str:
++    """Join alphabetic line-break hyphenation, leaving numeric ranges unchanged."""
++    return re.sub(r"(?<=[^\W\d_])-\s*\n\s*(?=[^\W\d_])", "", text)
++
++
++def lexical_tokens(text: str) -> list[str]:
++    normalized = dehyphenate(unicodedata.normalize("NFKC", text)).casefold()
++    terms = re.findall(r"[^\W\d_]+|\d+(?:\.\d+)?", normalized, re.UNICODE)
++    return [term for term in terms if term not in STOPWORDS]
++
++
++def sentence_spans(text: str) -> list[tuple[int, int]]:
++    """Keep decimals and wrapped lines intact; preserve exact source offsets."""
++    breaks = [0]
++    for match in re.finditer(r"\n\s*\n|(?<=[.!?])\s+(?=[A-Z\u00c0-\u024f])", text):
++        # Common scientific abbreviations are not sentence endings.
++        if re.search(r"\b(?:Fig|Eq|Dr|Mr|Ms|vs|al)\.$", text[: match.start()]):
++            continue
++        breaks.append(match.end())
++    breaks.append(len(text))
++    spans = []
++    for start, end in zip(breaks, breaks[1:], strict=False):
++        while start < end and text[start].isspace():
++            start += 1
++        while end > start and text[end - 1].isspace():
++            end -= 1
++        if start < end:
++            spans.append((start, end))
++    return spans
+--- baseline/tests/rag/test_chunking.py
++++ current/tests/rag/test_chunking.py
+@@ -44,7 +44,7 @@
+         PageText(4, second, (SectionSpan(0, len(second), "Methods"),), content_hash(second)),
+     )
+     document = ExtractedPaper(small_documents[0].paper, 4, pages, ())
+-    chunks = chunk_paper(document, tokenizer, RagConfig(chunk_size=4, overlap=1))
++    chunks = chunk_paper(document, tokenizer, RagConfig(chunk_size=4, overlap=1, chunking="fixed"))
+     first_chunk = chunks[0]
+     assert first_chunk.pages == (2, 4)
+     assert [source.section for source in first_chunk.sources] == ["Introduction", "Methods"]
+@@ -88,3 +88,23 @@
+     assert chunk_paper(document, tokenizer, RagConfig()) == chunk_paper(
+         repeated, tokenizer, RagConfig()
+     )
++
++
++def test_parent_heading_is_not_indexed_as_standalone_evidence(small_documents, tokenizer):
++    parent = "3.2 The Helium Text Language Model\n\n"
++    child = "3.2.1 Architecture\n\nHelium contains seven billion parameters."
++    text = parent + child
++    page = PageText(
++        1,
++        text,
++        (
++            SectionSpan(0, len(parent), parent.strip()),
++            SectionSpan(len(parent), len(text), "3.2.1 Architecture"),
++        ),
++        content_hash(text),
++    )
++    doc = replace(small_documents[1], pages=(page,))
++    chunks = chunk_paper(doc, tokenizer, RagConfig(chunk_size=80, overlap=0))
++    assert len(chunks) == 1
++    assert parent.strip() in chunks[0].text and "seven billion" in chunks[0].text
++    assert len(chunks[0].sources) == 2
+--- baseline/tests/rag/test_context.py
++++ current/tests/rag/test_context.py
+@@ -0,0 +1,89 @@
++from dataclasses import replace
++
++from retrieval.context import build_context, select_context
++from retrieval.models import SearchHit, SourceSpan
++
++
++def make_hit(identifier, text, *, paper="2410.00037", page=1, start=0):
++    return SearchHit(
++        identifier,
++        text,
++        "Paper",
++        paper,
++        1,
++        (page,),
++        ("Methods",),
++        (SourceSpan(page, "Methods", 0, len(text)),),
++        0.2,
++        char_start=start,
++    )
++
++
++def test_oversized_first_hit_does_not_hide_a_later_fitting_passage(tokenizer):
++    large = make_hit("large", "irrelevant " * 500)
++    small = make_hit("small", "The latency is 160 ms.", page=2, start=len(large.text))
++    context = select_context([large, small], tokenizer, max_tokens=70)
++    assert [h.chunk_id for h in context.hits] == ["small"]
++    assert "160 ms" in context.text
++    assert context.omitted_ids == ("large",)
++    assert context.token_count == len(tokenizer.encode(context.text)) <= 70
++
++
++def test_query_focusing_keeps_the_answer_and_correct_page(tokenizer):
++    background = "This paragraph discusses unrelated background.\n\n" * 40
++    evidence = "Moshi has theoretical latency 160 ms and practical latency 200 ms."
++    text = background + evidence
++    original = make_hit("long", text, start=100)
++    original = replace(
++        original,
++        pages=(1, 2),
++        sources=(
++            SourceSpan(1, "Introduction", 0, len(background)),
++            SourceSpan(2, "Latency", len(background), len(text)),
++        ),
++    )
++    selected = select_context(
++        [original], tokenizer, max_tokens=65, query="Moshi theoretical and practical latency"
++    )
++    assert "160 ms" in selected.text and "200 ms" in selected.text
++    passage = selected.hits[0]
++    assert passage.pages == (2,)
++    assert passage.source_url.endswith("#page=2")
++    assert passage.parent_chunk_id == "long"
++    assert passage.char_start == 100 + len(background)
++    assert passage.retrieval_method == "vector"
++    assert (
++        original.text[passage.char_start - 100 : passage.char_start - 100 + len(passage.text)]
++        == passage.text
++    )
++    assert selected.token_count <= 65
++
++
++def test_overlap_deduplication_keeps_distinct_paper_attribution(tokenizer):
++    first = make_hit("first", "Measured theoretical latency is 160 ms.")
++    duplicate = replace(first, chunk_id="duplicate")
++    other_paper = replace(first, chunk_id="other", arxiv_id="2507.07955")
++    result = select_context([first, duplicate, other_paper], tokenizer)
++    assert [h.chunk_id for h in result.hits] == ["first", "other"]
++
++
++def test_citation_and_separator_tokens_count_toward_the_exact_budget(tokenizer):
++    hits = [make_hit("a", "First result."), make_hit("b", "Second result.", page=2, start=50)]
++    full = build_context(hits, tokenizer)
++    count = len(tokenizer.encode(full))
++    assert build_context(hits, tokenizer, max_tokens=count) == full
++    smaller = select_context(hits, tokenizer, max_tokens=count - 1)
++    assert len(smaller.hits) == 1
++    assert smaller.token_count <= count - 1
++
++
++def test_unused_short_hit_budget_preserves_long_evidence(tokenizer):
++    first = make_hit(
++        "long", "Background. " * 12 + "Moshi latency is 160 ms and 200 ms in practice."
++    )
++    second = make_hit("short", "Related evidence.", page=2, start=1000)
++    full = build_context([first, second], tokenizer)
++    budget = len(tokenizer.encode(full))
++    selected = select_context([first, second], tokenizer, max_tokens=budget, query="Moshi latency")
++    assert selected.text == full
++    assert selected.token_count == budget
+--- baseline/tests/rag/test_evidence.py
++++ current/tests/rag/test_evidence.py
+@@ -0,0 +1,69 @@
++import pytest
++
++from retrieval.evidence import EvidenceRequirement, assess_evidence, infer_requirements
++from retrieval.models import SearchHit, SourceSpan
++
++
++def passage(text, paper="2410.00037"):
++    return SearchHit(
++        paper, text, "Paper", paper, 1, (1,), (), (SourceSpan(1, None, 0, len(text)),), 0.01
++    )
++
++
++def test_numbers_from_another_model_do_not_satisfy_the_request():
++    hits = [passage("MMLU accuracy is 60%.")]
++    requirements = infer_requirements("What MMLU accuracy does Attention Is All You Need report?")
++    assert assess_evidence(hits, requirements).refused
++
++
++def test_training_data_size_is_not_model_parameter_count():
++    question = "What benchmark results are reported for a 70-billion-parameter H-Net?"
++    requirements = infer_requirements(question)
++    assert assess_evidence(
++        [passage("70B Total Training Bytes", "2507.07955")], requirements
++    ).refused
++    supported = passage("The 70B-parameter H-Net reports benchmark results.", "2507.07955")
++    assert not assess_evidence([supported], requirements).refused
++
++
++def test_generic_latency_does_not_satisfy_hardware_percentile_constraints():
++    requirements = infer_requirements(
++        "What p95 latency does Moshi measure on iPhone 15 Pro running iOS?"
++    )
++    result = assess_evidence(
++        [passage("Moshi has 160ms theoretical latency, 200ms in practice.")], requirements
++    )
++    assert result.refused
++    assert any("p95" in label for label in result.missing)
++
++
++def test_explicit_requirements_check_all_units_with_literal_alternatives():
++    requirements = (
++        EvidenceRequirement("theoretical latency", ("160 ms", "160 milliseconds"), "2410.00037"),
++        EvidenceRequirement("practical latency", ("200 ms",), "2410.00037"),
++    )
++    assert assess_evidence([passage("160ms theoretical latency")], requirements).refused
++    result = assess_evidence(
++        [passage("160 milliseconds theoretical, 200ms practical.")], requirements
++    )
++    assert result.status == "candidate_evidence"
++    assert not result.refused
++
++
++def test_no_hits_and_dated_pricing_are_insufficient():
++    assert assess_evidence([], ()).refused
++    requirements = infer_requirements("What is Moshi API pricing in November 2026?")
++    assert assess_evidence([passage("Moshi provides a streaming API.")], requirements).refused
++
++
++@pytest.mark.parametrize(
++    "settings",
++    [
++        {"label": "empty"},
++        {"label": "blank", "alternatives": ("",)},
++        {"label": "paper", "arxiv_id": "0000.00000"},
++    ],
++)
++def test_invalid_requirements(settings):
++    with pytest.raises(ValueError):
++        EvidenceRequirement(**settings)
+--- baseline/tests/rag/test_extraction.py
++++ current/tests/rag/test_extraction.py
+@@ -89,7 +89,10 @@
+     expected = ["Scaled Dot-Product Attention", "Inner Monologue", "Dynamic Chunking"]
+     for document, heading in zip(supplied_documents, expected, strict=True):
+         assert len(document.pages) == document.page_count
+-        assert not document.issues
++        assert all(
++            issue.kind in {"math_layout_warning", "table_layout_warning"}
++            for issue in document.issues
++        )
+         sections = [span.section or "" for page in document.pages for span in page.sections]
+         assert any(heading in section for section in sections)
+         for page in document.pages:
+--- baseline/tests/rag/test_integration.py
++++ current/tests/rag/test_integration.py
+@@ -43,4 +43,13 @@
+             hit.arxiv_id == arxiv_id and relevant_pages.intersection(hit.pages) for hit in hits
+         ), [(hit.arxiv_id, hit.pages) for hit in hits]
+         assert all(hit.text and hit.citation and hit.sources for hit in hits)
++    latency_hits = pipeline.search(cases[1][0], strategy="bm25", top_k=3)
++    assert any(
++        hit.arxiv_id == "2410.00037"
++        and hit.version == 1
++        and 1 in hit.pages
++        and "160ms" in hit.text
++        and "200ms in practice" in hit.text
++        for hit in latency_hits
++    ), [(hit.pages, hit.text) for hit in latency_hits]
+     assert pipeline.ingest()["new_chunks"] == 0
+--- baseline/tests/rag/test_lexical.py
++++ current/tests/rag/test_lexical.py
+@@ -0,0 +1,59 @@
++from dataclasses import replace
++
++import pytest
++
++from retrieval.lexical import BM25, reciprocal_rank_fusion
++from retrieval.models import SearchHit, SourceSpan
++
++
++def hit(identifier, text):
++    return SearchHit(
++        identifier,
++        text,
++        "Moshi",
++        "2410.00037",
++        1,
++        (1,),
++        ("Abstract",),
++        (SourceSpan(1, "Abstract", 0, len(text)),),
++        0.2,
++    )
++
++
++def test_bm25_recovers_hyphenated_numerical_evidence_with_citations():
++    documents = [
++        hit("background", "Moshi is a full-duplex speech dialogue system."),
++        hit("evidence", "Moshi has a theoret-\nical latency of 160ms, 200ms in practice."),
++    ]
++    results = BM25(documents).search("Moshi theoretical latency 160 ms", top_k=2)
++    assert results[0].chunk_id == "evidence"
++    assert results[0].distance is None
++    assert results[0].to_dict()["score_type"] == "bm25"
++    assert results[0].sources == documents[1].sources
++    assert "arXiv:2410.00037v1" in results[0].citation
++
++
++def test_bm25_does_not_return_zero_score_neighbors():
++    assert BM25([hit("one", "speech dialogue")]).search("quasars", top_k=3) == []
++    assert BM25([]).search("speech", top_k=3) == []
++
++
++def test_fusion_includes_lexical_only_evidence_and_deduplicates():
++    first, second = hit("a", "topic"), hit("b", "measurement")
++    lexical = replace(second, distance=None, retrieval_method="bm25", retrieval_score=5.0)
++    results = reciprocal_rank_fusion([first, first], [lexical, first], top_k=5)
++    assert [result.chunk_id for result in results] == ["a", "b"]
++    assert results[1].distance is None
++    assert all(result.to_dict()["score_type"] == "rrf" for result in results)
++    assert len({result.chunk_id for result in results}) == len(results)
++
++
++@pytest.mark.parametrize("settings", [{"k1": 0}, {"b": 2}, {"k1": float("nan")}])
++def test_invalid_bm25_settings(settings):
++    with pytest.raises(ValueError):
++        BM25([], **settings)
++
++
++def test_ties_have_deterministic_order():
++    documents = [hit("b", "speech"), hit("a", "speech")]
++    assert [h.chunk_id for h in BM25(documents).search("speech", top_k=2)] == ["a", "b"]
+--- baseline/tests/rag/test_pipeline.py
++++ current/tests/rag/test_pipeline.py
+@@ -132,3 +132,39 @@
+     assert repaired["new_chunks"] == 1
+     assert repaired["total_chunks"] == report["total_chunks"]
+     assert pipeline.search("chunking")
++
++
++def test_lexical_and_hybrid_search_share_the_index_and_preserve_filters(pipeline, test_embedder):
++    original = pipeline.ingest()
++    calls = test_embedder.calls
++    hits = pipeline.search("speech moshi", strategy="bm25", arxiv_id="2410.00037")
++    assert hits and all(hit.arxiv_id == "2410.00037" for hit in hits)
++    assert test_embedder.calls == calls
++    pipeline.config = replace(pipeline.config, strategy="hybrid", rrf_constant=40)
++    assert pipeline.ingest()["fingerprint"] == original["fingerprint"]
++    results = pipeline.search("speech moshi", arxiv_id="2410.00037")
++    assert results and all(hit.retrieval_method == "hybrid" for hit in results)
++    assert all(hit.arxiv_id == "2410.00037" for hit in results)
++
++
++def test_extraction_cache_still_validates_pdf_bytes(small_documents, monkeypatch):
++    calls = []
++
++    def extract(paper, path):
++        calls.append(paper.arxiv_id)
++        return next(doc for doc in small_documents if doc.paper == paper)
++
++    monkeypatch.setattr(
++        "retrieval.pipeline.validate_corpus", lambda path: [d.paper for d in small_documents]
++    )
++    monkeypatch.setattr("retrieval.pipeline.extract_pdf", extract)
++    pipeline = RetrievalPipeline()
++    assert pipeline.extract() == pipeline.extract()
++    assert len(calls) == 3
++
++    def changed(path):
++        raise ExtractionError("PDF bytes changed")
++
++    monkeypatch.setattr("retrieval.pipeline.validate_corpus", changed)
++    with pytest.raises(ExtractionError, match="PDF bytes changed"):
++        pipeline.extract()
+--- baseline/tests/rag/test_regressions.py
++++ current/tests/rag/test_regressions.py
+@@ -0,0 +1,85 @@
++import re
++
++import pytest
++
++from retrieval.chunking import chunk_paper
++from retrieval.config import RagConfig
++from retrieval.models import PageText, SectionSpan, content_hash
++
++
++def test_moshi_numbers_hyphenation_and_signed_exponents(supplied_documents):
++    moshi = supplied_documents[1]
++    assert "theoretical latency of 160ms, 200ms in practice" in moshi.pages[0].text
++    table = moshi.pages[7].text
++    assert "10^{−4}" in table
++    assert "10^{−}^{4}" not in table
++    quantizers = moshi.pages[10].text
++    assert "Q = 8" in quantizers and "NA = 2048" in quantizers
++    assert "12.5Hz" in quantizers and "1.1kbps" in quantizers
++
++
++def test_table_rows_preserve_decimal_values_and_paper_conflicts(supplied_documents):
++    attention = supplied_documents[0].pages[7]
++    assert "Transformer (big) | 28.4 | 41.8" in attention.text
++    assert "2.3 · 10^{19}" in attention.text
++    assert "BLEU score of 41.0" in attention.text  # Original source conflict remains visible.
++    hnet = supplied_documents[2].pages[16]
++    assert "Transformer | 3.62 | T15 | 0.7404 | 0.599" in hnet.text
++    assert "H-Net (2-stage) | 5.81 | T30 | 0.7032 | 0.663" in hnet.text
++    assert any(region.kind == "table" for region in hnet.regions)
++
++
++def test_section_labels_reject_audited_table_and_prose_false_positives(supplied_documents):
++    for doc in supplied_documents:
++        for page in doc.pages:
++            for section in page.sections:
++                assert not re.match(
++                    r"^(?:38\.1|1920|56\.4|A natural question|50 continuations)",
++                    section.section or "",
++                )
++    moshi = supplied_documents[1]
++    assert any(
++        s.section == "5.3 Ablations on generative modeling" for s in moshi.pages[24].sections
++    )
++    assert any(s.section == "5.5 Spoken question answering" for s in moshi.pages[28].sections)
++
++
++def test_rotated_figure_labels_are_retained_and_math_uncertainty_is_reported(supplied_documents):
++    assert "block=32" in supplied_documents[1].pages[59].text
++    assert "block=256" in supplied_documents[1].pages[59].text
++    hnet = supplied_documents[2]
++    assert "Validation Bits-per-byte" in hnet.pages[12].text
++    assert "bt = 1{pt ≥0.5}" in hnet.pages[5].text
++    assert not re.search(r"[\x00-\x08\x0b-\x1f]", hnet.pages[5].text)
++    assert any(i.kind == "math_layout_warning" and i.page_number == 6 for i in hnet.issues)
++
++
++def test_boundary_chunks_keep_complete_measurement_sentences(small_documents, tokenizer):
++    from dataclasses import replace
++
++    text = (
++        "Background discusses spoken dialogue and previous systems. "
++        "Moshi latency is 160 ms theoretically and 200 ms in practice. "
++        "More unrelated detail follows."
++    )
++    page = PageText(1, text, (SectionSpan(0, len(text), "Abstract"),), content_hash(text))
++    document = replace(small_documents[1], pages=(page,))
++    chunks = chunk_paper(document, tokenizer, RagConfig(chunk_size=17, overlap=3))
++    assert any("160 ms theoretically and 200 ms in practice" in chunk.text for chunk in chunks)
++    assert all(chunk.token_count <= 17 for chunk in chunks)
++
++
++@pytest.mark.parametrize(
++    "settings",
++    [
++        {"strategy": "unknown"},
++        {"chunking": "unknown"},
++        {"bm25_b": float("nan")},
++        {"candidate_k": 0},
++        {"rrf_constant": True},
++        {"bm25_k1": False},
++    ],
++)
++def test_query_and_chunking_configuration_validation(settings):
++    with pytest.raises(ValueError):
++        RagConfig(**settings)

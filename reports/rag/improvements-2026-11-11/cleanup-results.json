@@ -1,0 +1,197 @@
+{
+    "completed_utc":  "2026-11-11T10:40:18.8275582Z",
+    "reference_files_scanned":  85,
+    "deleted_count":  31,
+    "bytes_removed":  373826,
+    "deleted":  [
+                    {
+                        "path":  "src/retrieval/__pycache__/catalog.cpython-312.pyc",
+                        "source":  "src/retrieval/catalog.py",
+                        "bytes":  4460,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/chunking.cpython-312.pyc",
+                        "source":  "src/retrieval/chunking.py",
+                        "bytes":  8484,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/cli.cpython-312.pyc",
+                        "source":  "src/retrieval/cli.py",
+                        "bytes":  6890,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/config.cpython-312.pyc",
+                        "source":  "src/retrieval/config.py",
+                        "bytes":  3456,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/context.cpython-312.pyc",
+                        "source":  "src/retrieval/context.py",
+                        "bytes":  10698,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/embeddings.cpython-312.pyc",
+                        "source":  "src/retrieval/embeddings.py",
+                        "bytes":  9956,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/errors.cpython-312.pyc",
+                        "source":  "src/retrieval/errors.py",
+                        "bytes":  1306,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/evidence.cpython-312.pyc",
+                        "source":  "src/retrieval/evidence.py",
+                        "bytes":  8433,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/extraction.cpython-312.pyc",
+                        "source":  "src/retrieval/extraction.py",
+                        "bytes":  10859,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/index.cpython-312.pyc",
+                        "source":  "src/retrieval/index.py",
+                        "bytes":  11681,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/layout.cpython-312.pyc",
+                        "source":  "src/retrieval/layout.py",
+                        "bytes":  13542,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/lexical.cpython-312.pyc",
+                        "source":  "src/retrieval/lexical.py",
+                        "bytes":  5372,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/models.cpython-312.pyc",
+                        "source":  "src/retrieval/models.py",
+                        "bytes":  10126,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/pipeline.cpython-312.pyc",
+                        "source":  "src/retrieval/pipeline.py",
+                        "bytes":  13285,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/text.cpython-312.pyc",
+                        "source":  "src/retrieval/text.py",
+                        "bytes":  2781,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/__init__.cpython-312.pyc",
+                        "source":  "src/retrieval/__init__.py",
+                        "bytes":  374,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "src/retrieval/__pycache__/__main__.cpython-312.pyc",
+                        "source":  "src/retrieval/__main__.py",
+                        "bytes":  230,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/conftest.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/conftest.py",
+                        "bytes":  9269,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_catalog.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_catalog.py",
+                        "bytes":  6279,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_chunking.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_chunking.py",
+                        "bytes":  25609,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_cli.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_cli.py",
+                        "bytes":  7743,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_context.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_context.py",
+                        "bytes":  21556,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_embeddings.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_embeddings.py",
+                        "bytes":  16906,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_evidence.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_evidence.py",
+                        "bytes":  10896,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_extraction.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_extraction.py",
+                        "bytes":  18396,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_index.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_index.py",
+                        "bytes":  21657,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_integration.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_integration.py",
+                        "bytes":  8555,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_lexical.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_lexical.py",
+                        "bytes":  11524,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_pipeline.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_pipeline.py",
+                        "bytes":  36246,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "tests/rag/__pycache__/test_regressions.cpython-312-pytest-9.2.0.pyc",
+                        "source":  "tests/rag/test_regressions.py",
+                        "bytes":  19668,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    },
+                    {
+                        "path":  "reports/rag/audit-2026-11-11/__pycache__/run_audit.cpython-312.pyc",
+                        "source":  "reports/rag/audit-2026-11-11/run_audit.py",
+                        "bytes":  37589,
+                        "reason":  "Regenerable bytecode; corresponding source exists. Not experiment data or submission evidence."
+                    }
+                ],
+    "source_files_deleted":  0,
+    "experiment_artifacts_deleted":  0,
+    "method":  "Validated all absolute targets and source files within the workspace; deleted only individually enumerated .pyc files using Remove-Item -LiteralPath, without recursion."
+}

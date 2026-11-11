@@ -1,0 +1,118 @@
+{
+  "purpose": "Diagnostic audit set, annotated before running retrieval comparisons. Not a held-out benchmark.",
+  "answerable": [
+    {
+      "id": "A1", "paper": "1706.03762", "kind": "explanation", "existing_smoke": true,
+      "query": "Why does scaled dot-product attention divide by the square root of key dimension?",
+      "answer": "Large dot products push softmax into regions with very small gradients; scaling by 1/sqrt(d_k) counters this.",
+      "units": [
+        {"label": "large dot products and small gradients", "alternatives": [[{"page": 4, "quote": "the dot products grow large in magnitude, pushing the softmax function into regions where it has\nextremely small gradients"}]]},
+        {"label": "inverse square-root scaling", "alternatives": [[{"page": 4, "quote": "To counteract this effect, we scale the dot products by\n1\n√dk"}], [{"page": 4, "quote": "divide each by √dk, and apply a softmax function"}]]}
+      ]
+    },
+    {
+      "id": "A2", "paper": "1706.03762", "kind": "table",
+      "query": "According to Table 2, what BLEU scores does Transformer (big) report for EN-DE and EN-FR?",
+      "answer": "Table 2: EN-DE 28.4, EN-FR 41.8. The prose on page 8 separately says 41.0 for EN-FR; do not silently resolve the discrepancy.",
+      "units": [
+        {"label": "BLEU column labels", "alternatives": [[{"page": 8, "quote": "BLEU\nTraining Cost (FLOPs)\nModel\nEN-DE\nEN-FR"}]]},
+        {"label": "big-model row with both scores", "alternatives": [[{"page": 8, "quote": "Transformer (big)\n28.4\n41.8"}]]}
+      ]
+    },
+    {
+      "id": "A3", "paper": "1706.03762", "kind": "numerical",
+      "query": "How many attention heads does the base Transformer use, and what are the per-head key and value dimensions?",
+      "answer": "8 heads, d_k=d_v=d_model/h=64.",
+      "units": [
+        {"label": "8 attention heads", "alternatives": [[{"page": 5, "quote": "we employ h = 8 parallel attention layers, or heads"}]]},
+        {"label": "64-dimensional keys and values", "alternatives": [[{"page": 5, "quote": "dk = dv = dmodel/h = 64"}]]}
+      ]
+    },
+    {
+      "id": "A4", "paper": "1706.03762", "kind": "numerical",
+      "query": "Which Adam beta values, epsilon, and number of learning-rate warmup steps were used to train the Transformer?",
+      "answer": "beta1=0.9, beta2=0.98, epsilon=10^-9, warmup_steps=4000.",
+      "units": [
+        {"label": "Adam hyperparameters", "alternatives": [[{"page": 7, "quote": "Adam optimizer [20] with β1 = 0.9, β2 = 0.98 and ε = 10−9"}]]},
+        {"label": "4000 warmup steps", "alternatives": [[{"page": 7, "quote": "warmup_steps = 4000"}]]}
+      ]
+    },
+    {
+      "id": "M1", "paper": "2410.00037", "kind": "numerical", "existing_smoke": true,
+      "query": "What are the theoretical and practical latency of Moshi full-duplex speech dialogue?",
+      "answer": "160 ms theoretical and 200 ms in practice.",
+      "units": [
+        {"label": "160 ms theoretical", "alternatives": [[{"page": 1, "quote": "theoret-\nical latency of 160ms"}], [{"page": 2, "quote": "theo-\nretical latency of 160 ms"}], [{"page": 26, "quote": "theoretical latency of 160ms"}], [{"page": 41, "quote": "160ms theoretical latency"}]]},
+        {"label": "200 ms practical", "alternatives": [[{"page": 1, "quote": "200ms in practice"}]]}
+      ]
+    },
+    {
+      "id": "M2", "paper": "2410.00037", "kind": "numerical",
+      "query": "How many quantizers and entries per codebook does Mimi use, at what frame rate and resulting bitrate?",
+      "answer": "8 quantizers, 2048 entries per codebook, 12.5 Hz, 1.1 kbps.",
+      "units": [
+        {"label": "8 quantizers and 2048 entries", "alternatives": [[{"page": 11, "quote": "Q = 8 quantizers, each with a codebook size of NA = 2048"}]]},
+        {"label": "12.5 Hz and 1.1 kbps", "alternatives": [[{"page": 11, "quote": "At 12.5Hz, this represents a bitrate of 1.1kbps"}], [{"page": 23, "quote": "Mimi, adv. loss only\n24kHz\n12.5Hz\n1.1kbps"}]]}
+      ]
+    },
+    {
+      "id": "M3", "paper": "2410.00037", "kind": "numerical",
+      "query": "How many parameters does Helium have, and how many tokens were used to pretrain it?",
+      "answer": "7 billion parameters and 2.1 trillion public-English tokens.",
+      "units": [
+        {"label": "7B parameters", "alternatives": [[{"page": 3, "quote": "Helium, a 7B-parameter text LLM"}], [{"page": 8, "quote": "7B-parameter Helium language model"}]]},
+        {"label": "2.1T pretraining tokens", "alternatives": [[{"page": 3, "quote": "we pretrain on 2.1T tokens of\npublic English data"}], [{"page": 22, "quote": "2.1T tokens that are used to train Helium"}]]}
+      ]
+    },
+    {
+      "id": "M4", "paper": "2410.00037", "kind": "explanation",
+      "query": "How does Moshi's Inner Monologue order and align text tokens with audio tokens?",
+      "answer": "It predicts time-aligned text before semantic/acoustic audio tokens, as a prefix in hierarchical generation.",
+      "units": [
+        {"label": "time-aligned text before audio", "alternatives": [[{"page": 1, "quote": "predict time-aligned text tokens as a prefix to audio tokens"}], [{"page": 3, "quote": "predicting time-aligned text tokens before audio to-\nkens"}], [{"page": 15, "quote": "We insert W as the first sub-sequence in V , such that it acts as a prefix to the\ngeneration of semantic tokens"}], [{"page": 26, "quote": "modeling text tokens as a prefix to audio tokens with Inner Monologue"}]]}
+      ]
+    },
+    {
+      "id": "H1", "paper": "2507.07955", "kind": "explanation", "existing_smoke": true,
+      "query": "How does H-Net replace tokenization using a learned dynamic chunking mechanism?",
+      "answer": "Joint end-to-end learning replaces handcrafted tokenization with content/context-dependent segmentation and compression.",
+      "units": [
+        {"label": "learned content-dependent segmentation", "alternatives": [[{"page": 1, "quote": "learns content- and context- dependent segmentation strategies learned jointly with the rest of the model"}], [{"page": 2, "quote": "replacing handcrafted heuristics with content-aware and context-dependent\nsegmentation learned from data"}], [{"page": 2, "quote": "H-Net learns segmentation strategies optimized jointly with the main backbone, dynamically compressing input\nvectors based on contextual information into meaningful chunks"}], [{"page": 4, "quote": "data-dependent dynamic subsampling that is learned\nend-to-end together with the rest of the model"}], [{"page": 6, "quote": "H-Net learns chunking boundaries through end-to-end training, allowing it to identify semantically meaningful units\nadaptively"}], [{"page": 23, "quote": "learn content- and context-\ndependent discrete segmentation strategies through standard gradient-based optimization"}]]}
+      ]
+    },
+    {
+      "id": "H2", "paper": "2507.07955", "kind": "equation",
+      "query": "What threshold turns H-Net routing probabilities into chunk boundaries, and what boundary probability is forced at the first position?",
+      "answer": "b_t=1 when p_t>=0.5; p_1=1.0 guarantees a boundary at the start.",
+      "units": [
+        {"label": "threshold >=0.5", "alternatives": [[{"page": 6, "quote": "bt = 1{pt ≥0.5}"}]]},
+        {"label": "initial probability 1.0", "alternatives": [[{"page": 6, "quote": "p1 = 1.0 by definition, ensuring the sequence begins with a boundary"}]]}
+      ]
+    },
+    {
+      "id": "H3", "paper": "2507.07955", "kind": "table",
+      "query": "According to Table 4, what XWinograd-zh accuracies do the Transformer and H-Net (2-stage) achieve?",
+      "answer": "Transformer 0.599 (59.9%); H-Net (2-stage) 0.663 (66.3%).",
+      "units": [
+        {"label": "XW-zh column identification", "alternatives": [[{"page": 17, "quote": "Model\nChinese\nCode\nBPIC\nMain arch.\nVal. BPB ↓\nXW-zh. acc. ↑"}]]},
+        {"label": "Transformer row", "alternatives": [[{"page": 17, "quote": "Transformer\n3.62\nT15\n0.7404\n0.599"}]]},
+        {"label": "H-Net two-stage row", "alternatives": [[{"page": 17, "quote": "H-Net (2-stage)\n5.81\nT30\n0.7032\n0.663"}]]}
+      ]
+    },
+    {
+      "id": "H4", "paper": "2507.07955", "kind": "figure",
+      "query": "What data-efficiency improvement over isotropic models does Figure 6 report for H-Net on HG38 DNA?",
+      "answer": "Approximately 3.6 times greater data efficiency (about 3.6 times less data at matched pre-decay perplexity).",
+      "units": [
+        {"label": "3.6x improvement with direction and comparison", "alternatives": [[{"page": 17, "quote": "Each H-Net model achieves the same pre-\ndecay perplexity of the corresponding isotropic model with\napproximately 3.6× less data"}], [{"page": 37, "quote": "H-Net (1-stage) with an M3T1 encoder achieves 3.6× the data efficiency of an isotropic architecture (Figure 6)"}]]}
+      ]
+    }
+  ],
+  "unanswerable": [
+    {"id": "U1", "query": "What p95 end-to-end latency does the Moshi paper measure on an iPhone 15 Pro running iOS?", "reason": "No iPhone/iOS deployment or p95 device-specific measurement is reported. The generic 160/200 ms statement cannot answer this hardware-specific question."},
+    {"id": "U2", "query": "What benchmark results does the Dynamic Chunking paper report for a 70-billion-parameter H-Net?", "reason": "No 70B-parameter H-Net experiment. Page 23 discusses FLOP-matching a 1.3B Transformer and leaves larger scales for future validation; 70B elsewhere refers to data or comparisons, not such a model."},
+    {"id": "U3", "query": "What MMLU accuracy does Attention Is All You Need report for the original Transformer?", "reason": "Attention does not report MMLU. MMLU numbers in the other papers are for different models and are not an answer."},
+    {"id": "U4", "query": "What is the commercial API price per million Moshi speech tokens in November 2026?", "reason": "The supplied papers do not provide that dated commercial pricing."},
+    {"id": "U5", "query": "By how many BLEU points does Moshi outperform H-Net on WMT 2014 English-to-French?", "reason": "Neither Moshi nor H-Net reports that paired benchmark comparison; Transformer BLEU numbers cannot be substituted."}
+  ]
+}

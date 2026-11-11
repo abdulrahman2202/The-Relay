@@ -1,0 +1,79 @@
+{
+  "question_file_sha256": "5eb731a42e93561fb6cc60ec7998b017cb699cb3960a1dd03bb8da8c0e78b731",
+  "runner_sha256": "d384c3839316872d847fb29334424b8733e6cdae064ad9eac2514c4fd3702888",
+  "positive_questions": 12,
+  "negative_questions": 5,
+  "chunk_sizes": [
+    300,
+    600,
+    900
+  ],
+  "overlap": 50,
+  "cutoffs": [
+    3,
+    5,
+    10
+  ],
+  "paper_filter": null,
+  "bm25": {
+    "k1": 1.5,
+    "b": 0.75,
+    "stopwords": [
+      "a",
+      "an",
+      "and",
+      "are",
+      "as",
+      "at",
+      "be",
+      "been",
+      "by",
+      "did",
+      "do",
+      "does",
+      "for",
+      "from",
+      "had",
+      "has",
+      "have",
+      "how",
+      "in",
+      "into",
+      "is",
+      "it",
+      "its",
+      "of",
+      "on",
+      "or",
+      "that",
+      "the",
+      "their",
+      "there",
+      "these",
+      "this",
+      "to",
+      "was",
+      "were",
+      "what",
+      "when",
+      "where",
+      "which",
+      "who",
+      "why",
+      "will",
+      "with",
+      "would"
+    ],
+    "join_line_hyphens": true
+  },
+  "rrf": {
+    "constant": 60,
+    "candidates_per_retriever": 50,
+    "weights": [
+      1,
+      1
+    ]
+  },
+  "metric": "Complete annotated evidence coverage: every required unit has at least one alternative fully covered by the union of returned source character intervals.",
+  "limits": "Small diagnostic set, not held out. Table questions require column labels and named rows. No precision/nDCG or answer-generation accuracy is claimed. Corpus extraction fidelity is audited separately."
+}
