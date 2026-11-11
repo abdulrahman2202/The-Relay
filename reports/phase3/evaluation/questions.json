@@ -1,0 +1,135 @@
+{
+  "purpose": "Phase 3 end-to-end evaluation questions written for follow-up answer-quality review. These are questions and expected behaviour only; no answer-quality scores are claimed here.",
+  "version": "phase3-eval-v1",
+  "created": "2026-11-11",
+  "counts": {
+    "total": 20,
+    "answerable": 12,
+    "unanswerable": 8
+  },
+  "answerable": [
+    {
+      "id": "A1",
+      "question": "What theoretical and practical latency figures does Moshi report?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1"
+    },
+    {
+      "id": "A2",
+      "question": "Which optimizer and beta values were used to train the Transformer, and how many learning-rate warmup steps were used?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7"
+    },
+    {
+      "id": "A3",
+      "question": "How many attention heads does the Transformer base model use, and what are the per-head key and value dimensions?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7"
+    },
+    {
+      "id": "A4",
+      "question": "According to Table 2, what BLEU scores does Transformer (big) report for English-to-German and English-to-French?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": "The prose and table contain a known EN-FR discrepancy; the interface should not silently hide a source conflict."
+    },
+    {
+      "id": "A5",
+      "question": "How many quantizers and codebook entries does Mimi use, and what frame rate and bitrate result?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1"
+    },
+    {
+      "id": "A6",
+      "question": "How many parameters does Helium have, and on how many pretraining tokens was it trained?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1"
+    },
+    {
+      "id": "A7",
+      "question": "How does Moshi's Inner Monologue method arrange text tokens relative to audio tokens?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2410.00037v1"
+    },
+    {
+      "id": "A8",
+      "question": "How does H-Net replace handcrafted tokenization with learned dynamic chunking?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2"
+    },
+    {
+      "id": "A9",
+      "question": "What probability threshold turns H-Net routing scores into chunk boundaries, and what boundary probability is forced at the first position?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2"
+    },
+    {
+      "id": "A10",
+      "question": "According to Table 4, what XWinograd-zh accuracies do the Transformer and H-Net (2-stage) achieve?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2"
+    },
+    {
+      "id": "A11",
+      "question": "What data-efficiency improvement over isotropic models does Figure 6 report for H-Net on HG38 DNA?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2"
+    },
+    {
+      "id": "A12",
+      "question": "Why does scaled dot-product attention divide by the square root of the key dimension?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7"
+    }
+  ],
+  "unanswerable": [
+    {
+      "id": "U1",
+      "question": "What p95 latency does Moshi measure on an iPhone 15 Pro running iOS?",
+      "expected_behavior": "refuse",
+      "reason": "The papers report generic Moshi latency, not a p95 measurement on that device and operating system."
+    },
+    {
+      "id": "U2",
+      "question": "How much did it cost in dollars to train Moshi?",
+      "expected_behavior": "refuse",
+      "reason": "The papers do not report a dollar training cost."
+    },
+    {
+      "id": "U3",
+      "question": "What MMLU accuracy does Attention Is All You Need report for the original Transformer?",
+      "expected_behavior": "refuse",
+      "reason": "Attention Is All You Need does not report MMLU results."
+    },
+    {
+      "id": "U4",
+      "question": "What benchmark results does the dynamic chunking paper report for a 70-billion-parameter H-Net?",
+      "expected_behavior": "refuse",
+      "reason": "The paper does not report a 70-billion-parameter H-Net experiment."
+    },
+    {
+      "id": "U5",
+      "question": "What is the commercial API price per million Moshi speech tokens in November 2026?",
+      "expected_behavior": "refuse",
+      "reason": "No dated commercial pricing appears in the supplied papers."
+    },
+    {
+      "id": "U6",
+      "question": "What is the carbon footprint of training the Transformer big model?",
+      "expected_behavior": "refuse",
+      "reason": "The Transformer paper reports training time and hardware but not a carbon footprint."
+    },
+    {
+      "id": "U7",
+      "question": "What accuracy does Moshi report on the GLUE benchmark?",
+      "expected_behavior": "refuse",
+      "reason": "Moshi is evaluated as a speech-text dialogue system and the paper does not report GLUE accuracy."
+    },
+    {
+      "id": "U8",
+      "question": "What BLEU score does H-Net achieve on WMT 2014 English-to-German translation?",
+      "expected_behavior": "refuse",
+      "reason": "The H-Net paper does not report WMT translation results; Transformer BLEU numbers must not be substituted."
+    }
+  ]
+}

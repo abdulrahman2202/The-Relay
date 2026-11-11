@@ -16,6 +16,8 @@ dependencies = [
     "transformers==5.22.2",
     "tokenizers==0.23.3",
     "huggingface-hub==2.4.0",
+    "groq==1.7.0",
+    "python-dotenv==1.2.4",
 ]
 
 [project.optional-dependencies]
@@ -23,13 +25,14 @@ dev = ["pytest==9.2.0", "ruff==0.14.14"]
 
 [project.scripts]
 relay-rag = "retrieval.cli:main"
+relay = "relay.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["retrieval*"]
+include = ["retrieval*", "relay*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/rag"]
+testpaths = ["tests/rag", "tests/relay"]
 pythonpath = ["src"]
 addopts = "-ra"
 markers = ["integration: uses the pinned, locally cached SentenceTransformer model"]

@@ -1,0 +1,643 @@
+{
+  "generated_utc": "2026-11-11T11:57:04.130449+00:00",
+  "model": "openai/gpt-oss-20b",
+  "prompt_version": "relay-phase3-v1",
+  "checks": [
+    {
+      "name": "normal_completion",
+      "ok": true,
+      "content": "RELAY OK",
+      "request": {
+        "stage": "completion",
+        "model": "openai/gpt-oss-20b",
+        "streaming": false,
+        "status": "completed",
+        "provider_model": "openai/gpt-oss-20b",
+        "request_id": "req_01m757fzdjeghay25xy9qfe01t",
+        "completion_id": "chatcmpl-a70f29fd-8a29-4c20-acf7-90eee4ec150c",
+        "finish_reason": "stop",
+        "input_tokens": 84,
+        "output_tokens": 21,
+        "total_tokens": 105,
+        "duration_seconds": 0.6298633999995218,
+        "first_token_seconds": null,
+        "prompt_budget_upper_bound": 1162,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 40.0,
+        "tool_names": [],
+        "error_code": null
+      }
+    },
+    {
+      "name": "streaming_completion",
+      "ok": true,
+      "text": "1 2 3 4 5",
+      "request": {
+        "stage": "generation",
+        "model": "openai/gpt-oss-20b",
+        "streaming": true,
+        "status": "completed",
+        "provider_model": "openai/gpt-oss-20b",
+        "request_id": "req_01m757fzvge83bk4x5tz2q6nmg",
+        "completion_id": "chatcmpl-6cfdbc19-db4e-4388-864a-785225f37c32",
+        "finish_reason": "stop",
+        "input_tokens": 86,
+        "output_tokens": 32,
+        "total_tokens": 118,
+        "duration_seconds": 0.44441270000061195,
+        "first_token_seconds": 0.4331867000000784,
+        "prompt_budget_upper_bound": 878,
+        "max_output_tokens": 2048,
+        "timeout_seconds": 40.0,
+        "tool_names": [],
+        "error_code": null
+      }
+    },
+    {
+      "name": "real_tool_call_and_retrieval",
+      "ok": true,
+      "question": "What are Moshi's theoretical and practical latency?",
+      "request": {
+        "stage": "planning",
+        "model": "openai/gpt-oss-20b",
+        "streaming": false,
+        "status": "completed",
+        "provider_model": "openai/gpt-oss-20b",
+        "request_id": "req_01m757g09hefjv4tjqhf74x2vd",
+        "completion_id": "chatcmpl-8f061fbb-f21c-4deb-a14e-584c4ac0a52f",
+        "finish_reason": "tool_calls",
+        "input_tokens": 448,
+        "output_tokens": 43,
+        "total_tokens": 491,
+        "duration_seconds": 0.4865533000011055,
+        "first_token_seconds": null,
+        "prompt_budget_upper_bound": 2947,
+        "max_output_tokens": 768,
+        "timeout_seconds": 40.0,
+        "tool_names": [
+          "search_research_papers"
+        ],
+        "error_code": null
+      },
+      "calls": [
+        {
+          "call_id": "fc_84cc711f-0745-4db1-9108-0b3fae86e579",
+          "query": "Moshi latency theoretical practical",
+          "strategy": "bm25",
+          "preset": 600
+        }
+      ],
+      "executions": [
+        {
+          "status": "evidence",
+          "seconds": 10.6160850999986,
+          "hits": [
+            {
+              "chunk_id": "ae95507936966555aba5c894f087e605bbb50d53e37fd95673fee6e5bd0a54fb",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                25,
+                26
+              ]
+            },
+            {
+              "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                1
+              ]
+            },
+            {
+              "chunk_id": "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                26
+              ]
+            },
+            {
+              "chunk_id": "85cacb0acb264c9d7810cf822fdb1a80002c7f437edde0119bff63eec73acfaa",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                41,
+                42
+              ]
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "answerable_research_question",
+      "ok": true,
+      "question": "What are Moshi's theoretical and practical latency?",
+      "status": "answered",
+      "answer": "Moshi\u2019s theoretical latency is 160\u202fms and its practical latency is 200\u202fms. [S2] [S3]",
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "tools": [
+        {
+          "call_id": "fc_15262dee-c7c7-4f49-8485-cfb44a5d69b4",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "ae95507936966555aba5c894f087e605bbb50d53e37fd95673fee6e5bd0a54fb",
+            "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+            "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+            "85cacb0acb264c9d7810cf822fdb1a80002c7f437edde0119bff63eec73acfaa"
+          ]
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "claims": [
+        {
+          "text": "Moshi\u2019s theoretical latency is 160\u202fms and its practical latency is 200\u202fms.",
+          "citations": [
+            {
+              "source_id": "S2",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                1
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+              "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+              "char_start": 1805,
+              "quote": "Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi."
+            },
+            {
+              "source_id": "S3",
+              "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+              "arxiv_id": "2410.00037",
+              "version": 1,
+              "pages": [
+                26
+              ],
+              "source_url": "https://arxiv.org/pdf/2410.00037v1#page=26",
+              "chunk_id": "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+              "char_start": 81143,
+              "quote": "we settle on a\ntheoretical latency of 160ms by pretraining Moshi with an acoustic delay of 2 and finetuning\nit with an acoustic delay of 1."
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            25,
+            26
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=25",
+          "text": "5.3 Ablations on generative modeling\n\nMetrics.\nWe perform ablation studies to evaluate the impact of using an RQ-Transformer,\nas well as comparing delay patterns and weighting of various token levels. All models are\ninitialized with Helium for the Temporal Transformer and pretrained on audio data. When\ncomparing models with a same delay pattern and without Inner Monologue, we rely on\nperplexity, averaged over semantic and acoustic tokens. However, perplexities are not comparable between models with various delays, as they do not model the same conditional\ndistributions. To compare various delay patterns, we measure the ability of Moshi to generate intelligible, consistent speech by transcribing generations (conditioned on a 3s prompt)\nwith Whisper (Radford et al., 2023) and scoring the resulting transcripts with an external\ntext language model. We rely on a lightweight text model\u2014LiteLlama-460M-1T^{14}\u2014 as it\nis more practical for continuous evaluation along training. We also report the length of the\n\n14. https://huggingface.co/ahxt/LiteLlama-460M-1T\n\n25\n\n\ntranscripts (in characters), as we find it to a be a strong predictor of model quality (weak\nmodels typically collapse to silence).\n\nResults - RQ-Transformer.\nTable 5 reports results for ablations on the use of an RQTransformer. We first replicate the setting of Copet et al. (2023) with the delay pattern\nof [0, 1, 2, 3, 4, 5, 6, 7], which means that each level of RVQ token is generated one timestep\nafter the preceding level.\nIn this context, we see that using an RQ-Transformer is not\nnecessary, as it only provides a marginal improvement in perplexity. However, this delay\npattern induces a theoretical latency of 8 timesteps, which amounts to 640ms, a latency\nthat is incompatible with the requirements of a real-time dialogue model. We thus switch to\na reduced latency of 240ms with the pattern [0, 2, 2, 2, 2, 2, 2, 2]. In that context, modeling\nRVQ tokens with an RQ-Transformer significantly improves perplexity over using separate\nclassification heads. Thus, the RQ-Transformer becomes a critical component of generative\nmodels of RVQ tokens under strict latency constraints.\n\nResults - Additional ablations.\nTable 6 reports additional ablations on additional\ndelay patterns, the weight of the semantic token loss and our proposed Inner Monologue\nprocedure, all using the RQ-Transformer. First, we compare three configurations of delays\nthat are compatible with real-time dialogue.",
+          "chunk_id": "ae95507936966555aba5c894f087e605bbb50d53e37fd95673fee6e5bd0a54fb",
+          "char_start": 77067
+        },
+        {
+          "source_id": "S2",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            1
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+          "text": "Abstract\n\nWe introduce Moshi, a speech-text foundation model and full-duplex spoken dialogue framework. Current systems for spoken dialogue rely on pipelines of independent components,\nnamely voice activity detection, speech recognition, textual dialogue and text-to-speech.\nSuch frameworks cannot emulate the experience of real conversations. First, their complexity induces a latency of several seconds between interactions. Second, text being the intermediate modality for dialogue, non-linguistic information that modifies meaning\u2014 such as\nemotion or non-speech sounds\u2014 is lost in the interaction. Finally, they rely on a segmentation into speaker turns, which does not take into account overlapping speech, interruptions\nand interjections. Moshi solves these independent issues altogether by casting spoken dialogue as speech-to-speech generation. Starting from a text language model backbone, Moshi\ngenerates speech as tokens from the residual quantizer of a neural audio codec, while modeling separately its own speech and that of the user into parallel streams. This allows for the\nremoval of explicit speaker turns, and the modeling of arbitrary conversational dynamics.\nWe moreover extend the hierarchical semantic-to-acoustic token generation of previous work\nto first predict time-aligned text tokens as a prefix to audio tokens. Not only this \u201cInner\nMonologue\u201d method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech. Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.\nKeywords:\nspeech, text, multimodal, foundation, spoken dialogue\n\n1",
+          "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+          "char_start": 266
+        },
+        {
+          "source_id": "S3",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            26
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=26",
+          "text": "First, we compare three configurations of delays\nthat are compatible with real-time dialogue. The [0, 0, 0, 0, 0, 0, 0, 0] pattern represents the\nminimal latency of 80ms that can be obtained with Mimi tokens at 12.5Hz.\nAllowing\nan additional 80ms of latency with one step of delay significantly improves the quality of\ngenerated speech, while 240ms of latency brings further moderate improvement. In early\nexperiments, we also observed that the individual losses per RVQ level were conflicting with\none another, despite each level being more important in the final intelligibility and audio\nquality than the next one. We thus bring two changes to the architecture and training\nprocess. We first increase the weight of the loss on predicting the semantic tokens to 100,\nwhile keeping it at 1 for all other levels of the audio tokens.\nThis gives another boost\nto speech intelligibility. We furthermore reduce competition between RVQ levels by using\na depthwise parametrization, as described in Section 3.4.1, such that each RVQ level is\npredicted by its own set of weights in the Depth Transformer, rather than having shared\nweights across levels. Finally, the most drastic improvement to the quality and length of\ngenerated speech comes from enabling Inner Monologue.\n\nDiscussion.\nBeyond the choice of architecture and delay patterns, these ablations show\nhow helpful modeling text tokens as a prefix to audio tokens with Inner Monologue is, even\nin an audio-to-audio setting. Given the positive impact of depthwise parametrization and\na weight of 100 for the semantic token, both are used in all our subsequent experiments, as\nwell as our final training procedure. Moreover, and as described in Table 1, we settle on a\ntheoretical latency of 160ms by pretraining Moshi with an acoustic delay of 2 and finetuning\nit with an acoustic delay of 1.",
+          "chunk_id": "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+          "char_start": 79439
+        },
+        {
+          "source_id": "S4",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            41,
+            42
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=41",
+          "text": "7 Conclusion\n\nIn this work, we introduce Moshi, the first real-time, full-duplex spoken dialogue system.\nThe first component of Moshi is Helium, a 7B parameter text LLM which is competitive with\nopen-weights models trained with a similar compute budget. To encode audio into discrete\nunits amenable to language modeling, we introduce Mimi, a semantic-acoustic neural audio\ncodec which provides state-of-the-art audio quality at low bitrates while operating at low\nframerates compatible with real-time generation. We then introduce a new, hierarchical\nmulti-stream architecture that supports generating arbitrary conversations in a speech-tospeech manner.\nWe moreover show that speech-to-speech generation can be drastically\nimproved by Inner Monologue, a new method that generates text tokens as a prefix to\naudio tokens, while remaining compatible with streaming inference. Our experiments show\nthat Moshi demonstrates state-of-the-art spoken question answering and dialogue modeling\nwhile displaying satisfying levels of safety by not generating toxic content and remaining\nconsistent in its voice. To summarize, we introduce a complete suite of models and recipes,\nfrom text LLMs to neural audio codecs and generative audio models, which we combine into\na real-time spoken dialogue system with a 160ms theoretical latency able to follow complex\nmulti-turn conversations across 5 minutes. We release both Mimi and Moshi to foster the\ndevelopment of such applications. Additionally, we show how our Inner Monologue method\nallows designing streaming TTS and streaming ASR just by changing the delay between text\nand audio tokens. We believe that both Inner Monologue and multi-stream modeling will\nhave a positive impact on speech-to-speech and audio-to-audio beyond dialogue modeling.\n\nAcknowledgments and Disclosure of Funding\n\nThis project is funded by Iliad Group, CMA CGM Group and Schmidt Sciences. We thank\nXavier Niel, Rodolphe Saad \u0301e, Eric Schmidt, Aude Durand, S \u0301everine Gr \u0301egoire and Nicolas\nGranatino, for their support; as well as Sarah H\u02c6ote and Guillaume Rouzaud at Kyutai for\n\n22. https://github.com/Stability-AI/stablediffusion/blob/main/scripts/txt2img.py#L363\n\n41\n\n\ntheir help. We also thank Alice, the voice artist who strived to give Moshi online demo its\nvoice, Elie Raffier who built the user interface for this demo, and Hugging Face for inference\ncompute donation. Audio training data set was built with the help of Noatune Studios and\nLandospeech. Model training was conducted at Scaleway.",
+          "chunk_id": "85cacb0acb264c9d7810cf822fdb1a80002c7f437edde0119bff63eec73acfaa",
+          "char_start": 126120
+        }
+      ],
+      "metrics": {
+        "total_seconds": 1.1371406000016577,
+        "first_answer_token_seconds": 1.1306591000011394,
+        "retrieval_seconds": 0.0945891000010306,
+        "evidence_selection_seconds": 0.023712399999567424,
+        "citation_validation_seconds": 0.0009356999998999527,
+        "llm_generation_seconds": 0.5240994000014325,
+        "llm_planning_seconds": 0.4943473000002996,
+        "generation_first_token_seconds": 0.3777086000009149,
+        "input_tokens": 3424,
+        "output_tokens": 238,
+        "known_input_tokens": 3424,
+        "known_output_tokens": 238,
+        "evidence_tokens": 2006,
+        "tool_calls": 1
+      },
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m757gb53etxv1mehxxr6jt1z",
+          "completion_id": "chatcmpl-e31d88a3-4687-4265-85f5-807985b5af3d",
+          "finish_reason": "tool_calls",
+          "input_tokens": 448,
+          "output_tokens": 43,
+          "total_tokens": 491,
+          "duration_seconds": 0.4943473000002996,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2947,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m757gbqnekpsq5chnjpsera6",
+          "completion_id": "chatcmpl-c068a407-ccab-4598-95b7-292cd00e2aa0",
+          "finish_reason": "stop",
+          "input_tokens": 2976,
+          "output_tokens": 195,
+          "total_tokens": 3171,
+          "duration_seconds": 0.5240994000014325,
+          "first_token_seconds": 0.3777086000009149,
+          "prompt_budget_upper_bound": 14822,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "citation_pdf_checks": [
+        {
+          "source_id": "S2",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            1
+          ],
+          "quote": "Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.",
+          "ok": true,
+          "page": 1,
+          "file": "moshi.pdf"
+        },
+        {
+          "source_id": "S3",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            26
+          ],
+          "quote": "we settle on a\ntheoretical latency of 160ms by pretraining Moshi with an acoustic delay of 2 and finetuning\nit with an acoustic delay of 1.",
+          "ok": true,
+          "page": 26,
+          "file": "moshi.pdf"
+        }
+      ]
+    },
+    {
+      "name": "unsupported_constraint_question",
+      "ok": true,
+      "question": "What p95 latency does Moshi measure on iPhone 15 Pro running iOS?",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "refuse_insufficient_evidence",
+        "finalize"
+      ],
+      "tools": [
+        {
+          "call_id": "fc_12d1322b-1ad3-4ff8-81c2-933e0ac0cf70",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "bf71a4c26ff64f0183696cf608497d0b22381b69c1a932126940680a0f65cabf",
+            "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+            "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+            "785daebb4e0bb634bf0767fdbfef124aaf1da1019f8f1199a92a3a8d44f5cc71"
+          ]
+        }
+      ],
+      "evidence_assessment": {
+        "status": "insufficient_evidence",
+        "reason": "The retrieved context does not support all requested constraints.",
+        "missing": [
+          "p95 in arXiv:2410.00037",
+          "iPhone 15 Pro in arXiv:2410.00037",
+          "iOS in arXiv:2410.00037"
+        ]
+      },
+      "claims": [],
+      "sources": [
+        {
+          "source_id": "S1",
+          "paper_title": "Dynamic Chunking for End-to-End Hierarchical Sequence Modeling",
+          "arxiv_id": "2507.07955",
+          "version": 2,
+          "pages": [
+            6,
+            7
+          ],
+          "source_url": "https://arxiv.org/pdf/2507.07955v2#page=6",
+          "text": "2.2.2\nDechunking\n\nThe dechunking layer (Dechunk in equation (3)) consists of a smoothing module and upsampler, as illustrated in Figure 1-\n( top-right ).\n\nSmoothing Module.\nThe critical challenge in training a dynamic chunking module lies in the discrete nature of chunk\nboundaries, which impedes gradient flow during backpropagation. We introduce the smoothing module as a technique\nto address this problem. As illustrated in Figure 1-(c), this component transforms discrete chunking operations into\n\n\n | n e w _ p r o d u c t ! _ |  |  |  |  | n e w _ p r o d u c t ! _ |  |  |  |  |  | n e w _ p r o d u c t ! _ |  |  | \n\u0302#new_ | #pro | #duct! | #ne | #new_ | #pro | #du | #duct! | #ne\u00e0 | #...ne | #new_ | #pro | #du | \u00e0 | #produ | \u0302#duct!\n | Upper Stages |  |  |  |  | Upper Stages |  |  |  |  |  | Upper Stages |  |  | \n!new_ | !pro | !duct! | !ne | !new_ | !pro | !du | !duct! | !ne | !new_ | !pro | !du | !duct!\n | ... n e w _ p r o d u c t ! |  |  |  |  | ... n e w _ p r o d u c t ! |  |  |  |  |  | ... n e w _ p r o d u c t ! |  |  | \n\u25cf | \u25cf | \u25cf | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf | \u25cf | \u25d0 | \u25cf\n | (a) Oracle Boundaries |  |  |  |  | (b) w/o Smoothing Module |  |  |  |  |  | (c) w/ Smoothing Module |  |  | \n\nFigure 2: Comparison of decompression strategies on the example sequence \"...new product!\". indicates a boundary\nwith high confidence (Pt = 1.0) and G# indicates a boundary with low confidence (Pt = 0.5). As each letter in the example\nis unique, we use the letters in subscripts to denote expected semantics of chunks. (a) Optimal chunking with oracle\nboundaries identifying linguistically meaningful units. (b) Suboptimal chunking without a smoothing module. This creates\nmisalignment during upsampling, causing information from incorrect contexts to propagate. (c) Improved decompression\nwith a smoothing module, where low-confidence chunks are interpolated with weighted combinations of previous chunks,\ncorrecting the shaded regions.",
+          "chunk_id": "bf71a4c26ff64f0183696cf608497d0b22381b69c1a932126940680a0f65cabf",
+          "char_start": 22430
+        },
+        {
+          "source_id": "S2",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            1
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=1",
+          "text": "Abstract\n\nWe introduce Moshi, a speech-text foundation model and full-duplex spoken dialogue framework. Current systems for spoken dialogue rely on pipelines of independent components,\nnamely voice activity detection, speech recognition, textual dialogue and text-to-speech.\nSuch frameworks cannot emulate the experience of real conversations. First, their complexity induces a latency of several seconds between interactions. Second, text being the intermediate modality for dialogue, non-linguistic information that modifies meaning\u2014 such as\nemotion or non-speech sounds\u2014 is lost in the interaction. Finally, they rely on a segmentation into speaker turns, which does not take into account overlapping speech, interruptions\nand interjections. Moshi solves these independent issues altogether by casting spoken dialogue as speech-to-speech generation. Starting from a text language model backbone, Moshi\ngenerates speech as tokens from the residual quantizer of a neural audio codec, while modeling separately its own speech and that of the user into parallel streams. This allows for the\nremoval of explicit speaker turns, and the modeling of arbitrary conversational dynamics.\nWe moreover extend the hierarchical semantic-to-acoustic token generation of previous work\nto first predict time-aligned text tokens as a prefix to audio tokens. Not only this \u201cInner\nMonologue\u201d method significantly improves the linguistic quality of generated speech, but we\nalso illustrate how it can provide streaming speech recognition and text-to-speech. Our resulting model is the first real-time full-duplex spoken large language model, with a theoretical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.\nKeywords:\nspeech, text, multimodal, foundation, spoken dialogue\n\n1",
+          "chunk_id": "5a67969fcbf034f3ec9c3a75884223aefe4a5b126a557e0d3a449ec65425684c",
+          "char_start": 266
+        },
+        {
+          "source_id": "S3",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            26
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=26",
+          "text": "First, we compare three configurations of delays\nthat are compatible with real-time dialogue. The [0, 0, 0, 0, 0, 0, 0, 0] pattern represents the\nminimal latency of 80ms that can be obtained with Mimi tokens at 12.5Hz.\nAllowing\nan additional 80ms of latency with one step of delay significantly improves the quality of\ngenerated speech, while 240ms of latency brings further moderate improvement. In early\nexperiments, we also observed that the individual losses per RVQ level were conflicting with\none another, despite each level being more important in the final intelligibility and audio\nquality than the next one. We thus bring two changes to the architecture and training\nprocess. We first increase the weight of the loss on predicting the semantic tokens to 100,\nwhile keeping it at 1 for all other levels of the audio tokens.\nThis gives another boost\nto speech intelligibility. We furthermore reduce competition between RVQ levels by using\na depthwise parametrization, as described in Section 3.4.1, such that each RVQ level is\npredicted by its own set of weights in the Depth Transformer, rather than having shared\nweights across levels. Finally, the most drastic improvement to the quality and length of\ngenerated speech comes from enabling Inner Monologue.\n\nDiscussion.\nBeyond the choice of architecture and delay patterns, these ablations show\nhow helpful modeling text tokens as a prefix to audio tokens with Inner Monologue is, even\nin an audio-to-audio setting. Given the positive impact of depthwise parametrization and\na weight of 100 for the semantic token, both are used in all our subsequent experiments, as\nwell as our final training procedure. Moreover, and as described in Table 1, we settle on a\ntheoretical latency of 160ms by pretraining Moshi with an acoustic delay of 2 and finetuning\nit with an acoustic delay of 1.",
+          "chunk_id": "b51b851b487ba80f6c914553511786aa0af93fd4e7283a2d6955bca089b52ad8",
+          "char_start": 79439
+        },
+        {
+          "source_id": "S4",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            64
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=64",
+          "text": "F.2 Misspelling\n\nUSER: I\u2019d like to learn about Danyh Amendol?\nMOSHI: Sorry, I\u2019m not sure what you\u2019re referring to.\nUSER: Oh, Danyh Amendola, the football player. The former football player.\nMOSHI: Okay, I know who Danny Amendola is. He is a former professional football\nwide receiver who played for the New England Patriots.\nHe also played for the\nMiami Dolphins, Detroit Lions, and Houston Texans.\nUSER: Okay,\nMOSHI: He was drafted by the New England Patriots in 2010.\nUSER: and how about his college football\nMOSHI: He played college football for the Texas Tech Red Raiders. His career in the\nNFL,\nUSER: okay,\nMOSHI: he was named an alternate for the 2011 Pro Bowl.\nUSER: yeah,\nMOSHI: He also appeared in three Super Bowls, winning two.\nUSER: yeah.\n\nUSER: I\u2019d like to learn about Maroom?\nMOSHI: I\u2019m sorry, I did not catch that.\nUSER: I\u2019d like to learn about Maroon.\nMOSHI: Oh, Marron. Okay, well, let\u2019s see. Maroon is a color that is a dark red or\na brownish red.\nIt is named after the French word for chestnut.\nIt has a range\nof shades from a dark brownish red color to a dark reddish purple color. It\u2019s also\nconsidered to be the complementary color to teal.\nUSER: What\u2019s the opposite of Maroom?\nMOSHI: The opposite of Maroon, I\u2019m sorry, that\u2019s not a word. I think you mean\ncomplementary color.\nUSER: Yeah, that\u2019s\nMOSHI: Okay,\nUSER: it.\nMOSHI: so, teal is a color that is made up of blue and green, and maroon is a color\nthat is made up of red and brown. So, when you put those two colors together, they\ncreate a complementary color, which is the opposite color.\nUSER: Yeah. I think I\u2019m gonna look more up on Maroom.\nMOSHI: Oh, okay. Yeah,\nUSER: I\u2019ve got some questions.\nMOSHI: yeah.\n\n64",
+          "chunk_id": "785daebb4e0bb634bf0767fdbfef124aaf1da1019f8f1199a92a3a8d44f5cc71",
+          "char_start": 186837
+        }
+      ],
+      "metrics": {
+        "total_seconds": 0.7936595999999554,
+        "first_answer_token_seconds": 0.7936540999999124,
+        "retrieval_seconds": 0.09471750000011525,
+        "evidence_selection_seconds": 0.02173450000009325,
+        "citation_validation_seconds": 0.0,
+        "llm_generation_seconds": 0.0,
+        "llm_planning_seconds": 0.6770323999990069,
+        "generation_first_token_seconds": null,
+        "input_tokens": 456,
+        "output_tokens": 50,
+        "known_input_tokens": 456,
+        "known_output_tokens": 50,
+        "evidence_tokens": 1905,
+        "tool_calls": 1
+      },
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m757gc8secqsct8vaahh4nad",
+          "completion_id": "chatcmpl-2c41c13d-e603-443f-9f3f-5713c5a29ba0",
+          "finish_reason": "tool_calls",
+          "input_tokens": 456,
+          "output_tokens": 50,
+          "total_tokens": 506,
+          "duration_seconds": 0.6770323999990069,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2961,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "citation_pdf_checks": []
+    },
+    {
+      "name": "model_refusal_question",
+      "ok": true,
+      "question": "How much did it cost in dollars to train Moshi?",
+      "status": "refused",
+      "answer": "The supplied papers do not provide enough evidence to answer that question.",
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "tools": [
+        {
+          "call_id": "fc_41eb9712-83e2-43c7-a811-204d85d76db1",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "d40c570aa785461b34a3d96a48be6e067b7ddb99678379cd21cf792e2cda0956",
+            "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+            "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+            "449ae6bbfb98258b69c54681752859936995ed95842e36354a174d8e2dc26c17"
+          ]
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "claims": [],
+      "sources": [
+        {
+          "source_id": "S1",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            29,
+            30
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=29",
+          "text": "5.5 Spoken question answering\n\nMetrics.\nWe evaluate the spoken question answering abilities of our final multi-stream\nMoshi model. We rely on Spoken Web Questions and Llama Questions, both introduced\nby Nachmani et al. (2024). We also synthesize an audio version of TriviaQA as another\nbenchmark. When evaluating Moshi, we insert the audio tokens of the question into the\nuser stream to simulate a user interaction.\n\nBaselines.\nWe compare to Spectron and baselines used by Nachmani et al. (2024), all\nhaving been already introduced in Section 5.4 except for SpeechGPT (Zhang et al., 2024a).\nAs a way to measure the impact of Inner Monologue on spoken fluency, we compare these\nbaselines with Moshi trained with and without Inner Monologue. Moreover, to quantify\nan eventual degradation in knowledge due to training on audio data, we also compare to\nHelium when evaluated on the textual counterpart to each spoken dataset.\n\nResults.\nTable 8 reports accuracies on the three benchmarks. The most striking result is\nthe impact of Inner Monologue on Moshi\u2019s performance, almost tripling its accuracy on all\nbenchmarks, and significantly improving over previous work. This is remarkable as Inner\nMonologue only marginally increases inference cost (each multi-stream timestep requires\ngenerating 17 tokens, instead of 16 without Inner Monologue). We emphasize again that\namong all models in this comparison, Moshi not only provides the best spoken question\nanswering performance, but is also the only one to model jointly semantic and acoustic\ntokens, such that it can handle interactions between arbitrary voices in many conditions.\n\nDiscussion.\nDespite the strong performance of Moshi, we observe a weaker performance\nthan its original Helium checkpoint, which is consistent with the reduced MMLU of 49.7 re-\n\n29\n\n\nTable 9: Linguistic quality and turn-taking statistics of generated dialogues. As\nwe train our multi-stream model to generate both sides of the conversation, we can generate\ndialogues without the need to interact with a real user. This allows evaluating how much\nMoshi learns natural conversational dynamics.",
+          "chunk_id": "d40c570aa785461b34a3d96a48be6e067b7ddb99678379cd21cf792e2cda0956",
+          "char_start": 89690
+        },
+        {
+          "source_id": "S2",
+          "paper_title": "Attention Is All You Need",
+          "arxiv_id": "1706.03762",
+          "version": 7,
+          "pages": [
+            8
+          ],
+          "source_url": "https://arxiv.org/pdf/1706.03762v7#page=8",
+          "text": "6\nResults\n\n6.1\nMachine Translation\n\nOn the WMT 2014 English-to-German translation task, the big transformer model (Transformer (big)\nin Table 2) outperforms the best previously reported models (including ensembles) by more than 2.0\nBLEU, establishing a new state-of-the-art BLEU score of 28.4. The configuration of this model is\nlisted in the bottom line of Table 3. Training took 3.5 days on 8 P100 GPUs. Even our base model\nsurpasses all previously published models and ensembles, at a fraction of the training cost of any of\nthe competitive models.\n\nOn the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.0,\noutperforming all of the previously published single models, at less than 1/4 the training cost of the\nprevious state-of-the-art model. The Transformer (big) model trained for English-to-French used\ndropout rate Pdrop = 0.1, instead of 0.3.\n\nFor the base models, we used a single model obtained by averaging the last 5 checkpoints, which\nwere written at 10-minute intervals. For the big models, we averaged the last 20 checkpoints. We\nused beam search with a beam size of 4 and length penalty \u03b1 = 0.6 [38]. These hyperparameters\nwere chosen after experimentation on the development set. We set the maximum output length during\ninference to input length + 50, but terminate early when possible [38].\n\nTable 2 summarizes our results and compares our translation quality and training costs to other model\narchitectures from the literature. We estimate the number of floating point operations used to train a\nmodel by multiplying the training time, the number of GPUs used, and an estimate of the sustained\nsingle-precision floating-point capacity of each GPU ^{5}.",
+          "chunk_id": "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+          "char_start": 22968
+        },
+        {
+          "source_id": "S3",
+          "paper_title": "Attention Is All You Need",
+          "arxiv_id": "1706.03762",
+          "version": 7,
+          "pages": [
+            7,
+            8
+          ],
+          "source_url": "https://arxiv.org/pdf/1706.03762v7#page=7",
+          "text": "5.4\nRegularization\n\nWe employ three types of regularization during training:\n\n\nTable 2: The Transformer achieves better BLEU scores than previous state-of-the-art models on the\nEnglish-to-German and English-to-French newstest2014 tests at a fraction of the training cost.\n\nBLEU | Training Cost (FLOPs)\nModel |  |  |  | \n | EN-DE | EN-FR | EN-DE | EN-FR\nByteNet [18] | 23.75 |  |  | \nDeep-Att + PosUnk [39] |  | 39.2 |  | 1.0 \u00b7 10^{20}\nGNMT + RL [38] | 24.6 | 39.92 | 2.3 \u00b7 10^{19} | 1.4 \u00b7 10^{20}\nConvS2S [9] | 25.16 | 40.46 | 9.6 \u00b7 10^{18} | 1.5 \u00b7 10^{20}\nMoE [32] | 26.03 | 40.56 | 2.0 \u00b7 10^{19} | 1.2 \u00b7 10^{20}\nDeep-Att + PosUnk Ensemble [39] |  | 40.4 |  | 8.0 \u00b7 10^{20}\nGNMT + RL Ensemble [38] | 26.30 | 41.16 | 1.8 \u00b7 10^{20} | 1.1 \u00b7 10^{21}\nConvS2S Ensemble [9] | 26.36 | 41.29 | 7.7 \u00b7 10^{19} | 1.2 \u00b7 10^{21}\nTransformer (base model) | 27.3 | 38.1 | 3.3 \u00b7 10^{18}\nTransformer (big) | 28.4 | 41.8 | 2.3 \u00b7 10^{19}\n\nResidual Dropout\nWe apply dropout [33] to the output of each sub-layer, before it is added to the\nsub-layer input and normalized. In addition, we apply dropout to the sums of the embeddings and the\npositional encodings in both the encoder and decoder stacks. For the base model, we use a rate of\nPdrop = 0.1.\n\nLabel Smoothing\nDuring training, we employed label smoothing of value \u03b5ls = 0.1 [36]. This\nhurts perplexity, as the model learns to be more unsure, but improves accuracy and BLEU score.",
+          "chunk_id": "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+          "char_start": 21551
+        },
+        {
+          "source_id": "S4",
+          "paper_title": "Moshi: a speech-text foundation model for real-time dialogue",
+          "arxiv_id": "2410.00037",
+          "version": 1,
+          "pages": [
+            6,
+            7
+          ],
+          "source_url": "https://arxiv.org/pdf/2410.00037v1#page=6",
+          "text": "3 Model\n\n3.1 Overview\n\nMoshi is a multi-stream speech-to-speech Transformer model, which allows for full-duplex\nspoken dialogue with a user thanks to an innovative architecture summarized in Figure 1.\n\n6\n\n\nMoshi is built on top of Helium, a text LLM which we build from scratch (Section 3.2),\nrelying on high-quality text data to provide strong reasoning abilities to the model. We also\npropose Inner Monologue (Section 3.4.4), a training and inference procedure in which we\njointly model text and audio tokens. This allows the model to fully exploit the knowledge\nimparted from the text modality, while remaining a speech-to-speech system. To enable\nreal-time dialogue, we also design Moshi as a multi-stream architecture from the get-go\n(Section 3.4.3): The model is able to both speak and listen to the user at the same time,\nand does not need to explicitly model speaker turns. In addition, to capture the input user\naudio and output Moshi\u2019s voice with high quality and in an efficient manner, we propose\nMimi (Section 3.3), a neural audio codec combining semantic and acoustic information\ninto a single tokenizer by using residual vector quantization and knowledge distillation. To\njointly model the audio streams from Moshi and the user, as well as Moshi\u2019s text tokens, we\nrely on a Depth Transformer compatible with streaming inference (Sections 3.4.1, 3.4.2).\n\nIn this section, we further detail each of these components. We then describe the training\ndatasets and the different training phases we used to train Moshi in Section 4. Finally, in\nSection 5, we report thorough evaluation results on Moshi\u2019s abilities, both linguistic and\nacoustic, as well as ablation experiments on its main components, while Section 6 provides\nanalyses on the safety of our system.",
+          "chunk_id": "449ae6bbfb98258b69c54681752859936995ed95842e36354a174d8e2dc26c17",
+          "char_start": 18915
+        }
+      ],
+      "metrics": {
+        "total_seconds": 0.8725260999999591,
+        "first_answer_token_seconds": 0.8642964999999094,
+        "retrieval_seconds": 0.1002911999985372,
+        "evidence_selection_seconds": 0.01969239999925776,
+        "citation_validation_seconds": 9.800001862458885e-06,
+        "llm_generation_seconds": 0.6179763000000094,
+        "llm_planning_seconds": 0.13427929999852495,
+        "generation_first_token_seconds": 0.5992944999998144,
+        "input_tokens": 3363,
+        "output_tokens": 68,
+        "known_input_tokens": 3363,
+        "known_output_tokens": 68,
+        "evidence_tokens": 1876,
+        "tool_calls": 1
+      },
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m757gd1fe77rfp0b8fmzpmvc",
+          "completion_id": "chatcmpl-b938d9ee-727c-48f9-a121-ed421b4ade09",
+          "finish_reason": "tool_calls",
+          "input_tokens": 450,
+          "output_tokens": 41,
+          "total_tokens": 491,
+          "duration_seconds": 0.13427929999852495,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2943,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m757gd9mepnb1tke4fen06sj",
+          "completion_id": "chatcmpl-3a0da9f8-373b-49e8-83ee-eb1b6a3b2b6e",
+          "finish_reason": "stop",
+          "input_tokens": 2913,
+          "output_tokens": 27,
+          "total_tokens": 2940,
+          "duration_seconds": 0.6179763000000094,
+          "first_token_seconds": 0.5992944999998144,
+          "prompt_budget_upper_bound": 13154,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "citation_pdf_checks": []
+    }
+  ],
+  "elapsed_seconds": 15.005325800000719
+}
