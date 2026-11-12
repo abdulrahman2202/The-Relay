@@ -32,6 +32,7 @@ def test_supported_question_calls_actual_tool_interface_then_streams_validated_a
     assert result.metrics.input_tokens == 60 and result.metrics.output_tokens == 80
     assert result.metrics.first_answer_token_seconds is not None
     assert result.metrics.citation_validation_seconds >= 0
+    assert result.failure_diagnostics is None
     assert len(result.stages) >= 6
     assert mock.received[0]["tool_choice"] == "required"
     assert mock.received[1]["tool_choice"] == "none"
@@ -115,6 +116,64 @@ def test_truncated_stream_is_never_recorded_as_success(
     assert shown and result.displayed_characters > 0
     assert result.status == "failed" and not result.answer and not result.claims
     assert result.error["code"] == "incomplete_stream"
+
+
+def test_citation_failure_retains_diagnostics_without_exposing_answer(
+    config, api, api_payloads, tool_message, claim, research_tool
+):
+    bad = copy.deepcopy(claim)
+    bad["evidence"][0]["quote"] = "This quotation was fabricated."
+    plan = httpx.Response(200, json=api_payloads.completion(tool_message, reason="tool_calls"))
+    body = api_payloads.sse(
+        [
+            api_payloads.chunk(json.dumps(bad) + "\n"),
+            api_payloads.chunk(reason="stop", usage=True),
+        ]
+    )
+    mock = api(
+        [plan, httpx.Response(200, text=body, headers={"content-type": "text/event-stream"})]
+    )
+    shown = []
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "What is Moshi latency?", shown.append
+    )
+    assert result.status == "failed" and result.error["code"] == "citation_validation"
+    assert not result.answer and not result.claims and not shown
+    assert result.displayed_characters == 0
+    diagnostics = result.failure_diagnostics
+    assert diagnostics is not None
+    assert diagnostics["rejected_quote"] == "This quotation was fabricated."
+    assert diagnostics["source_id"] == "S1"
+    assert diagnostics["accepted_claims"] == []
+    assert result.to_dict()["failure_diagnostics"] == diagnostics
+
+
+def test_stream_failure_retains_last_valid_claim_and_unparsed_suffix(
+    config, api, api_payloads, tool_message, claim, research_tool
+):
+    plan = httpx.Response(200, json=api_payloads.completion(tool_message, reason="tool_calls"))
+    body = api_payloads.sse(
+        [
+            api_payloads.chunk(json.dumps(claim) + "\nThe prose explains the conflict.\n"),
+            api_payloads.chunk(reason="stop", usage=True),
+        ]
+    )
+    mock = api(
+        [plan, httpx.Response(200, text=body, headers={"content-type": "text/event-stream"})]
+    )
+    shown = []
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "What is Moshi latency?", shown.append
+    )
+    assert result.status == "failed" and result.error["code"] == "stream_format"
+    assert shown and result.displayed_characters > 0
+    assert not result.answer and not result.claims
+    diagnostics = result.failure_diagnostics
+    assert diagnostics is not None
+    assert "The prose explains the conflict." in diagnostics["stream_suffix"]
+    assert diagnostics["last_record"] == claim
+    assert diagnostics["accepted_claim_count"] == 1
+    assert diagnostics["accepted_claims"][0]["text"] == claim["text"]
 
 
 def test_missing_completion_marker_fails_even_when_provider_says_stop(

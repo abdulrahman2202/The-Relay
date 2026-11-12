@@ -75,6 +75,7 @@ class TurnResult:
     evidence_assessment: dict[str, Any] | None = None
     metrics: TurnMetrics = field(default_factory=TurnMetrics)
     error: dict[str, Any] | None = None
+    failure_diagnostics: dict[str, Any] | None = None
     displayed_characters: int = 0
 
     def to_dict(self) -> dict[str, Any]:
@@ -258,6 +259,8 @@ class ResearchAssistant:
                 result.answer, result.claims = "", []
             if parser is not None:
                 result.metrics.citation_validation_seconds = parser.validation_seconds
+                if parser.failure is not None:
+                    result.failure_diagnostics = parser.failure
             result.requests = list(self.llm.records[request_start:])
             # Preserve per-turn reports without keeping unbounded session metadata.
             if len(self.llm.records) > 32:

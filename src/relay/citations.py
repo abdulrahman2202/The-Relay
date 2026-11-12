@@ -14,15 +14,81 @@ from .prompts import REFUSAL
 from .tools import EvidenceSource, has_controls, strict_json
 
 
-def _normalized_positions(text: str) -> tuple[str, list[int]]:
-    characters, positions = [], []
-    for match in re.finditer(r"\S+", text):
-        if characters:
-            characters.append(" ")
-            positions.append(match.start())
-        characters.extend(match.group())
-        positions.extend(range(match.start(), match.end()))
-    return "".join(characters), positions
+class CitationValidationError(RelayError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        source_id: str | None = None,
+        quote: str | None = None,
+    ) -> None:
+        super().__init__("citation_validation", message)
+        self.source_id = source_id
+        self.quote = quote
+
+
+_FORMAT_TRANSLATION = str.maketrans(
+    {
+        "\u2212": "-",
+        "\u00d7": "x",
+        "\u2192": "->",
+        "\u2190": "<-",
+        "\u2265": ">=",
+        "\u2264": "<=",
+        "\u2260": "!=",
+        "\u00b7": "*",
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2019": "'",
+        "\u2018": "'",
+        "\u201c": '"',
+        "\u201d": '"',
+    }
+)
+
+
+def _canonical_positions(text: str) -> tuple[str, list[int]]:
+    """Normalize documented rendering differences while preserving content.
+
+    This ignores formatting that the extractor and model commonly render differently:
+    whitespace, table pipes, superscript markers, line-break hyphenation, slash-style
+    fractions, and Unicode mathematical symbols. Words, numbers, signs, punctuation
+    and ordering remain exact, so paraphrases and fabricated quotations still fail.
+    """
+    characters: list[tuple[str, int]] = []
+    for index, original in enumerate(text):
+        for character in unicodedata.normalize("NFKC", original):
+            characters.append((character, index))
+
+    cleaned: list[tuple[str, int]] = []
+    for index, (character, position) in enumerate(characters):
+        if character == "-":
+            before = index - 1
+            while before >= 0 and characters[before][0].isspace():
+                before -= 1
+            after = index + 1
+            while after < len(characters) and characters[after][0].isspace():
+                after += 1
+            if (
+                before >= 0
+                and after < len(characters)
+                and (characters[before][0].isalnum() or characters[before][0] == "_")
+                and characters[after][0].isalpha()
+            ):
+                continue
+        cleaned.append((character, position))
+
+    output: list[str] = []
+    positions: list[int] = []
+    for character, position in cleaned:
+        if character in "|/^{}":
+            continue
+        for mapped in character.translate(_FORMAT_TRANSLATION):
+            if mapped.isspace():
+                continue
+            output.append(mapped)
+            positions.append(position)
+    return "".join(output), positions
 
 
 def _numbers(text: str) -> set[str]:
@@ -104,12 +170,14 @@ def validate_claim(value: dict[str, Any], sources: dict[str, EvidenceSource]) ->
                 "citation_validation", "A citation needs a nonempty supporting quotation."
             )
         hit = sources[identifier].hit
-        normalized, offsets = _normalized_positions(hit.text)
-        needle = " ".join(quote.split())
-        start = normalized.find(needle)
+        normalized, offsets = _canonical_positions(hit.text)
+        needle = _canonical_positions(quote)[0]
+        start = normalized.find(needle) if needle else -1
         if start < 0:
-            raise RelayError(
-                "citation_validation", "The supporting quotation is absent from the cited passage."
+            raise CitationValidationError(
+                "The supporting quotation is absent from the cited passage.",
+                source_id=identifier,
+                quote=quote,
             )
         quoted = slice_hit(hit, offsets[start], offsets[start + len(needle) - 1] + 1)
         citations.append(
@@ -175,12 +243,39 @@ class ClaimStream:
         self.refused = False
         self.done = False
         self.validation_seconds = 0.0
+        self.last_record: dict[str, Any] | None = None
+        self.failure: dict[str, Any] | None = None
 
     def feed(self, delta: str) -> None:
         self.buffer += delta
-        self._consume()
-        if len(self.buffer) > 16000:
-            raise RelayError("stream_format", "A generated claim exceeds the line-size limit.")
+        try:
+            self._consume()
+            if len(self.buffer) > 16000:
+                raise RelayError("stream_format", "A generated claim exceeds the line-size limit.")
+        except RelayError as error:
+            self._record_failure(error)
+            raise
+
+    def _record_failure(
+        self,
+        error: RelayError,
+        *,
+        candidate_record: Any | None = None,
+        raw_record: str | None = None,
+    ) -> None:
+        if self.failure is not None:
+            return
+        self.failure = {
+            "error": error.to_dict(),
+            "stream_suffix": self.buffer[:16000],
+            "raw_record": raw_record,
+            "candidate_record": candidate_record,
+            "last_record": self.last_record,
+            "rejected_quote": getattr(error, "quote", None),
+            "source_id": getattr(error, "source_id", None),
+            "accepted_claim_count": len(self.claims),
+            "accepted_claims": [claim.to_dict() for claim in self.claims],
+        }
 
     def _consume(self) -> None:
         while True:
@@ -191,7 +286,16 @@ class ClaimStream:
             if end is None:
                 return
             raw, self.buffer = self.buffer[:end], self.buffer[end:]
-            self._value(strict_json(raw))
+            try:
+                value = strict_json(raw)
+            except RelayError as error:
+                self._record_failure(error, raw_record=raw)
+                raise
+            try:
+                self._value(value)
+            except RelayError as error:
+                self._record_failure(error, candidate_record=value)
+                raise
 
     def _value(self, value: Any) -> None:
         start = time.perf_counter()
@@ -222,15 +326,20 @@ class ClaimStream:
                 raise RelayError("stream_format", "Unexpected, mixed or excessive answer records.")
         finally:
             self.validation_seconds += time.perf_counter() - start
+        self.last_record = value
         if rendered is not None:
             self.emit(rendered + "\n")
 
     def finish(self) -> None:
-        self._consume()
-        if self.buffer.strip():
-            raise RelayError("stream_format", "The answer ended with an incomplete record.")
+        try:
+            self._consume()
+            if self.buffer.strip():
+                raise RelayError("stream_format", "The answer ended with an incomplete record.")
+            if not self.done:
+                raise RelayError(
+                    "incomplete_answer", "The answer did not include its completion marker."
+                )
+        except RelayError as error:
+            self._record_failure(error)
+            raise
         self.buffer = ""
-        if not self.done:
-            raise RelayError(
-                "incomplete_answer", "The answer did not include its completion marker."
-            )

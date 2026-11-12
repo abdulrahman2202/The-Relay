@@ -18,6 +18,7 @@ from typing import Any
 
 from relay.cli import build_assistant
 from relay.config import RelayConfig
+from relay.prompts import PROMPT_VERSION
 
 ROOT = Path(__file__).resolve().parents[1]
 QUESTIONS_PATH = ROOT / "reports/phase3/evaluation/questions.json"
@@ -217,6 +218,7 @@ def build_entry(
         "stages": result.stages,
         "requests": [request.__dict__ for request in result.requests],
         "error": result.error,
+        "failure_diagnostics": result.failure_diagnostics,
         "attempts": attempts,
         "behavior_matches_expectation": behavior_matches,
         "grade_status": "pending_manual_review",
@@ -248,6 +250,7 @@ def ask_with_attempts(assistant: Any, question: str, max_attempts: int) -> tuple
                 "status": result.status,
                 "error_code": result.error.get("code") if result.error else None,
                 "retryable": retryable,
+                "failure_diagnostics": result.failure_diagnostics,
                 "elapsed_seconds": round(time.perf_counter() - started, 3),
             }
         )
@@ -292,7 +295,7 @@ def write_artifacts(
         "measurement_type": "real_groq_end_to_end",
         "simulated": False,
         "model": config.model,
-        "prompt_version": "relay-phase3-v1",
+        "prompt_version": PROMPT_VERSION,
         "conditions": {
             "strategy": config.strategy,
             "preset": config.preset,
