@@ -67,7 +67,11 @@ class RetryPolicy:
         ):
             chosen = retry_after_seconds
         chosen = min(chosen, self.max_delay_seconds)
-        return max(0.0, chosen * (1.0 + _jitter(attempt, self.seed, self.jitter_fraction)))
+        delay = max(0.0, chosen * (1.0 + _jitter(attempt, self.seed, self.jitter_fraction)))
+        if self.respect_retry_after and retry_after_seconds is not None:
+            # The backoff cap and negative jitter must not shorten the server's minimum.
+            delay = max(delay, retry_after_seconds)
+        return delay
 
 
 @dataclass

@@ -1,102 +1,74 @@
-# Final Assignment Report
+# The Relay — Final Assignment Report
 
-Date: 2026-11-12  
-Two-page assignment summary using recorded measurements only. Phase 5 manual grading is complete for 13 of 20 questions; 7 operational failures remain ungraded.
+Date: 2026-11-12. Two-page draft; personal sections require confirmation. Measurements below come from preserved project records, not new model calls.
 
-## 1. Evidence boundary
+## 1. What I built and why
 
-| Evidence | Type | Status |
-|---|---|---|
-| Phase 5 answer quality, 20 questions | Real Groq, prompt `relay-phase3-v1` | Complete |
-| Phase 5.3 targeted recheck, A2/A4/A8 | Real Groq, prompt `relay-phase3-v2` | Partial; stopped at A8 |
-| Phase 4 calibration, 10 calls | Real Groq | Complete; 9 successful |
-| Phase 4 load and retry scenarios | Deterministic mock/stand-in | Simulated |
-| Retrieval comparison, 60 measurements | Offline local retrieval | Complete; not simulated |
-| Previously recorded local checks | pytest and Ruff | `203 passed, 5 skipped`; Ruff clean; not rerun for this grading update |
+The Relay is a Python terminal research assistant grounded in three version-pinned papers. Its flow is question classification → Groq tool planning → local retrieval → bounded evidence → validated streaming → completion checks. It includes help/refusal/failure branches, a bounded tool-call loop, and repeated terminal questions. Citations carry authoritative paper/version/page metadata. Phase 5.4 uses prompt `relay-phase3-v3`, evidence-first quotations, deterministic multipart coverage, strict JSON completion, and optional redacted failure diagnostics. Coverage checks quantities against each claim's own quotations; they do not prove unrestricted semantic entailment.
 
-Phase 5 and Phase 5.3 are separate runs. Phase 5.3 did not overwrite Phase 5 evidence and did not retest A9-A12.
+## 2. The real service and my stand-in
 
-## 2. Answer-quality results
+Real integration uses Groq `openai/gpt-oss-20b`, structured tool calls, and streaming. The FastAPI stand-in models completion/SSE responses, bounded queues, overload, transient failures, rate limits, and daily request/token budgets. Its delays and token estimates are simulated. The in-process request manager bounds concurrency and retries; it is not a distributed queue. The live CLI does not automatically retry failed generation.
 
-Phase 5 attempted all 20 questions through the real pipeline with `openai/gpt-oss-20b`, BM25, preset `600`, evidence budget `3000`, `temperature=0`, and `seed=0`.
+## 3. Results
 
-| Phase 5 result | Count |
-|---|---:|
-| Questions attempted | 20 |
-| Answerable graded `correct` | 5 / 12 |
-| Answerable operational failures (ungraded) | 7 / 12 |
-| Unanswerable graded `refused_correctly` | 8 / 8 |
-| Answered with valid citations | 5 / 5 |
-| Final grades assigned | 13 / 20 |
-| Questions ungraded | 7 / 20 |
+Recorded latency percentiles are reproduced unchanged below; **n** is the measurement count. Calibration comprised 10 real requests: 3 non-streaming, 3 streaming, 3 concurrent non-streaming successes, and one deliberate invalid-model error.
 
-Final Phase 5 grades in `manual-grading.csv`: A1, A3, A5, A6, and A7 are `correct`; U1-U8 are `refused_correctly`. A2, A4, and A8-A12 retain blank final grades for operational failures and are not classified as `wrong` or `refused_wrongly`.
+| Dataset | TTFT p50 / p95 / p99, ms (n) | Total p50 / p95 / p99, ms (n) | Failed / given up |
+|---|---|---|---|
+| Real Groq calibration | 757.566 / 1511.044 / 1578.020 (3) | 466.627 / 1265.984 / 1531.804 (9 successes) | 1 / 10, deliberate probe |
+| Simulated steady | 829.065 / 850.627 / 857.245 (40) | 829.239 / 850.777 / 857.437 (40) | 0 / 40 |
+| Simulated burst | 817.115 / 842.938 / 845.627 (30) | 1643.186 / 3244.761 / 3246.141 (30) | 0 / 30 |
+| Simulated overload | 387.041 / 651.615 / 658.333 (25) | 307.889 / 633.399 / 654.101 (80) | 55 / 80: 35 timeouts, 20 errors |
 
-Failures were `citation_validation` for A2, A8, A10, A11, and A12, and `stream_format` for A4 and A9. Mean total latency was `3776.8 ms` for answered, `1211.4 ms` for refused, and `4010.3 ms` for failed turns. A1 included a `10.618 s` retrieval stage, so it is not a typical sample.
+Stand-in TTFT is the harness-observed value: HTTPX ASGI transport buffers the response, so it is **not wire-level first-token latency**. Stand-in total percentiles include fast failures; real calibration totals exclude its error probe. These datasets are not pooled. Real capacity under load and real 429 latency percentiles: **Not measured**; quota was not deliberately exhausted. No new end-to-end percentile is calculated from incomplete/mixed evaluation runs.
 
-Phase 5.3 allowed one attempt per question, used no automatic retries, and stopped at A8 on HTTP `429`.
+**Quality:** original Phase 5 used a controlled 20-question protocol, prompt v1, BM25/600, top-4, a 3000-token evidence ceiling, temperature/seed 0. Grades remain **5 correct answerable answers + 8 correct refusals + 7 operational failures = 13/20 graded, 7/20 ungraded**. A1/A3/A5/A6/A7 are correct; U1–U8 are refused correctly. A2/A4/A8–A12 stay blank, never wrong/refused wrongly. Five failures were citation validation; two were stream format.
 
-| ID | Status | Measured outcome |
-|---|---|---|
-| A2 | answered | 1 claim, 1 valid citation; `42,275.984 ms`; tokens `3,638/290`; retrieval `40,416.505 ms`. Reports Adam, `β1 = 0.9`, `β2 = 0.98`, `4000` warmup steps. Factual grade pending. |
-| A4 | failed (`stream_format`) | `1,295.449 ms`; no final answer/claims/citations. Diagnostics retained a claim mentioning `28.4` and `41.8`, but not `41.0`; stream suffix was a single backslash. |
-| A8 | failed (`rate_limit`) | HTTP `429`, retryable, `retry_after_seconds=11.0`, `681.792 ms`; no model content, so no parser diagnostics. |
-| A9-A12 | not_attempted | Run stopped after A8; no live result. |
+**Tokens per successful Phase 5 answer (input/output, planning plus generation):** A1 `3063/328`; A3 `2804/161`; A5 `3692/273`; A6 `3899/157`; A7 `3488/275`. Full failed-turn usage: **Not measured**, because interrupted requests lack final usage. Phase 4 CSV grades are blank because that experiment did not assess answer quality.
 
-Only A2 of the seven targeted Phase 5 failures produced an answer with a valid citation in Phase 5.3; its factual grade remains pending and does not change its ungraded Phase 5 result. A4 still failed, A8 was rejected before any model content was streamed, and A9-A12 are unmeasured.
+**Separate follow-ups:** Phase 5.1 diagnosed the failures; Phase 5.2 added quote-format handling/diagnostics and prompt v2. Phase 5.3 answered A2 with a valid citation (now factually verified), failed A4 with `stream_format`, hit HTTP 429 on A8, and never attempted A9–A12. Phase 5.4 adds local reliability safeguards, not a new controlled quality score. Later November 12 manual sessions reported fuller BLEU/routing answers; this is observed behavior, not statistically proven improvement. XWinograd's definition answer did not test accuracy. Broad “Attention” was refused. Original grades remain unchanged.
 
-## 3. Retrieval comparison
+## 4. Where time goes
 
-The comparison used production retrieval, preset `600`, `top_k=4`, ranking depth `50`, 600/50 boundary chunking, and a 3000-token ceiling.
+Phase 5 A1 spent `10617.764 ms` in retrieval out of `12879.494 ms` total. Warm A3 spent `105.202 ms` retrieving, `338.305 ms` planning, `377.046 ms` generating, and `0.706 ms` validating. Phase 5.3 A2 retrieval was `40416.505 ms` of `42275.984 ms`. Simulated burst queue wait p95 was `2406.0 ms`. Cold initialization, generation, and queueing dominate different cases; isolated network/provider-compute timings were **Not measured**.
 
-| Strategy | Complete coverage | MRR | Mean first relevant rank | Unsupported refusals | Mean context tokens | Mean retrieval ms |
-|---|---:|---:|---:|---:|---:|---:|
-| vector | 9 / 12 | 0.6566 | 3.667 | 6 / 8 | 1790.417 | 64.118 |
-| BM25 | 11 / 12 | 0.7292 | 1.667 | 6 / 8 | 1839.000 | 125.090 |
-| hybrid | 10 / 12 | 0.7778 | 1.833 | 6 / 8 | 1919.083 | 150.977 |
+## 5. When limits are hit
 
-BM25 had the best complete evidence coverage and mean first-relevant rank; hybrid had the best MRR but lower coverage and higher cost. No strategy falsely refused an answerable question. A6 was incomplete for all strategies; A1 was incomplete for vector and hybrid; A9 was incomplete for vector. Coverage measures annotated evidence spans, not answer correctness. U2/U6 were refused at answer level although the evidence gate flagged only 6 of 8 unsupported questions.
+Phase 4's simulated minute limit admitted `30/40` requests; halving it admitted `15/40`. A simulated daily budget admitted `10/25`. These are not Groq quotas. Real Phase 5 first attempts U2/U3/U5 hit rate limits and completed after one retry each: 23 question attempts for 20 questions. Phase 5.3 stopped on A8's HTTP 429 with `Retry-After: 11`, leaving four questions unattempted.
 
-## 4. Retry analysis and rate-limit behavior
+## 6. Retries
 
-- **Phase 5, real:** 20 questions used 23 attempts. Three first attempts (U2, U3, U5) received `rate_limit`; each was retried once and completed without another recorded `429`. Other failures were not retried.
-- **Phase 5.3, real:** A8 received HTTP `429` with `retry_after_seconds=11.0`; no retry was allowed, so the run stopped and A9-A12 were not measured.
-- **Phase 4 calibration, real:** 10 requests produced 9 successes, one deliberate invalid-model error, zero `429` responses, and zero timeouts. TTFT p50/p95/p99 was `757.566/1,511.044/1,578.020 ms` from 3 samples; total latency p50/p95/p99 was `466.627/1,265.984/1,531.804 ms` from 9 samples. Real `429` latency was not measured.
-- **Phase 4 retry and load, simulated:** one transient failure recovered with one retry (`1/1`). Against an exhausted per-minute limit, no-retry produced `3/6` successes with 3 rate-limited; retrying produced `3/6` successes but 6 extra attempts. Daily-budget exhaustion was non-retryable (`3/5` successes, 2 rate-limited). Simulated load produced `40/40`, `30/30`, and `25/80` successes for steady, burst, and overload; overload added 35 timeouts and 20 errors. Per-minute limits admitted `30/40` and `15/40`; a daily budget admitted `10/25`. These are not Groq capacity measurements.
+One simulated transient failure recovered with one retry. Retrying an exhausted minute made things worse: successes stayed `3/6`, while retries added **six extra attempts**. Daily-budget exhaustion was non-retryable (`3/5` succeeded). Final review corrected a policy defect that let a cap or negative jitter shorten `Retry-After`; the server minimum now survives both. Historical measurements were not rerun or replaced.
 
-## 5. Observability improvements
+## 7. Retrieval quality versus cost
 
-Phase 5.2 added diagnostics instead of discarding partial output:
+The offline comparison contains 60 rows: 20 questions × three strategies, preset 600/50, top-4, ranking depth 50, 3000-token ceiling. Coverage/MRR/rank/context means use 12 answerable questions; latency means use all 20 per strategy after warmup.
 
-- `CitationValidationError` retains the rejected quote and source ID.
-- `ClaimStream.failure` retains the error, unparsed suffix, raw/candidate record, last valid record, rejected quote/source, and accepted claims.
-- `TurnResult.failure_diagnostics` is persisted per evaluation entry and attempt while the user-visible answer stays empty on failure.
-- Quote canonicalization handles formatting-only differences such as NFKC forms, whitespace/table pipes, superscripts, dehyphenation, split fractions, and Unicode math symbols. Matching remains lexical; changed numbers or words still fail.
-- Prompt `relay-phase3-v2` requires one JSON object per claim, separate claims for conflicts and multi-part answers, and no prose outside JSON.
+| Method | Complete coverage | MRR | Mean first relevant rank | Context tokens | Retrieval ms |
+|---|---:|---:|---:|---:|---:|
+| Vector | 9/12 | 0.6566 | 3.667 | 1790.417 | 64.118 |
+| BM25 | 11/12 | 0.7292 | 1.667 | 1839.000 | 125.090 |
+| Hybrid | 10/12 | 0.7778 | 1.833 | 1919.083 | 150.977 |
 
-A4 in Phase 5.3 demonstrates the benefit: the failed turn retained the last accepted claim, its quoted table row, the source ID, and the trailing backslash. The remaining framing failure is therefore diagnosable without inventing an answer.
+Select the existing **BM25/600/top-4** configuration for its best coverage and mean first relevant rank. Hybrid leads MRR at higher context/latency cost; vector is fastest. Each evidence gate flagged `6/8` unsupported questions, with no answerable false refusals; U2/U6 needed model-level refusal. This diagnostic set measures annotated evidence coverage, not held-out answer accuracy.
 
-## 6. Unmeasured metrics and limitations
+## 8. Three ways retrieval can mislead
 
-- Seven Phase 5 operational failures remain ungraded; Phase 5.3 A2 still requires factual review.
-- A4's source inconsistency remains unresolved: Attention Is All You Need reports English-to-German `28.4` BLEU and English-to-French `41.8` in Table 2, but English-to-French `41.0` in the prose on the same physical page 8. Neither value is selected; no final answer exposed both.
-- A4 still failed in Phase 5.3; A8 produced no model content; A9-A12 were not attempted.
-- Real rate-limit latency distributions and real capacity under load are unmeasured; Phase 4 load/retry results are simulated.
-- Failed Phase 5.3 turns lack final token counts; only known input/output counts exist.
-- A2's retrieval stage was `40.4 s`, making its total latency an outlier; sample sizes are small.
-- U2/U6 required model-level refusal because the evidence gate missed them.
-- Retrieval timings are warm local measurements, not Groq end-to-end latency.
-- Five integration tests requiring `--run-integration` were skipped.
-- Stand-in token counts use a character-based heuristic, not a tokenizer.
+1. U8 asks for H-Net WMT BLEU; vector rank 1 is Attention p. 8. Substituting its `28.4` would misattribute another model's result.
+2. A6's top-4 comparison covers only one of two annotated units for every method: training-token evidence can hide the missing parameter statement, even while the gate passes.
+3. U6 asks for carbon footprint; BM25 rank 1 supplies Attention p. 8 training hardware/FLOPs, and the gate passes. Those figures do not establish carbon emissions; the model ultimately refused.
 
-## 7. Vaani feedback (user section - intentionally blank)
+Local PDF review also preserves two source conflicts: Attention p. 8 EN-FR `41.8` in Table 2 versus `41.0` in prose; H-Net p. 17 Figure 6 says `3.6× less data`, while nearby prose says `3.6× the amount`. Latest routing initialization/threshold match p. 6, but its exact generated formula is unavailable. Earlier A8's full answer/citations are also unavailable; neither answer is fully verified.
 
-> **To be completed by the user.** Record Vaani's feedback here. No feedback has been invented or inferred.
+## 9. Vaani feedback
 
-## 8. Personal assistant-work reflections (user section - intentionally blank)
+[Add actual Vaani feedback if received; otherwise state that no feedback was received.]
 
-> **To be completed by the user.** Record personal reflections on working with the AI assistant here. This report does not attribute any reflection to the user.
+## 10. How I worked with the assistant
 
-## Evidence files
+Repository records show AI-assisted implementation, review, diagnosis, and tests. Three actual prompt strategies in the supplied history were evidence-only grading, read-only diagnosis before edits, and deterministic coverage with exact quotations. One documented mistake was assuming JSON objects always had newline separators; real adjacent objects exposed it, and the parser was changed. An extra repair-retry approach proposed in Phase 5.1 was not adopted in Phase 5.4; validation and coverage were improved instead. **[Confirm your personal role in that decision/rejection.]**
 
-`answer-quality-results.json`, `raw/answer-quality-raw.json`, `evaluation-summary.md`, `submission-readiness.md`, `final-submission-checklist.md`, `retrieval-comparison.csv`, `retrieval-comparison-summary.json`, `raw/retrieval-rankings.json`, `manual-grading.csv`, `failure-analysis.md`, `remediation-report.md`, and `phase5-3/`. Phase 4 evidence remains in `reports/phase4/` and `results/phase4/raw/`.
+The supplied history confirms that the user set constraints, prescribed grades, and supplied manual terminal observations. **[Add which technical decisions, implementation, tests, and PDF verification you personally performed; do not claim assistant work as your own.]** No personal contribution or feedback is inferred.
+
+Evidence: [Phase 4 measurements](../phase4/completion-status.md), [Phase 5 results](answer-quality-results.json), [manual grades](manual-grading.csv), [Phase 5.3](phase5-3/verification-summary.md), [manual sessions](manual-interactive-test-2026-11-12.md), [PDF verification](factual-verification.md), and [final checks/reproducibility](final-review-2026-11-12.md).

@@ -1,117 +1,49 @@
-# Phase 5 Submission Readiness
+# Submission Readiness
 
-Generated: 2026-11-11  
-Updated: 2026-11-12 with Phase 5 manual grading and separate Phase 5.3 outcomes  
-Overall status: **evaluation artifacts ready; Phase 5.3 remains incomplete; not ready for an unqualified "all evaluations passed" claim.** Phase 5 manual grading is complete for 13 of 20 questions; 7 operational failures remain ungraded.
+Updated: 2026-11-12. **NOT READY TO SUBMIT.** The implementation/evidence package is prepared for review, but the original brief, feedback status, personal attribution, final report approval, and actual submission require user input/action. No external API/model call was made during finalization.
 
-## Readiness checklist
+## What is prepared
 
-| Check | Status | Evidence |
+| Deliverable | Status | Evidence |
 |---|---|---|
-| All 20 Phase 3 questions attempted with the real pipeline | Complete | 20 real end-to-end results |
-| Answerable questions answered | Partial | 5 / 12 graded `correct` with valid citations; 7 operational failures ungraded |
-| Unanswerable questions refused | Complete | 8 / 8 graded `refused_correctly` |
-| Evidence-gate unsupported detection | Partial | 6 / 8 flagged; U2 and U6 required model-level refusal |
-| A4 known source conflict handled | Pending | A4 failed with `stream_format`; source conflict remains unresolved and documented for review |
-| Retrieval strategies compared | Complete | 60 rows: 20 questions x vector, BM25, hybrid |
-| Manual grading worksheet prepared | Complete | 20 rows; 13 final grades assigned; 7 operational failures retain blank grades |
-| Phase 5 manual grading | Complete for 13 / 20 questions | 5 `correct`; 8 `refused_correctly`; 7 / 20 ungraded |
-| A2 Phase 5.3 factual review | Pending | Answered with a valid citation; factual grade still pending |
-| Phase 5.3 targeted live verification | Partial | A2 answered; A4 failed; A8 rate-limited; A9-A12 not attempted |
-| Full default test suite | Passed | 203 passed, 5 skipped in 96.24 s (2026-11-12) |
-| Full integration suite | Passed per user report | 190 passed |
-| Ruff check | Passed | All checks passed |
-| Ruff format check | Passed | 68 files already formatted |
-| Existing Phase 1-4 evidence preserved | Yes | No prior reports, raw evidence, or CSV rows overwritten |
-| Original Phase 5 evidence preserved | Yes | Phase 5.3 artifacts written separately under `phase5-3/` |
-| API key exposed in artifacts | No | No key written to Phase 5 or Phase 5.3 artifacts |
+| Current implementation and Phase 5.4 review | COMPLETE | Final review covers orchestration, tools/branches/loops, RAG, coverage, citations, prompt v3, streaming, diagnostics, and stand-in behavior. |
+| Critical reliability correction | COMPLETE | `RetryPolicy.delay()` preserves the server's Retry-After minimum after cap/jitter; focused regressions added. No retrieval/citation/prompt change. |
+| Manual interactive record | COMPLETE | Earlier attempts retained and latest BLEU/routing/XWinograd-definition/Attention-refusal observations added with exact supplied metrics. |
+| Local factual verification | COMPLETE | `factual-verification.md` checks all eight topics against exact PDF versions. Missing answer text/formulas and conflicting source wording are explicit. |
+| Historical evaluation/grades | COMPLETE | Original Phase 5, Phase 5.3, raw results, manual grades, Phase 4 CSV, and earlier reports retained. |
+| Final report content draft | COMPLETE | All ten requested sections, real/simulated results, retrieval trade-offs, misleading cases, and evidence-based reflection draft. |
+| Two-page PDF draft | COMPLETE | `final-assignment-report.pdf`: two A4 pages, rendered and visually checked; final personal sections require confirmation. |
+| Setup, security, reproducibility review | COMPLETE | Updated README/RAG guide and detailed final review, including safe package exclusions and historical replay limits. |
+| Final local tests, Ruff, format, CSV validation | COMPLETE | Each run once: 276 passed, 5 skipped in 84.00s; Ruff All checks passed!; 70 files already formatted; CSV Validated rows: 283. All exit 0; exact outputs in final review. |
+| Original brief, feedback, personal contribution, final approval | NEEDS USER INPUT | No original brief or actual Vaani feedback was found; personal ownership cannot be inferred from agent-authored code/reports. |
+| Google Drive upload and final link submission | INCOMPLETE | User action after review; no external sharing performed. |
 
-Test and lint statuses above are prior recorded results; no tests, lint, or API calls were run for this grading update.
+## Grading and factual findings
 
-## Required artifacts present
+Original Phase 5 remains **5 correct answerable answers, 8 correctly refused unanswerable questions, and 7 operational failures: 13/20 graded, 7/20 ungraded**. A1/A3/A5/A6/A7 are `correct`; U1–U8 are `refused_correctly`; A2/A4/A8–A12 remain blank. Failed operational requests are not `wrong` or `refused_wrongly`.
 
-1. `answer-quality-results.json` - 20 real Groq end-to-end results.
-2. `retrieval-comparison.csv` - 60 retrieval measurements.
-3. `manual-grading.csv` - 20-row manual review sheet; 13 final grades assigned; 7 operational failures ungraded.
-4. `evaluation-summary.md` - methodology, results, and limitations.
-5. `submission-readiness.md` - this assessment.
-6. `final-assignment-report.md` - two-page assignment summary using measured results only.
-7. `final-submission-checklist.md` - claim controls, artifact status, and user-review gates.
+Phase 5.3 is separate: A2 answered with a valid citation and its factual review is now **correct for the question asked**, documented in the new factual review only. A4 failed `stream_format`; A8 failed HTTP 429 with Retry-After 11 seconds; A9–A12 were not attempted. Historical pending-grade metadata is preserved as captured.
 
-Supporting evidence:
+The latest manual BLEU values match their respective table/prose passages, but Attention v7 p. 8 remains internally inconsistent: big EN-DE **28.4**, EN-FR **41.8 in Table 2** versus **41.0 in prose**. Base scores are 27.3/38.1. The later answer is not called completely verified. H-Net v2 p. 17 also conflicts: Figure 6 says approximately **3.6× less data**, while prose says **3.6× the amount of data**.
 
-- `retrieval-comparison-summary.json`
-- `raw/answer-quality-raw.json`
-- `raw/retrieval-rankings.json`
+Routing's reported `p1 = 1.0` and inclusive `pt >= 0.5` agree with H-Net p. 6, restoring the previously omitted initial condition. The generated formula string is missing, so full factual verification remains unresolved. A8's earlier three-citation answer also lacks its full text/quotes. Table 4 establishes XWinograd-zh accuracies **0.599** (Transformer) and **0.663** (two-stage H-Net) in the Chinese setting; the latest definition question did not test these accuracies. The broad Attention refusal is not an A12 success. No newer manual result changes the original evaluation CSV.
 
-## Phase 5.3 live verification outcomes
+BM25 retains the best complete evidence coverage (11/12); hybrid the best MRR (0.7778); vector the lowest mean local retrieval time (64.118 ms). The final report keeps the full recorded trade-off table and describes three actual misleading retrieval cases. Stand-in TTFT is explicitly qualified as buffered in-process delivery, not real network streaming latency.
 
-Phase 5.3 used the real Relay pipeline and the real Groq API with `openai/gpt-oss-20b`, prompt `relay-phase3-v2`, BM25, preset `600`, evidence budget `3000`, `temperature=0`, and `seed=0`. It allowed one attempt per question and no automatic retries. The run stopped at A8 after Groq returned HTTP `429` with `retry_after_seconds=11.0`.
+## Exact remaining user actions
 
-| ID | Status | Measured outcome |
-|---|---|---|
-| A2 | answered | 1 claim, 1 valid citation, `42275.984 ms`, tokens `3638/290`; factual grade pending |
-| A4 | failed (`stream_format`) | `1295.449 ms`; no final answer/claims/citations; diagnostics retained an accepted claim mentioning `41.8` but not `41.0`; stream suffix was `\` |
-| A8 | failed (`rate_limit`) | HTTP `429`, retryable, `retry_after_seconds=11.0`, `681.792 ms`; no model content, so no parser diagnostics |
-| A9-A12 | not_attempted | Run stopped after A8; no live result |
+1. **Provide or locate the original assignment brief.** Check every stated deliverable, required two-page format, naming convention, recipient, submission deadline, and Google Drive link procedure against it. The supplied conversation requirements were used until that brief is available.
+2. **Complete Vaani feedback.** Replace the exact placeholder with actual feedback, or explicitly state that no feedback was received. No feedback has been fabricated.
+3. **Complete personal attribution.** Confirm how you used assistants, which suggestion you personally rejected/changed, and what decisions, implementation, tests, and PDF checks you personally performed. The report provides evidence-based prompt strategies and a documented parser mistake, but does not assign agent work to you.
+4. **Review factual/evaluation limitations.** Keep both Attention EN-FR values and both HG38 wordings visible. Accept the disclosed seven original operational failures and incomplete follow-up coverage, or explicitly state the remaining limitation. To fully grade the later routing/A8 answers, supply their already observed complete text/formulas/citations; otherwise retain unresolved/provisional labels. No additional API run is required to submit an honest account of the existing evidence.
+5. **Approve the final report and PDF.** Review the Markdown and PDF together, remove only placeholders you can answer truthfully, then re-export/check exactly two readable pages. Verify that no statement implies all original questions passed or that simulated measurements were real Groq behavior.
+6. **Prepare the final package from reviewed files.** Review the Git diff, include all intended changes/new reports, and create a source ZIP or folder according to the original brief. Include source/tests/scripts, README/docs, dependency files, supplied PDFs, results CSV, and historical evidence. Exclude `.env`, `.git`, `.venv`, caches, private credentials, and local Chroma databases. A ZIP of the entire working folder is unsuitable because an ignored credential-bearing `.env` exists. If using `git archive`, first commit the reviewed changes so the new reports/fix are included. No commit/history rewrite was performed by this review.
+7. **Upload and submit through Google Drive.** Create the requested folder, upload the reviewed two-page PDF, source package, `results/results.csv`, and required supporting evidence. Grant Viewer access to the required recipient (or link access only if the brief requires it), verify every file opens from a signed-out/private browser or the intended reviewer account, and submit the folder/file link through the specified channel. No upload, sharing change, or message has been sent on your behalf.
 
-This verification does **not** show that all seven Phase 5 failures are fixed. Only A2 produced an answer with a valid citation in Phase 5.3; its factual grade remains pending and does not change its ungraded Phase 5 result. A4 remained a `stream_format` failure, A8 was rejected before generation, and A9-A12 were not measured.
+## Security and verification limits
 
-Phase 5.3 artifacts:
+The local scan found no known key/pattern matches in 200 tracked files, three source archives, or 221 reachable historical blobs across 11 commits. `.env` is untracked and ignored but contains credentials; its exclusion is still a packaging requirement. Pattern scanning is not proof that every possible encoded/unknown secret is absent.
 
-- `phase5-3/live-results.json`
-- `phase5-3/live-results.csv`
-- `phase5-3/verification-summary.md`
+[Final review](final-review-2026-11-12.md) records the exact commands/results, test skips, buffered stand-in measurements, unavailable transcripts, and noncritical evaluator limitations (`relevant_hits_top_k` counter and optional `--overwrite` path). These limits are disclosed; historical results are not silently repaired or relabeled. Five cached-model integration cases are opt-in and are not part of the default test pass.
 
-## Blocking issues
-
-### 1. Seven answerable questions produced no final answer
-
-In Phase 5, `A2`, `A4`, `A8`, `A9`, `A10`, `A11`, and `A12` failed after real attempts:
-
-- `A2`, `A8`, `A10`, `A11`, `A12`: citation validation rejected the supporting quotation.
-- `A4`, `A9`: generation did not produce the required structured answer object.
-
-These are observed system outcomes. They were not replaced with synthetic answers. A submission claiming full answer coverage would be inaccurate.
-
-Phase 5.3 partially rechecked the targeted set: A2 answered with a valid citation, A4 again failed with `stream_format`, A8 hit a real HTTP `429` before generation, and A9-A12 were not attempted. It is not a full seven-question pass.
-
-### 2. A4's source conflict was not exposed in an answer
-
-A4 failed before answer generation completed. Attention Is All You Need contains an unresolved source inconsistency:
-
-- Table 2, physical page 8: English-to-German `28.4` BLEU; English-to-French `41.8` BLEU.
-- Prose on the same physical page 8: English-to-French `41.0` BLEU.
-
-Neither conflicting value is selected. Final review must explicitly document the discrepancy and how both values will be represented.
-
-### 3. U2 and U6 are not rejected by the evidence gate alone
-
-The final model refused both questions, which is the desired answer-level behavior. However, the literal evidence assessment classified their retrieved context as candidate evidence. The evidence gate therefore missed 2 of 8 unsupported questions; final refusal depended on generation behavior.
-
-### 4. Seven operational failures remain ungraded
-
-`manual-grading.csv` records 5 `correct` answers (A1, A3, A5, A6, A7) and 8 `refused_correctly` refusals (U1-U8): 13 of 20 questions graded. The 7 Phase 5 operational failures (A2, A4, A8-A12) retain blank final grades and are not classified as `wrong` or `refused_wrongly`. Manual grading is complete for the 13 graded questions; Phase 5.3 A2 factual review remains pending separately.
-
-## What is ready
-
-- The real 20-question run is complete and reproducible.
-- The retrieval comparison is complete with protocol metadata, per-question rankings, coverage, latency, and context-token costs.
-- All five answered questions are graded `correct` and have validated citations.
-- All 8 unanswerable questions are graded `refused_correctly`.
-- A4's verified conflict and the U2/U6 evidence-gate limitation are documented.
-- Phase 5.3 real outcomes and diagnostics are preserved separately from the original Phase 5 run.
-- Existing RM/Relay artifacts and CSV rows were preserved.
-- Prior recorded tests and lint: `203 passed, 5 skipped`; Ruff check and format clean on 2026-11-12.
-
-## Required manual review actions
-
-1. Complete the A2 Phase 5.3 factual review and record its grade separately from Phase 5.
-2. Review the unresolved A4 source conflict and document how both `41.8` (Table 2) and `41.0` (prose) will be represented.
-3. Add Vaani feedback in the marked final-report section.
-4. Add personal assistant-work reflections in the marked final-report section.
-5. Complete final user review and submission.
-
-## Recommended next action
-
-Complete the pending A2 Phase 5.3 factual review, A4 source-conflict review, Vaani feedback, and personal assistant-work reflections before final user review and submission.
+A submission can describe limitations honestly; it cannot claim full evaluation success. Readiness remains **NOT READY** until the user-input, final approval, and upload steps above are completed.

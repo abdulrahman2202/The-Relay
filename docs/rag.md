@@ -33,8 +33,8 @@ python -m venv .venv
 
 `pyproject.toml` pins the module's runtime dependencies, Pytest, and Ruff. The
 existing `requirements.txt` supplies constraints for transitive dependencies; it
-has not been rewritten. The package installs only the `retrieval` namespace from
-`src`. On Linux/macOS, replace `.venv\Scripts\python.exe` with `.venv/bin/python`.
+has not been rewritten. The package installs the `retrieval` and `relay` namespaces
+from `src`. On Linux/macOS, replace `.venv\Scripts\python.exe` with `.venv/bin/python`.
 
 Provision model files once if the following revision is not already cached. This
 optional preparation step downloads model assets; it never uploads paper text.
@@ -240,7 +240,7 @@ for hit in hits:
     print(hit.citation, hit.source_url, hit.score)
     print(hit.text)
 
-# Optional input for a future answer-generation layer. This performs no LLM call.
+# Optional local context preparation. This performs no LLM call.
 context = build_context(hits, rag.embedder.tokenizer, max_tokens=3000,
                         query="How does Moshi handle overlapping speech?")
 ```
@@ -262,8 +262,8 @@ passages from the same paper are omitted. `select_context` also exposes selected
 hits, exact token counts and omitted IDs. Every clipped passage has adjusted source
 spans, physical pages, a parent chunk ID and paper-relative character offset.
 Final counts include citation headers, ordinals and separators. No entire-paper context is
-constructed or sent to an LLM. Budget counts use the supplied tokenizer; a future
-generation model with a different tokenizer needs its own final prompt budget check.
+constructed or sent to an LLM. Budget counts use the supplied tokenizer; the Relay
+application also checks a conservative whole-prompt bound in `relay/budget.py`.
 
 `EvidenceRequirement` accepts a label, alternative literal phrases (OR), and an
 optional paper ID. Multiple requirements use AND semantics. `retrieve` also
@@ -312,8 +312,8 @@ tests require the pinned local model; when requested, missing assets fail the te
 instead of being silently skipped. Tests block Python socket connections, covering
 offline operation. Test database files are isolated under Pytest temporary directories.
 The pre-existing `tests/test_model.py` and `tests/groqtest.py` are manual scripts that
-call Groq at import/execution time. They are unchanged and excluded by the new
-`testpaths = ["tests/rag"]` setting.
+call Groq at import/execution time. They are excluded by the current
+`testpaths = ["tests/rag", "tests/relay"]` setting.
 
 The integration checks compare short-input embeddings with standard
 SentenceTransformers output, verify that long-input suffixes affect embeddings, and
@@ -367,12 +367,18 @@ not held-out validation; the original audit is preserved. See the
 - Vector search still returns neighbors for unsupported questions. The separate
   evidence assessment provides explicit, limited refusal support; it is not a
   calibrated entailment model. Lexical overlap and rank fusion can introduce
-  regressions. There is no cross-encoder, LLM, contradiction resolver or load test.
+  regressions. This retrieval module has no cross-encoder or contradiction resolver;
+  the separate `relay` package implements generation and stand-in load experiments.
 - The PDFs contain conflicting statements (Attention EN-FR BLEU 41.8 in Table 2
   versus 41.0 in prose, and H-Net's 3.6× data-efficiency wording). Extraction keeps
-  both statements. A future answer layer must cite the requested source and expose
+  both statements. The answer layer must cite the requested source and expose
   conflicts rather than silently resolve them.
 
-The module ends at cited retrieval and bounded context preparation. Application
-integration and selection of a production retrieval configuration await final
-review and broader held-out measurement.
+The retrieval module ends at cited retrieval and bounded context preparation. The
+current application uses BM25/600/top-4 and is documented in [README.md](../README.md).
+Phase 5.4 also uses `infer_answer_parts()` and `assess_answer_coverage()` from
+`evidence.py` to check recognized multipart quantities against validated claim text
+and its own quotations. This is separate from the retrieval evidence gate and is
+not unrestricted semantic entailment. Unrecognized coordinated requests fail safely.
+See [final submission review](../reports/final-evaluation/final-review-2026-11-12.md)
+for current verification, historical evidence boundaries, and remaining limitations.

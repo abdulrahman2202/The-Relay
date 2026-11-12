@@ -84,6 +84,37 @@ def test_retry_after_beyond_limit_gives_up_instead_of_sleeping():
     assert len(calls) == 1 and result.status == "rate_limited" and result.retries == 0
 
 
+@pytest.mark.parametrize("retry_after, jitter", [(1.0, 0.1), (4.0, 0.0), (4.0, 0.1)])
+def test_retry_after_is_never_shortened_by_delay_cap_or_jitter(retry_after, jitter):
+    policy = RetryPolicy(max_delay_seconds=2, max_retry_after_seconds=5, jitter_fraction=jitter)
+    assert policy.delay(1, retry_after) >= retry_after
+
+
+def test_manager_waits_for_server_minimum_before_retry(monkeypatch):
+    events = []
+
+    async def sleep(delay):
+        events.append(("wait", delay))
+
+    async def operation():
+        events.append(("request", None))
+        if len(events) == 1:
+            return AttemptResult("rate_limited", retryable=True, retry_after_seconds=4)
+        return AttemptResult("ok", value="recovered")
+
+    monkeypatch.setattr("relay.reliability.asyncio.sleep", sleep)
+    result = run(RequestManager(retry_policy=RetryPolicy(max_attempts=2)).execute(operation))
+    assert result.status == "ok" and result.retries == 1
+    assert [event[0] for event in events] == ["request", "wait", "request"]
+    assert events[1][1] >= 4
+    assert result.retry_delays_seconds == [events[1][1]]
+
+
+def test_explicit_simulated_retry_policy_can_ignore_retry_after():
+    policy = RetryPolicy(respect_retry_after=False)
+    assert policy.delay(1, 60) == policy.delay(1)
+
+
 def test_bounded_queue_rejects_when_waiting_room_is_full():
     async def scenario():
         manager = RequestManager(max_concurrency=1, max_queue_size=0)
