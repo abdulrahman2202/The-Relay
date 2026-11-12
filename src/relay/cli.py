@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -23,7 +24,72 @@ def _duration(value: float | None) -> str:
     return "unavailable" if value is None else f"{value:.3f} s"
 
 
-def display_result(result: TurnResult) -> None:
+def _diagnostic_value(value: str, secrets: tuple[str, ...]) -> str:
+    """Bound and quote untrusted text; never emit terminal controls or credentials."""
+    for secret in secrets:
+        if secret:
+            for encoded in (secret, json.dumps(secret, ensure_ascii=True)[1:-1]):
+                value = value.replace(encoded, "[REDACTED]")
+    value = re.sub(r"\b(?:gsk_|sk-)[A-Za-z0-9_-]+", "[REDACTED]", value)
+    value = re.sub(r"(?i)(\b(?:bearer|basic)\s+)[^\s\"'\\,;{}\[\]]+", r"\1[REDACTED]", value)
+    value = re.sub(
+        r"""(?ix)(\b[\w-]*(?:api[_ -]?key|secret(?:[_ -]?key)?|password|(?:access[_-]?)?token)
+        \b["']?\s*[:=]\s*)
+        (?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s"'\\,;{}\[\]]+)""",
+        r"\1[REDACTED]",
+        value,
+    )
+    if len(value) > 2000:
+        value = value[:2000] + "... [truncated]"
+    return json.dumps(value, ensure_ascii=True)
+
+
+def display_failure_diagnostics(result: TurnResult, *, secrets: tuple[str, ...] = ()) -> None:
+    details = result.failure_diagnostics
+    print("\nFailure diagnostics:")
+    if not isinstance(details, dict):
+        print("- No retained diagnostics are available for this turn.")
+        return
+    fields = [
+        ("Rejected quotation", details.get("rejected_quote")),
+        ("Source ID", details.get("source_id")),
+    ]
+    candidate = details.get("candidate_record")
+    if isinstance(candidate, dict) and isinstance(candidate.get("evidence"), list):
+        for item in candidate["evidence"][:3]:
+            if not isinstance(item, dict):
+                continue
+            if not details.get("source_id"):
+                fields.append(("Candidate source ID", item.get("source_id")))
+            if not details.get("rejected_quote"):
+                fields.append(("Candidate quotation", item.get("quote")))
+    accepted = details.get("accepted_claims")
+    last = accepted[-1] if isinstance(accepted, list) and accepted else details.get("last_record")
+    if isinstance(last, dict):
+        fields.append(("Last valid claim", last.get("text")))
+    fields.append(("Malformed stream suffix", details.get("stream_suffix")))
+    numbers = details.get("unsupported_numbers")
+    if isinstance(numbers, (list, tuple)):
+        fields.append(("Unsupported numbers", ", ".join(n for n in numbers if isinstance(n, str))))
+    coverage = details.get("answer_coverage")
+    if isinstance(coverage, dict):
+        for key, label in (
+            ("missing", "Missing answer parts"),
+            ("unrecognized", "Unrecognized question parts"),
+        ):
+            values = coverage.get(key)
+            if isinstance(values, (list, tuple)):
+                fields.append(
+                    (label, "; ".join(value for value in values if isinstance(value, str)))
+                )
+    for label, value in fields:
+        if isinstance(value, str) and value:
+            print(f"- {label}: {_diagnostic_value(value, secrets)}")
+
+
+def display_result(
+    result: TurnResult, *, diagnostics: bool = False, secrets: tuple[str, ...] = ()
+) -> None:
     if result.error:
         print(f"\nError [{result.error['code']}]: {result.error['message']}")
         if result.displayed_characters:
@@ -34,6 +100,8 @@ def display_result(result: TurnResult) -> None:
         retry = result.error.get("retry_after_seconds")
         if retry is not None:
             print(f"Retry after at least {retry:g} seconds.")
+    if diagnostics and result.status == "failed":
+        display_failure_diagnostics(result, secrets=secrets)
     if result.status == "answered":
         references: dict[tuple[str, tuple[int, ...]], Citation] = {}
         for claim in result.claims:
@@ -65,8 +133,12 @@ def display_result(result: TurnResult) -> None:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="The Relay - AI Research Assistant")
     parser.add_argument("--question", help="Ask one question and exit")
-    parser.add_argument(
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument(
         "--json", action="store_true", help="Return one result as JSON; requires --question"
+    )
+    output.add_argument(
+        "--diagnostics", action="store_true", help="Show redacted diagnostics for failed turns"
     )
     parser.add_argument("--env-file", type=Path, default=Path(".env"))
     parser.add_argument("--model", help="Override GROQ_MODEL")
@@ -129,7 +201,9 @@ def main(argv: list[str] | None = None) -> int:
             if args.json:
                 print(json.dumps(result.to_dict(), ensure_ascii=True, indent=2))
             else:
-                display_result(result)
+                api_key = getattr(getattr(assistant.llm, "client", None), "api_key", None)
+                secrets = (api_key,) if isinstance(api_key, str) else ()
+                display_result(result, diagnostics=args.diagnostics, secrets=secrets)
             return result
 
         if args.question is not None:

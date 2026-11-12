@@ -73,6 +73,7 @@ class TurnResult:
     tools: list[dict[str, Any]] = field(default_factory=list)
     stages: list[str] = field(default_factory=list)
     evidence_assessment: dict[str, Any] | None = None
+    answer_coverage: dict[str, Any] | None = None
     metrics: TurnMetrics = field(default_factory=TurnMetrics)
     error: dict[str, Any] | None = None
     failure_diagnostics: dict[str, Any] | None = None
@@ -228,7 +229,7 @@ class ResearchAssistant:
                 result.status = "refused"
             else:
                 result.stages.append("stream_and_validate_claims")
-                parser = ClaimStream(sources, emit)
+                parser = ClaimStream(sources, emit, question=question)
                 request = self.llm.stream(
                     messages, parser.feed, tools=[tool_schema(self.config)], deadline=deadline
                 )
@@ -236,6 +237,7 @@ class ResearchAssistant:
                     raise RelayError(
                         "incomplete_stream", "The answer stream failed during cleanup."
                     )
+                result.stages.append("verify_answer_coverage")
                 parser.finish()
                 result.claims = [claim.to_dict() for claim in parser.claims]
                 result.status = "refused" if parser.refused else "answered"
@@ -259,6 +261,8 @@ class ResearchAssistant:
                 result.answer, result.claims = "", []
             if parser is not None:
                 result.metrics.citation_validation_seconds = parser.validation_seconds
+                if parser.coverage is not None:
+                    result.answer_coverage = asdict(parser.coverage)
                 if parser.failure is not None:
                     result.failure_diagnostics = parser.failure
             result.requests = list(self.llm.records[request_start:])

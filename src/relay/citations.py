@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from retrieval.context import slice_hit
+from retrieval.evidence import AnswerCoverage, assess_answer_coverage, infer_answer_parts
 
 from .errors import RelayError
 from .prompts import REFUSAL
@@ -25,6 +26,14 @@ class CitationValidationError(RelayError):
         super().__init__("citation_validation", message)
         self.source_id = source_id
         self.quote = quote
+
+
+class UnsupportedNumberError(RelayError):
+    def __init__(self, numbers: set[str]) -> None:
+        super().__init__(
+            "unsupported_number", "A claimed number is absent from its supporting quotations."
+        )
+        self.numbers = tuple(sorted(numbers))
 
 
 _FORMAT_TRANSLATION = str.maketrans(
@@ -193,10 +202,9 @@ def validate_claim(value: dict[str, Any], sources: dict[str, EvidenceSource]) ->
                 quoted.text,
             )
         )
-    if not _numbers(text) <= set().union(*(_numbers(c.quote) for c in citations)):
-        raise RelayError(
-            "unsupported_number", "A claimed number is absent from its supporting quotations."
-        )
+    unsupported = _numbers(text) - set().union(*(_numbers(c.quote) for c in citations))
+    if unsupported:
+        raise UnsupportedNumberError(unsupported)
     return Claim(text.strip(), tuple(citations))
 
 
@@ -235,7 +243,13 @@ def _object_end(text: str) -> int | None:
 class ClaimStream:
     """Buffer complete JSON objects, validate each, then publish readable text."""
 
-    def __init__(self, sources: list[EvidenceSource], emit: Callable[[str], None]) -> None:
+    def __init__(
+        self,
+        sources: list[EvidenceSource],
+        emit: Callable[[str], None],
+        *,
+        question: str = "",
+    ) -> None:
         self.sources = {s.source_id: s for s in sources}
         self.emit = emit
         self.buffer = ""
@@ -245,6 +259,8 @@ class ClaimStream:
         self.validation_seconds = 0.0
         self.last_record: dict[str, Any] | None = None
         self.failure: dict[str, Any] | None = None
+        self.coverage_plan = infer_answer_parts(question)
+        self.coverage: AnswerCoverage | None = None
 
     def feed(self, delta: str) -> None:
         self.buffer += delta
@@ -275,6 +291,8 @@ class ClaimStream:
             "source_id": getattr(error, "source_id", None),
             "accepted_claim_count": len(self.claims),
             "accepted_claims": [claim.to_dict() for claim in self.claims],
+            "unsupported_numbers": list(getattr(error, "numbers", ())),
+            "answer_coverage": asdict(self.coverage) if self.coverage is not None else None,
         }
 
     def _consume(self) -> None:
@@ -339,6 +357,20 @@ class ClaimStream:
                 raise RelayError(
                     "incomplete_answer", "The answer did not include its completion marker."
                 )
+            if not self.refused:
+                self.coverage = assess_answer_coverage(
+                    self.coverage_plan,
+                    tuple(
+                        (claim.text, tuple(citation.quote for citation in claim.citations))
+                        for claim in self.claims
+                    ),
+                )
+                if self.coverage.status not in {"complete", "not_required"}:
+                    raise RelayError(
+                        "incomplete_answer",
+                        "The answer does not establish coverage of every requested part. "
+                        "Try asking for each part separately.",
+                    )
         except RelayError as error:
             self._record_failure(error)
             raise

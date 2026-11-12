@@ -287,3 +287,141 @@ def test_model_refusal_does_not_accept_arbitrary_text(source):
     assert output == [
         "The supplied papers do not provide enough evidence to answer that question.\n"
     ]
+
+
+def test_a4_unsupported_number_after_valid_claim_retains_diagnostics(source):
+    quote = "Transformer (big) | 28.4 | 41.8"
+    source = evidence(source, quote)
+    good = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": "Transformer (big) reports 28.4 for English-to-German.",
+    }
+    bad = copy.deepcopy(good)
+    bad["text"] = "The prose reports 41.0 for English-to-French."
+    output = []
+    parser = ClaimStream([source], output.append)
+    parser.feed(json.dumps(good))
+    with pytest.raises(RelayError) as error:
+        parser.feed(json.dumps(bad))
+    assert error.value.code == "unsupported_number"
+    assert len(output) == len(parser.claims) == 1
+    assert parser.failure["unsupported_numbers"] == ["41.0"]
+    assert parser.failure["candidate_record"] == bad
+    assert parser.failure["last_record"] == good
+    assert parser.failure["accepted_claims"][0]["text"] == good["text"]
+
+
+def test_a9_clean_done_cannot_hide_a_missing_question_part(source):
+    quote = "bt = 1{pt ≥0.5}; p1 = 1.0 by definition, ensuring the first boundary."
+    parser = ClaimStream(
+        [evidence(source, quote)],
+        lambda text: None,
+        question="What is the routing threshold and the first-position boundary probability?",
+    )
+    claim = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": "The routing threshold is 0.5.",
+    }
+    parser.feed(json.dumps(claim) + '{"type":"done"}')
+    with pytest.raises(RelayError, match="every requested part") as error:
+        parser.finish()
+    assert error.value.code == "incomplete_answer"
+    assert parser.failure["answer_coverage"]["missing"] == ("first-position boundary probability",)
+    assert parser.failure["accepted_claim_count"] == 1
+
+
+@pytest.mark.parametrize(
+    "row, text",
+    [
+        (
+            "Transformer | 3.62 | T15 | 0.7404 | 0.599",
+            "Transformer reports XWinograd-zh accuracy of 0.599.",
+        ),
+        (
+            "H-Net (2-stage) | 5.81 | T30 | 0.7032 | 0.663",
+            "H-Net (2-stage) reports XWinograd-zh accuracy of 0.663.",
+        ),
+    ],
+)
+def test_a10_exact_table_rows_support_numbers_in_source_notation(source, row, text):
+    claim = {"type": "claim", "evidence": [{"source_id": "S1", "quote": row}], "text": text}
+    assert validate_claim(claim, {"S1": evidence(source, row)}).text == text
+
+
+@pytest.mark.parametrize(
+    "text, quote, code",
+    [
+        ("Accuracy is 59.9%.", "Transformer | 3.62 | T15 | 0.7404 | 0.599", "unsupported_number"),
+        ("Accuracy is 0.599.", "Transformer | 0.599", "citation_validation"),
+        ("Accuracy is 0.699.", "Transformer | 3.62 | T15 | 0.7404 | 0.699", "citation_validation"),
+    ],
+)
+def test_a10_rewritten_numbers_and_noncontiguous_rows_still_fail(source, text, quote, code):
+    source = evidence(source, "Transformer | 3.62 | T15 | 0.7404 | 0.599")
+    claim = {"type": "claim", "evidence": [{"source_id": "S1", "quote": quote}], "text": text}
+    with pytest.raises(RelayError) as error:
+        validate_claim(claim, {"S1": source})
+    assert error.value.code == code
+
+
+def test_a11_caption_is_copied_exactly_even_when_claim_uses_prose(source):
+    caption = "H-Net is 3.6x more data efficient than isotropic model."
+    claim = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": caption}],
+        "text": "The figure reports a data-efficiency factor of 3.6.",
+    }
+    assert validate_claim(claim, {"S1": evidence(source, caption)}).citations[0].quote == caption
+    claim["evidence"][0]["quote"] = "H-Net is 3.6 times more data efficient than isotropic models."
+    with pytest.raises(RelayError, match="absent"):
+        validate_claim(claim, {"S1": evidence(source, caption)})
+
+
+def formula_claim():
+    quote = r"We scale scores by 1/\sqrt{d_k} to avoid tiny gradients."
+    return {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": r"The formula scales scores by 1/\sqrt{d_k}.",
+    }
+
+
+def test_a12_escaped_formula_and_explanation_survive_character_streaming(source):
+    claim = formula_claim()
+    quote = claim["evidence"][0]["quote"]
+    explanation = copy.deepcopy(claim)
+    explanation["text"] = "Scaling avoids tiny gradients."
+    output = []
+    parser = ClaimStream([evidence(source, quote)], output.append)
+    body = json.dumps(claim) + "\n" + json.dumps(explanation) + '\n{"type":"done"}\n'
+    for character in body:
+        parser.feed(character)
+    parser.finish()
+    assert parser.done and len(parser.claims) == 2
+    assert r"1/\sqrt{d_k}" in output[0]
+    assert parser.failure is None
+
+
+@pytest.mark.parametrize("tail", ["\\", r"\n", r"\[", "Unstructured explanation.", chr(96) * 3])
+def test_a12_formula_then_malformed_trailing_content_is_rejected(source, tail):
+    claim = formula_claim()
+    parser = ClaimStream([evidence(source, claim["evidence"][0]["quote"])], lambda text: None)
+    parser.feed(json.dumps(claim) + '\n{"type":"done"}\n')
+    with pytest.raises(RelayError) as error:
+        parser.feed(tail)
+    assert error.value.code == "stream_format"
+    assert parser.failure["stream_suffix"] == tail
+    assert parser.failure["accepted_claims"][0]["text"] == claim["text"]
+
+
+def test_a12_invalid_json_escape_is_not_repaired_or_accepted(source):
+    claim = formula_claim()
+    parser = ClaimStream([evidence(source, claim["evidence"][0]["quote"])], lambda text: None)
+    invalid = json.dumps(claim).replace(r"\\sqrt", r"\sqrt")
+    with pytest.raises(RelayError) as error:
+        parser.feed(invalid)
+    assert error.value.code == "invalid_json"
+    assert parser.failure["raw_record"] == invalid
+    assert not parser.claims

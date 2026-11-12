@@ -6,6 +6,8 @@ import httpx
 import pytest
 
 from relay.orchestrator import ResearchAssistant
+from retrieval.catalog import PAPERS
+from retrieval.models import SourceSpan
 
 
 def responses(payloads, tool_message, claim, *, finish="stop"):
@@ -239,3 +241,144 @@ def test_bad_questions_never_reach_the_api(config, api, research_tool, question)
     result = ResearchAssistant(config, mock.service, research_tool).ask(question)
     assert result.status == "failed" and result.error["code"] == "question"
     assert not mock.received
+
+
+def use_passage(research_tool, source, text, paper_index):
+    paper = PAPERS[paper_index]
+    hit = replace(
+        source.hit,
+        text=text,
+        paper_title=paper.title,
+        arxiv_id=paper.arxiv_id,
+        version=paper.version,
+        pages=(1,),
+        sources=(SourceSpan(1, "Test evidence", 0, len(text)),),
+    )
+    research_tool.pipeline.search = lambda *args, **kwargs: [hit]
+
+
+def recorded_stream(payloads, tool_message, claims, tail='{"type":"done"}'):
+    plan = httpx.Response(200, json=payloads.completion(tool_message, reason="tool_calls"))
+    text = "\n".join(json.dumps(claim) for claim in claims) + "\n" + tail
+    body = payloads.sse([payloads.chunk(text), payloads.chunk(reason="stop", usage=True)])
+    return [plan, httpx.Response(200, text=body, headers={"content-type": "text/event-stream"})]
+
+
+@pytest.mark.parametrize("duplicates", [1, 2])
+def test_a9_original_question_coverage_survives_query_rewrite(
+    config, api, api_payloads, tool_message, research_tool, source, duplicates
+):
+    quote = "bt = 1{pt ≥0.5}; p1 = 1.0 by definition, ensuring the first boundary."
+    use_passage(research_tool, source, quote, 2)
+    claim = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": "The routing threshold is 0.5.",
+    }
+    mock = api(recorded_stream(api_payloads, tool_message, [claim] * duplicates))
+    shown = []
+    question = (
+        "What probability threshold turns H-Net routing scores into chunk boundaries, "
+        "and what boundary probability is forced at the first position?"
+    )
+    result = ResearchAssistant(config, mock.service, research_tool).ask(question, shown.append)
+    assert result.status == "failed" and result.error["code"] == "incomplete_answer"
+    assert shown and not result.answer and not result.claims
+    assert result.answer_coverage["missing"] == ("first-position boundary probability",)
+    assert result.failure_diagnostics["answer_coverage"] == result.answer_coverage
+    assert result.failure_diagnostics["accepted_claim_count"] == duplicates
+    assert len(mock.received) == 2  # No repair request or retry.
+    assert mock.received[1]["messages"][1]["content"] == question
+
+
+def test_one_claim_can_complete_both_requested_parts(
+    config, api, api_payloads, tool_message, research_tool, source
+):
+    quote = "bt = 1{pt ≥0.5}; p1 = 1.0 by definition, ensuring the first boundary."
+    use_passage(research_tool, source, quote, 2)
+    claim = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": "The routing threshold is 0.5; the initial boundary probability is 1.0.",
+    }
+    mock = api(recorded_stream(api_payloads, tool_message, [claim]))
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "What is H-Net's routing threshold and first-position boundary probability?"
+    )
+    assert result.status == "answered", result.error
+    assert len(result.claims) == 1 and len(result.answer_coverage["required"]) == 2
+    assert result.answer_coverage["status"] == "complete"
+    assert result.failure_diagnostics is None
+
+
+def test_unknown_multipart_wording_is_not_automatically_complete(
+    config, api, api_payloads, tool_message, claim, research_tool
+):
+    mock = api(recorded_stream(api_payloads, tool_message, [claim]))
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "What is Moshi's practical latency, and who designed its training curriculum?"
+    )
+    assert result.status == "failed" and result.error["code"] == "incomplete_answer"
+    assert result.answer_coverage["status"] == "unrecognized"
+    assert result.answer_coverage["unrecognized"]
+    assert not result.answer and not result.claims
+
+
+def test_multipart_refusal_does_not_require_inventing_missing_parts(
+    config, api, api_payloads, tool_message, research_tool
+):
+    mock = api(recorded_stream(api_payloads, tool_message, [{"type": "refusal"}]))
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "What is Moshi's practical latency and training cost?"
+    )
+    assert result.status == "refused" and not result.claims
+    assert result.answer_coverage is None
+
+
+def test_a4_numeric_failure_keeps_partial_output_out_of_final_answer(
+    config, api, api_payloads, tool_message, research_tool, source
+):
+    quote = "Transformer (big) | 28.4 | 41.8"
+    use_passage(research_tool, source, "BLEU scores:\n" + quote, 0)
+    good = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": "Transformer (big) reports 28.4 for English-to-German.",
+    }
+    bad = copy.deepcopy(good)
+    bad["text"] = "The prose reports 41.0 for English-to-French."
+    mock = api(recorded_stream(api_payloads, tool_message, [good, bad]))
+    shown = []
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "What BLEU scores does Transformer (big) report for English-to-German "
+        "and English-to-French?",
+        shown.append,
+    )
+    assert result.status == "failed" and result.error["code"] == "unsupported_number"
+    assert len(shown) == 1 and not result.answer and not result.claims
+    assert result.failure_diagnostics["unsupported_numbers"] == ["41.0"]
+    assert result.failure_diagnostics["accepted_claims"][0]["text"] == good["text"]
+
+
+@pytest.mark.parametrize("tail, status", [('{"type":"done"}', "answered"), ("\\", "failed")])
+def test_a12_formula_stream_completion_is_required(
+    config, api, api_payloads, tool_message, research_tool, source, tail, status
+):
+    quote = r"We scale scores by 1/\sqrt{d_k} to avoid tiny gradients."
+    use_passage(research_tool, source, quote, 0)
+    claim = {
+        "type": "claim",
+        "evidence": [{"source_id": "S1", "quote": quote}],
+        "text": r"Scaling by 1/\sqrt{d_k} avoids tiny gradients.",
+    }
+    mock = api(recorded_stream(api_payloads, tool_message, [claim], tail))
+    result = ResearchAssistant(config, mock.service, research_tool).ask(
+        "Why does scaled dot-product attention divide by the square root of the key dimension?"
+    )
+    assert result.status == status, result.error
+    if status == "failed":
+        assert result.error["code"] == "stream_format"
+        assert not result.answer and not result.claims
+        assert result.failure_diagnostics["stream_suffix"] == "\\"
+    else:
+        assert r"1/\sqrt{d_k}" in result.answer

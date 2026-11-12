@@ -1,0 +1,620 @@
+{
+  "generated_utc": "2026-11-12T06:45:59.836394+00:00",
+  "started_utc": "2026-11-12T06:45:09.213864+00:00",
+  "finished_utc": "2026-11-12T06:45:59.836394+00:00",
+  "measurement_type": "real_groq_end_to_end_phase5_3",
+  "simulated": false,
+  "model": "openai/gpt-oss-20b",
+  "prompt_version": "relay-phase3-v2",
+  "conditions": {
+    "strategy": "bm25",
+    "preset": 600,
+    "evidence_tokens": 3000,
+    "temperature": 0,
+    "seed": 0,
+    "attempts_per_question": 1
+  },
+  "questions_requested": [
+    "A2",
+    "A4",
+    "A8",
+    "A9",
+    "A10",
+    "A11",
+    "A12"
+  ],
+  "questions_processed": [
+    "A2",
+    "A4",
+    "A8"
+  ],
+  "run_status": "stopped",
+  "stopped_reason": "rate_limit: Groq rate limit reached. Wait before trying again.",
+  "results": [
+    {
+      "id": "A2",
+      "category": "answerable",
+      "question": "Which optimizer and beta values were used to train the Transformer, and how many learning-rate warmup steps were used?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": null,
+      "status": "answered",
+      "answer": "The Transformer was trained with the Adam optimizer, using β1 = 0.9 and β2 = 0.98, and the learning‑rate schedule employed 4000 warmup steps. [S1]",
+      "claims": [
+        {
+          "text": "The Transformer was trained with the Adam optimizer, using β1 = 0.9 and β2 = 0.98, and the learning‑rate schedule employed 4000 warmup steps.",
+          "citations": [
+            {
+              "source_id": "S1",
+              "paper_title": "Attention Is All You Need",
+              "arxiv_id": "1706.03762",
+              "version": 7,
+              "pages": [
+                7
+              ],
+              "source_url": "https://arxiv.org/pdf/1706.03762v7#page=7",
+              "chunk_id": "10756f19bc1d360711b8f7e74b4c5ec9ae55fec784d217f073162c7d4b57bbf4",
+              "char_start": 21093,
+              "quote": "We used the Adam optimizer [20] with β1 = 0.9, β2 = 0.98 and ε = 10^{−9}. We varied the learning\nrate over the course of training, according to the formula:\n\nlrate = d^{−0.5}\n\nmodel ^{·min(step_num−0.5, step_num·warmup_steps−1.5)}\n(3)\n\nThis corresponds to increasing the learning rate linearly for the first warmup_steps training steps,\nand decreasing it thereafter proportionally to the inverse square root of the step number. We used\nwarmup_steps = 4000."
+            }
+          ]
+        }
+      ],
+      "supporting": {
+        "papers": [
+          "Attention Is All You Need"
+        ],
+        "pages": [
+          "arXiv:1706.03762 p. 7"
+        ],
+        "labels": [
+          "Attention Is All You Need (arXiv:1706.03762v7, p. 7)"
+        ]
+      },
+      "citation_validation": {
+        "status": "valid",
+        "claim_count": 1,
+        "citation_count": 1,
+        "quotes_present": true,
+        "numbers_supported": true,
+        "errors": []
+      },
+      "citations": [
+        {
+          "source_id": "S1",
+          "paper_title": "Attention Is All You Need",
+          "arxiv_id": "1706.03762",
+          "version": 7,
+          "pages": [
+            7
+          ],
+          "source_url": "https://arxiv.org/pdf/1706.03762v7#page=7",
+          "quote": "We used the Adam optimizer [20] with β1 = 0.9, β2 = 0.98 and ε = 10^{−9}. We varied the learning\nrate over the course of training, according to the formula:\n\nlrate = d^{−0.5}\n\nmodel ^{·min(step_num−0.5, step_num·warmup_steps−1.5)}\n(3)\n\nThis corresponds to increasing the learning rate linearly for the first warmup_steps training steps,\nand decreasing it thereafter proportionally to the inverse square root of the step number. We used\nwarmup_steps = 4000.",
+          "label": "Attention Is All You Need (arXiv:1706.03762v7, p. 7)"
+        }
+      ],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 42275.984,
+        "ttft_ms": 42269.248,
+        "generation_first_token_ms": 1179.455,
+        "retrieval_ms": 40416.505,
+        "evidence_selection_ms": 23.247,
+        "citation_validation_ms": 1.077,
+        "planning_ms": 398.221,
+        "generation_ms": 1437.516,
+        "input_tokens": 3638,
+        "output_tokens": 290,
+        "known_input_tokens": 3638,
+        "known_output_tokens": 290,
+        "evidence_tokens": 1785,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_bba9020b-22b7-4e1a-8eb1-374be7a687bf",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "10756f19bc1d360711b8f7e74b4c5ec9ae55fec784d217f073162c7d4b57bbf4",
+            "799e01ddd16172aaccc4c2c7b6ad1d0772c4ea57cc1bae46def9c1e79e4cdfa8",
+            "f640512fc42494ddd5c1d6e9eb7f658d43880eb80e163c36b12ea14c637af1e2",
+            "e3cfb32fddf4d013d16807b75207bfc592f260d57768a6f468f6cf93701f8f03"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-12T06:45:09.582670+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m7781k0yez28w7djvc8znhqz",
+          "completion_id": "chatcmpl-f1f1df95-0e4e-4751-8c31-228fd00ee478",
+          "finish_reason": "tool_calls",
+          "input_tokens": 461,
+          "output_tokens": 44,
+          "total_tokens": 505,
+          "duration_seconds": 0.3982207999997627,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 3014,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-12T06:45:50.421160+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m7782tqcearbj6w9f7y0mxn3",
+          "completion_id": "chatcmpl-4c267d70-4508-4a05-b1bd-57d2f4d64f3c",
+          "finish_reason": "stop",
+          "input_tokens": 3177,
+          "output_tokens": 246,
+          "total_tokens": 3423,
+          "duration_seconds": 1.4375155999996423,
+          "first_token_seconds": 1.1794554999996762,
+          "prompt_budget_upper_bound": 13536,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": null
+        }
+      ],
+      "error": null,
+      "failure_diagnostics": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "answered",
+          "error_code": null,
+          "retryable": false,
+          "failure_diagnostics": null,
+          "elapsed_seconds": 42.276
+        }
+      ],
+      "behavior_matches_expectation": true,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": "",
+      "prompt_version": "relay-phase3-v2"
+    },
+    {
+      "id": "A4",
+      "category": "answerable",
+      "question": "According to Table 2, what BLEU scores does Transformer (big) report for English-to-German and English-to-French?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:1706.03762v7",
+      "note": "The prose and table contain a known EN-FR discrepancy; the interface should not silently hide a source conflict.",
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 1295.449,
+        "ttft_ms": 1295.189,
+        "generation_first_token_ms": 541.843,
+        "retrieval_ms": 105.724,
+        "evidence_selection_ms": 21.859,
+        "citation_validation_ms": 1.26,
+        "planning_ms": 516.686,
+        "generation_ms": 650.777,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 465,
+        "known_output_tokens": 57,
+        "evidence_tokens": 1601,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_88bdcaf1-6c8d-4ff8-9036-b3f5ff2e5223",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "083f8af225205118e3b7fd44bcde9911b7e27cf3594f7993c3ad70da1b6155e3",
+            "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+            "549782c834b6366f535db1176c53aab83a55d43ed209455e95be0eaeb0a464cf",
+            "5b2ba86c3a2ae79623391890b5e673d8d642cd9a9795640a94a2e6ead8544e2c"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-12T06:45:54.860008+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m7782z17ebxr7mk06wan7ynt",
+          "completion_id": "chatcmpl-4843dbc2-d803-489e-95fc-5462bb3e3414",
+          "finish_reason": "tool_calls",
+          "input_tokens": 465,
+          "output_tokens": 57,
+          "total_tokens": 522,
+          "duration_seconds": 0.5166857999993226,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 3009,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-12T06:45:55.504476+00:00",
+          "status": "failed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m7782znmew1aky0z4tf1ebyy",
+          "completion_id": "chatcmpl-d2d048e9-184c-42a5-8910-993981bfebb0",
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 0.6507774000001518,
+          "first_token_seconds": 0.541843300000437,
+          "prompt_budget_upper_bound": 13371,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "stream_format"
+        }
+      ],
+      "error": {
+        "code": "stream_format",
+        "message": "Expected a structured answer object.",
+        "retryable": false,
+        "status_code": null,
+        "retry_after_seconds": null
+      },
+      "failure_diagnostics": {
+        "error": {
+          "code": "stream_format",
+          "message": "Expected a structured answer object.",
+          "retryable": false,
+          "status_code": null,
+          "retry_after_seconds": null
+        },
+        "stream_suffix": "\\",
+        "raw_record": null,
+        "candidate_record": null,
+        "last_record": {
+          "type": "claim",
+          "text": "Transformer (big) reports a BLEU score of 28.4 for English-to-German and 41.8 for English-to-French.",
+          "evidence": [
+            {
+              "source_id": "S2",
+              "quote": "Transformer (big) | 28.4 | 41.8 | 2.3 · 10^{19}"
+            }
+          ]
+        },
+        "rejected_quote": null,
+        "source_id": null,
+        "accepted_claim_count": 1,
+        "accepted_claims": [
+          {
+            "text": "Transformer (big) reports a BLEU score of 28.4 for English-to-German and 41.8 for English-to-French.",
+            "citations": [
+              {
+                "source_id": "S2",
+                "paper_title": "Attention Is All You Need",
+                "arxiv_id": "1706.03762",
+                "version": 7,
+                "pages": [
+                  8
+                ],
+                "source_url": "https://arxiv.org/pdf/1706.03762v7#page=8",
+                "chunk_id": "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+                "char_start": 22422,
+                "quote": "Transformer (big) | 28.4 | 41.8 | 2.3 · 10^{19"
+              }
+            ]
+          }
+        ]
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "stream_format",
+          "retryable": false,
+          "failure_diagnostics": {
+            "error": {
+              "code": "stream_format",
+              "message": "Expected a structured answer object.",
+              "retryable": false,
+              "status_code": null,
+              "retry_after_seconds": null
+            },
+            "stream_suffix": "\\",
+            "raw_record": null,
+            "candidate_record": null,
+            "last_record": {
+              "type": "claim",
+              "text": "Transformer (big) reports a BLEU score of 28.4 for English-to-German and 41.8 for English-to-French.",
+              "evidence": [
+                {
+                  "source_id": "S2",
+                  "quote": "Transformer (big) | 28.4 | 41.8 | 2.3 · 10^{19}"
+                }
+              ]
+            },
+            "rejected_quote": null,
+            "source_id": null,
+            "accepted_claim_count": 1,
+            "accepted_claims": [
+              {
+                "text": "Transformer (big) reports a BLEU score of 28.4 for English-to-German and 41.8 for English-to-French.",
+                "citations": [
+                  {
+                    "source_id": "S2",
+                    "paper_title": "Attention Is All You Need",
+                    "arxiv_id": "1706.03762",
+                    "version": 7,
+                    "pages": [
+                      8
+                    ],
+                    "source_url": "https://arxiv.org/pdf/1706.03762v7#page=8",
+                    "chunk_id": "29994b38f51903c660f58914338c39b7c62239d6332881699eb8394efee3d660",
+                    "char_start": 22422,
+                    "quote": "Transformer (big) | 28.4 | 41.8 | 2.3 · 10^{19"
+                  }
+                ]
+              }
+            ]
+          },
+          "elapsed_seconds": 1.295
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": "",
+      "known_source_conflict": {
+        "description": "Attention Is All You Need reports English-to-French BLEU 41.8 in Table 2 and 41.0 in the prose on physical page 8. The conflict must not be silently hidden or resolved by inventing a third value.",
+        "table_2": {
+          "page": 8,
+          "english_to_german": 28.4,
+          "english_to_french": 41.8,
+          "verified_quote": "Transformer (big) | 28.4 | 41.8"
+        },
+        "prose": {
+          "page": 8,
+          "english_to_french": 41.0,
+          "verified_quote": "our big model achieves a BLEU score of 41.0, outperforming all of the previously published single models"
+        },
+        "provenance": "reports/rag/audit-2026-11-11/questions.json (A2) and direct PDF page 8 check",
+        "review_requirement": "Identify the discrepancy explicitly in the final review.",
+        "answer_mentions_28_4": false,
+        "answer_mentions_41_8": false,
+        "answer_mentions_41_0": false,
+        "exposes_both_values": false
+      },
+      "prompt_version": "relay-phase3-v2",
+      "phase5_3_fact_check": {
+        "mentions_41_8": false,
+        "mentions_41_0": false,
+        "mentions_table_2": false,
+        "mentions_prose": false,
+        "exposes_both_values": false
+      }
+    },
+    {
+      "id": "A8",
+      "category": "answerable",
+      "question": "How does H-Net replace handcrafted tokenization with learned dynamic chunking?",
+      "expected_behavior": "answer",
+      "relevant_paper": "arXiv:2507.07955v2",
+      "note": null,
+      "status": "failed",
+      "answer": "",
+      "claims": [],
+      "supporting": {
+        "papers": [],
+        "pages": [],
+        "labels": []
+      },
+      "citation_validation": {
+        "status": "not_applicable_failed",
+        "claim_count": 0,
+        "citation_count": 0,
+        "quotes_present": false,
+        "numbers_supported": false,
+        "errors": []
+      },
+      "citations": [],
+      "evidence_assessment": {
+        "status": "candidate_evidence",
+        "reason": "Cited passages pass the requested literal constraints; this does not establish full answer entailment.",
+        "missing": []
+      },
+      "metrics": {
+        "total_ms": 681.792,
+        "ttft_ms": null,
+        "generation_first_token_ms": null,
+        "retrieval_ms": 103.496,
+        "evidence_selection_ms": 22.902,
+        "citation_validation_ms": 0.0,
+        "planning_ms": 506.626,
+        "generation_ms": 48.434,
+        "input_tokens": null,
+        "output_tokens": null,
+        "known_input_tokens": 452,
+        "known_output_tokens": 47,
+        "evidence_tokens": 1794,
+        "tool_calls": 1
+      },
+      "tools": [
+        {
+          "call_id": "fc_6c1916fa-ae5b-4733-a466-0279ead2083b",
+          "name": "search_research_papers",
+          "strategy": "bm25",
+          "preset": 600,
+          "status": "evidence",
+          "retrieved_chunk_ids": [
+            "f4a748fc7969923162e5815160c86c89be40b06a722a6e2241c4aac752cacf65",
+            "3a46d8836b14242d419dc2c83acaa685b027d0b582fc2e5dccd94b40d23d182e",
+            "837e1069b52cd75b8a89c593f346322c6c2153d54c40418ecf624c6724f1be94",
+            "e4fd972041f7f67d2fb723d3a3811031d8fc8e7ede8e02d36c27b8568f6d3c48"
+          ]
+        }
+      ],
+      "stages": [
+        "classify",
+        "plan_tool_call",
+        "execute_retrieval",
+        "select_and_assess_evidence",
+        "stream_and_validate_claims",
+        "finalize"
+      ],
+      "requests": [
+        {
+          "stage": "planning",
+          "model": "openai/gpt-oss-20b",
+          "streaming": false,
+          "started_utc": "2026-11-12T06:45:59.155694+00:00",
+          "status": "completed",
+          "provider_model": "openai/gpt-oss-20b",
+          "request_id": "req_01m7783381ettv5fsecwmp9s6y",
+          "completion_id": "chatcmpl-3a30930b-b4da-45ed-bf17-d69ace31f17c",
+          "finish_reason": "tool_calls",
+          "input_tokens": 452,
+          "output_tokens": 47,
+          "total_tokens": 499,
+          "duration_seconds": 0.5066258999995625,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 2974,
+          "max_output_tokens": 768,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [
+            "search_research_papers"
+          ],
+          "error_code": null
+        },
+        {
+          "stage": "generation",
+          "model": "openai/gpt-oss-20b",
+          "streaming": true,
+          "started_utc": "2026-11-12T06:45:59.788995+00:00",
+          "status": "failed",
+          "provider_model": null,
+          "request_id": null,
+          "completion_id": null,
+          "finish_reason": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "total_tokens": null,
+          "duration_seconds": 0.04843449999953009,
+          "first_token_seconds": null,
+          "prompt_budget_upper_bound": 15382,
+          "max_output_tokens": 2048,
+          "timeout_seconds": 40.0,
+          "temperature": 0.0,
+          "seed": 0,
+          "tool_names": [],
+          "error_code": "rate_limit"
+        }
+      ],
+      "error": {
+        "code": "rate_limit",
+        "message": "Groq rate limit reached. Wait before trying again.",
+        "retryable": true,
+        "status_code": 429,
+        "retry_after_seconds": 11.0
+      },
+      "failure_diagnostics": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "failed",
+          "error_code": "rate_limit",
+          "retryable": true,
+          "failure_diagnostics": null,
+          "elapsed_seconds": 0.682
+        }
+      ],
+      "behavior_matches_expectation": false,
+      "grade_status": "pending_manual_review",
+      "provisional_grade": null,
+      "final_grade": "",
+      "prompt_version": "relay-phase3-v2"
+    }
+  ],
+  "stopped_after": "A8",
+  "not_attempted": [
+    "A9",
+    "A10",
+    "A11",
+    "A12"
+  ],
+  "stop_condition": {
+    "error_code": "rate_limit",
+    "http_status": 429,
+    "retry_after_seconds": 11.0
+  }
+}

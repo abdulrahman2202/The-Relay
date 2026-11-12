@@ -1,6 +1,8 @@
 """Versioned instructions; evidence remains data at tool-message priority."""
 
-PROMPT_VERSION = "relay-phase3-v2"
+import json
+
+PROMPT_VERSION = "relay-phase3-v3"
 REFUSAL = "The supplied papers do not provide enough evidence to answer that question."
 
 SYSTEM = """You are The Relay, a research assistant. Your ONLY factual sources are:
@@ -19,40 +21,109 @@ Never output internal reasoning. The application supplies authoritative paper ti
 arXiv version and physical page citations from the source identifiers you select.
 """
 
-ANSWER = (
-    """Answer the ORIGINAL user question using only the following tool evidence.
-Output JSON Lines: one compact JSON object per line, without Markdown fences or headings.
-Every claim MUST be its own complete JSON object. Never write prose, bullets, equations,
-headings, conflict explanations or a bare quotation outside a JSON object.
-For each directly supported claim, emit:
-"""
-    '{"type":"claim","text":"A concise supported statement.",'
-    '"evidence":[{"source_id":"S1",'
-    '"quote":"An exact supporting quotation copied from source S1."}]}\n'
-    """
-Use 1-6 claims, at most 3 evidence items per claim. Quotes must be 12-1200 characters
-and support the WHOLE claim. Copy the evidence exactly, including table separators (|),
-superscript markers (^{...}), line breaks, and Unicode symbols. Formatting-only differences
-are tolerated for whitespace, table pipes, superscript braces/carets, line-break
-hyphenation, slash-style fractions, and Unicode minus/multiplication/arrows, but never
-paraphrase or change words, numbers, signs or units. Keep numbers in the source's
-units/notation; do not derive new numbers or convert units. Distinguish models and
-metrics. The text must not contain citations, URLs or source IDs: the application adds them.
-For a multi-part question, emit one claim per part. For a source conflict, emit a separate
-structured claim for each conflicting value, each with its own exact quote; do not explain
-the conflict in prose. Do not output extra keys. If a fully supported answer is unavailable,
-emit ONLY:
-{"type":"refusal"}
-After the claims OR refusal, emit {"type":"done"} on its own line. Emit done only after
-all claims or the refusal. Do not mix claims and refusal. Do not repeat the question or
-add unsupported background.
-Format examples (illustrative values, not evidence):
-"""
-    '{"type":"claim","text":"The table reports 12.5 for model A.",'
-    '"evidence":[{"source_id":"S1","quote":"Model A | 12.5 | 0.91"}]}\n'
-    '{"type":"claim","text":"The prose reports 12.0 for model A.",'
-    '"evidence":[{"source_id":"S2","quote":"model A reaches 12.0 in the prose"}]}\n'
-    '{"type":"claim","text":"The coefficient is 10^{−9}.",'
-    '"evidence":[{"source_id":"S1","quote":"coefficient = 10^{−9}"}]}\n'
-    '{"type":"done"}\n'
+
+def _example(name: str, sources: dict[str, str], claims: tuple[tuple[str, str], ...]) -> str:
+    # Serialize the examples with the same JSON escaping required of the model.
+    lines = [f"Example: {name}"]
+    lines.extend(
+        f"Source {identifier}: {json.dumps(quote, ensure_ascii=False)}"
+        for identifier, quote in sources.items()
+    )
+    for identifier, text in claims:
+        lines.append(
+            json.dumps(
+                {
+                    "type": "claim",
+                    "evidence": [{"source_id": identifier, "quote": sources[identifier]}],
+                    "text": text,
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        )
+    return "\n".join([*lines, '{"type":"done"}', ""])
+
+
+ANSWER = r"""Answer the ORIGINAL user question using only the following tool evidence.
+Before emitting anything, identify every requested part and locate its source support.
+If any part has no support, emit only a refusal followed by done; never fill a gap.
+For each claim, FIRST copy its exact source quotation into evidence, THEN compose text
+using only that quotation. Output the keys in this order: type, evidence, text.
+Never paraphrase inside quote fields. Copy contiguous source spans, including table
+separators, signs, superscripts, units, punctuation, and Unicode characters.
+Keep exact numerical notation: do not convert decimals to percentages, convert units,
+round values, or introduce numbers from memory. Every number in text must occur in
+that claim's own quotations. Table/page numbers are also numbers; omit such labels
+unless their numbers are supported by the quoted caption or header.
+For numeric tables, quote the relevant header and complete row so the model, metric,
+column, and value remain identifiable. Do not splice nonadjacent cells into a quotation.
+For figures, copy the caption or label exactly; paraphrasing is allowed only in text.
+
+Output JSON Lines, one complete compact JSON object per physical line. Use 1-6 claims
+with 1-3 evidence items each; quotations must be 12-1200 characters. Use only the keys
+type, evidence, text for claims, and source_id, quote for evidence items.
+Name each requested quantity explicitly with its value. A fact mentioned only in a
+quotation is not an answer to that part. Multiple claims about one part do not cover
+another part. For a why question, supply the supported explanation, not only a formula.
+For conflicting sources, emit separate claims with separate exact quotations and name
+the table/prose distinction. Preserve both conflicting values without choosing one.
+No citations, URLs, or source IDs belong in text; the application adds citations.
+
+Equations and explanations MUST stay inside JSON string values. Escape each literal
+backslash as \\ and each embedded line break as \n inside a JSON string; escape quotes
+as \". Never put raw line breaks inside a string or a bare backslash between objects.
+Never output prose, headings, equations, Markdown fences, or extra keys outside JSON.
+If a fully supported answer is unavailable, emit {"type":"refusal"}.
+After ALL supported parts, or after the refusal, emit {"type":"done"} on its own line.
+Emit done exactly once. Do not mix claims and refusal. After done, output nothing
+except whitespace. A completion marker does not make an incomplete answer complete.
+Do not output internal reasoning or the sources/examples below as standalone records.
+
+Format examples (synthetic values and passages, NEVER evidence for the user's question):
+""" + "\n".join(
+    (
+        _example(
+            "numeric table",
+            {"S1": "Model | Accuracy | Cost\nModel A | 0.875 | 12.0"},
+            (("S1", "Model A has an accuracy of 0.875."),),
+        ),
+        _example(
+            "conflicting source values",
+            {
+                "S1": "Model | Score\nModel A | 12.5",
+                "S2": "The prose reports a score of 12.0 for Model A.",
+            },
+            (
+                ("S1", "The table reports a score of 12.5 for Model A."),
+                ("S2", "The prose reports a score of 12.0 for Model A."),
+            ),
+        ),
+        _example(
+            "exact figure caption",
+            {"S1": "Model A uses 2.4x less data than Model B."},
+            (("S1", "The figure reports 2.4x less data for Model A than Model B."),),
+        ),
+        _example(
+            "formula and explanation",
+            {
+                "S1": r"The scores are scaled by 1/\sqrt{m}.",
+                "S2": "Scaling avoids saturation and the resulting tiny gradients.",
+            },
+            (
+                ("S1", r"The scaling formula is 1/\sqrt{m}."),
+                ("S2", "Scaling avoids saturation and the resulting tiny gradients."),
+            ),
+        ),
+        _example(
+            "both parts of a boundary-probability question",
+            {
+                "S1": "A boundary is selected when pt >=0.25.",
+                "S2": "p1 = 0.8 is the initial boundary probability.",
+            },
+            (
+                ("S1", "The routing threshold is 0.25."),
+                ("S2", "The initial boundary probability is 0.8."),
+            ),
+        ),
+    )
 )
